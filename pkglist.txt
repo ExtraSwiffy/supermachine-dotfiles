@@ -18,6 +18,7 @@ dolphin
 dunst
 efibootmgr
 eww
+fastfetch
 feh
 firefox
 gamemode
