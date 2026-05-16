@@ -13,6 +13,7 @@ btop
 code
 conky
 ddcutil
+dkms
 dolphin
 dunst
 efibootmgr
@@ -29,6 +30,7 @@ lib32-vulkan-radeon
 libnotify
 linux-firmware
 linux-lts
+linux-lts-headers
 lxappearance
 mangohud
 mesa-utils
@@ -58,6 +60,8 @@ steam
 terminus-font
 tint2
 ttf-jetbrains-mono-nerd
+virtualbox
+virtualbox-host-dkms
 vulkan-radeon
 vulkan-tools
 wget
@@ -65,6 +69,7 @@ wine-staging
 winetricks
 wireplumber
 wmctrl
+woff2-font-awesome
 xf86-video-amdgpu
 xorg-server
 xorg-xinit
