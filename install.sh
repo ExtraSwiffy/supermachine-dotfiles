@@ -8,6 +8,9 @@ echo "Creating config folders..."
 
 mkdir -p ~/.config
 mkdir -p ~/Pictures/wallpapers
+mkdir -p ~/.icons
+mkdir -p ~/.config/gtk-3.0
+mkdir -p ~/.config/gtk-4.0
 
 echo "Copying wallpaper..."
 
@@ -19,9 +22,20 @@ cp -r eww ~/.config/
 cp -r openbox ~/.config/
 cp -r rofi ~/.config/
 cp -r picom ~/.config/
+cp -r alacritty ~/.config/
 
 cp .fehbg ~/
 cp -r .screenlayout ~/
+
+echo "Copying cursor theme..."
+
+cp -r icons/ArchCursor ~/.icons/
+
+cp .Xresources ~/
+xrdb ~/.Xresources
+
+cp gtk-3.0/settings.ini ~/.config/gtk-3.0/
+cp gtk-4.0/settings.ini ~/.config/gtk-4.0/
 
 echo "Making scripts executable..."
 
