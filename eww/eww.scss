@@ -1,0 +1,142 @@
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font";
+}
+
+.sidebar {
+  background: rgba(15, 15, 15, 0.35);
+  padding: 25px 0px;
+  margin: 0px;
+  min-width: 90px;
+}
+
+.launcher {
+  font-size: 54px;
+  color: #88C0D0;
+  padding: 0px;
+  margin: 0px;
+  margin-left: -20px;
+  min-width: 90px;
+}
+
+.launcher:hover {
+  color: #ffffff;
+}
+
+.workspace {
+  font-size: 22px;
+  color: #555555;
+}
+
+.workspace-active {
+  font-size: 32px;
+  color: #88C0D0;
+}
+
+.clock {
+  font-size: 20px;
+  color: #88C0D0;
+  min-width: 80px;
+}
+
+.ampm {
+  font-size: 13px;
+  color: #777777;
+  min-width: 80px;
+}
+
+.settings-button {
+  font-size: 24px;
+  color: #777777;
+}
+
+.settings-button:hover {
+  color: #88C0D0;
+}
+
+.controlcenter {
+  background: rgba(15, 15, 15, 0.35);
+  border-radius: 22px;
+  padding: 20px;
+  min-width: 300px;
+}
+
+.control-title {
+  font-size: 17px;
+  color: #88C0D0;
+  margin-bottom: 50px;
+}
+
+.control-sub-title {
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom:  60px;
+}
+
+.toggle-circle-on,
+.toggle-circle-off {
+  border-radius: 999px;
+
+  min-width: 45px;
+  min-height: 45px;
+
+  padding: 0px;
+
+  font-size: 16px;
+}
+
+.toggle-circle-on {
+  background: rgba(136, 192, 208, 0.28);
+  color: #88C0D0;
+}
+
+.toggle-circle-off {
+  background: rgba(255, 255, 255, 0.06);
+  color: #777777;
+}
+
+.toggle-circle-on:hover {
+  background: rgba(136, 192, 208, 0.45);
+  color: #ffffff;
+}
+
+.toggle-circle-off:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #cccccc;
+}
+
+.slider-label {
+  color: #88C0D0;
+  font-size: 12px;
+  margin-top: 0px;
+  margin-bottom: -50px;
+}
+
+.quick-slider trough {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  min-height: 6px;
+}
+
+.quick-slider highlight {
+  background: #88C0D0;
+  border-radius: 999px;
+}
+
+.quick-slider slider {
+  background: #88C0D0;
+  border-radius: 999px;
+  min-width: 10px;
+  min-height: 10px;
+}
+
+.sys-title {
+  color: #88C0D0;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.sys-info {
+  color: #bbbbbb;
+  font-size: 11px;
+}

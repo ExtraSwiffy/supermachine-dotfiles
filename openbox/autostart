@@ -1,0 +1,13 @@
+~/.screenlayout/monitors.sh &
+
+~/.fehbg &
+alacritty &
+picom &
+nm-applet &
+kdeconnectd &
+
+killall eww &
+eww daemon &
+
+sleep 1
+eww open sidebar &

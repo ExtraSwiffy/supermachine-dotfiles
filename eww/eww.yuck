@@ -1,0 +1,182 @@
+(defpoll CLOCK_TIME :interval "1s" "date '+%I:%M'")
+(defpoll CLOCK_AMPM :interval "5s" "date '+%p'")
+(defpoll CURRENT_WS :interval "1s" "wmctrl -d | awk '/\\*/ {print $1 + 1}'")
+
+(defpoll CPU_USAGE :interval "2s" "top -bn1 | grep 'Cpu(s)' | awk '{print int($2)}'")
+(defpoll CPU_FREQ :interval "2s" "grep 'cpu MHz' /proc/cpuinfo | head -1 | awk '{print int($4)}'")
+(defpoll RAM_USAGE :interval "2s" "free | awk '/Mem:/ {print int($3/$2 * 100)}'")
+(defpoll GPU_USAGE :interval "2s" "cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0")
+(defpoll CPU_TEMP :interval "5s" "sensors | awk '/Tctl:/ {print int($2)}' | tr -d '+'")
+
+(defpoll PERF_STATE :interval "1s" "powerprofilesctl get | grep -q performance && echo on || echo off")
+(defpoll GAME_STATE :interval "1s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
+(defpoll VOLUME :interval "1s" "pamixer --get-volume")
+(defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs")
+
+(defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
+
+(defwindow sidebar
+  :monitor 0
+  :exclusive true
+  :reserve (struts :side "left" :distance "90px")
+  :stacking "fg"
+
+  :geometry (geometry
+    :x "0px"
+    :y "0px"
+    :width "90px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :halign "fill"
+    :valign "fill"
+    :vexpand true
+    :hexpand true
+    :class "sidebar"
+
+    (box
+      :orientation "v"
+      :spacing 18
+      :halign "center"
+      :valign "start"
+
+      (button :class {CURRENT_WS == "1" ? "workspace-active" : "workspace"} :onclick "wmctrl -s 0" "•")
+      (button :class {CURRENT_WS == "2" ? "workspace-active" : "workspace"} :onclick "wmctrl -s 1" "•")
+      (button :class {CURRENT_WS == "3" ? "workspace-active" : "workspace"} :onclick "wmctrl -s 2" "•")
+      (button :class {CURRENT_WS == "4" ? "workspace-active" : "workspace"} :onclick "wmctrl -s 3" "•")
+    )
+
+    (box
+      :orientation "v"
+      :halign "center"
+      :valign "center"
+      :vexpand true
+
+      (button
+        :class "launcher"
+        :halign "center"
+        :onclick "bash -c 'sleep 0.1; rofi -show drun &'"
+        "")
+    )
+
+    (box
+      :orientation "v"
+      :halign "center"
+      :valign "end"
+      :spacing 8
+
+      (label :class "clock" :text CLOCK_TIME)
+      (label :class "ampm" :text CLOCK_AMPM)
+
+      (button
+        :class "settings-button"
+        :onclick "eww open --toggle controlcenter"
+        "󰒓")
+    )
+  )
+)
+
+(defwindow controlcenter
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "105px"
+    :y "-20px"
+    :width "200px"
+    :height "340px"
+    :anchor "bottom left")
+
+  (box
+    :orientation "v"
+    :class "controlcenter"
+    :spacing -40
+
+    (label
+      :class "control-title"
+      :text "SuperMachine Panel")
+
+    (label
+      :class "control-sub-title"
+      :text "JESUS FIRST")
+
+    (box
+      :orientation "h"
+      :spacing 6
+      :halign "center"
+      :valign "center"
+
+      (button
+        :class {PERF_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}
+        :tooltip "Performance Mode"
+        :onclick "~/.config/eww/scripts/toggle-performance.sh"
+        "󰓅")
+
+      (button
+        :class {GAME_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}
+        :tooltip "Game Mode"
+        :onclick "~/.config/eww/scripts/toggle-gamemode.sh"
+        "󰊴")
+
+      (button
+  :class {NIGHT_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}
+  :tooltip "Night Mode"
+  :onclick "~/.config/eww/scripts/toggle-nightmode.sh"
+  "󰖔")
+  
+      (button :class "toggle-circle-off" :tooltip "Bluetooth" :onclick "" "󰂯"))
+
+    (box
+      :orientation "h"
+      :spacing 6
+      :halign "center"
+      :valign "center"
+
+      (button :class "toggle-circle-on"  :tooltip "Wi-Fi" :onclick "" "󰖩")
+      (button :class "toggle-circle-off" :tooltip "Focus Mode" :onclick "" "󰝥")
+      (button :class "toggle-circle-off" :tooltip "RGB Off" :onclick "" "󰌾")
+      (button :class "toggle-circle-off" :tooltip "Stream Mode" :onclick "" "󰐌"))
+
+    (label :class "slider-label" :text "Brightness")
+
+(scale
+  :class "quick-slider"
+  :min 1
+  :max 100
+  :value BRIGHTNESS
+  :onchange "bash -c 'sudo ddcutil --bus 10 setvcp 10 {}; sudo ddcutil --bus 7 setvcp 10 {}'")
+
+    (label :class "slider-label" :text "Volume")
+    (scale
+      :class "quick-slider"
+      :min 0
+      :max 100
+      :value VOLUME
+      :onchange "pamixer --set-volume {}")
+
+    (box
+      :orientation "v"
+      :spacing 0
+
+      (label :class "sys-title" :text "System")
+
+      (label
+        :class "sys-info"
+        :text { "CPU  " + CPU_USAGE + "%   " + CPU_FREQ + " MHz" })
+
+      (label
+        :class "sys-info"
+        :text { "GPU  " + GPU_USAGE + "%" })
+
+      (label
+        :class "sys-info"
+        :text { "RAM  " + RAM_USAGE + "%" })
+
+      (label
+        :class "sys-info"
+        :text { "TEMP " + CPU_TEMP + "°C" }))
+  )
+)

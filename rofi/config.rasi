@@ -1,0 +1,126 @@
+* {
+    background: rgba(15, 15, 15, 0.35);
+    background-alt: rgba(30, 30, 30, 0.25);
+
+    foreground: #f2f2f2;
+    accent: #88C0D0;
+    muted: #777777;
+
+    border: 0px;
+    outline: none;
+}
+
+configuration {
+    modi: "drun";
+    show-icons: true;
+    font: "JetBrainsMono Nerd Font 13";
+    display-drun: "Apps";
+}
+
+window {
+    width: 420px;
+
+    background-color: @background;
+
+    border-radius: 0px;
+
+    border: 0px;
+    padding: 18px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing: 12px;
+}
+
+inputbar {
+    background-color: rgba(40, 40, 40, 0.25);
+
+    border-radius: 14px;
+
+    border: 0px;
+
+    padding: 12px;
+    spacing: 10px;
+}
+
+prompt {
+    text-color: @accent;
+}
+
+entry {
+    background-color: transparent;
+    text-color: @foreground;
+
+    border: 0px;
+}
+
+listview {
+    background-color: transparent;
+
+    columns: 1;
+    lines: 8;
+
+    spacing: 6px;
+
+    scrollbar: false;
+
+    border: 0px;
+}
+
+element {
+    background-color: transparent;
+
+    border-radius: 12px;
+
+    border: 0px;
+
+    padding: 10px;
+
+    spacing: 12px;
+}
+
+element selected {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+element-icon {
+    background-color: transparent;
+
+    size: 28px;
+}
+
+element-text {
+    background-color: transparent;
+
+    text-color: @foreground;
+}
+
+element-text selected {
+    text-color: @accent;
+}
+
+element alternate {
+    background-color: transparent;
+}
+
+element normal.normal {
+    background-color: transparent;
+}
+
+element alternate.normal {
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+element-text normal.normal,
+element-text alternate.normal {
+    text-color: @foreground;
+}
+
+element-text selected.normal {
+    text-color: @accent;
+}

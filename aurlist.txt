@@ -1,0 +1,6 @@
+betterlockscreen
+eww
+pamac-aur
+protonup-qt
+yay
+yay-debug
