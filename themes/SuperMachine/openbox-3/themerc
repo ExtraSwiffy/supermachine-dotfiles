@@ -23,7 +23,7 @@ menu.overlap: 0
 *.bg.shadow: 00
 
 ! Menu
-menu.border.color: #88C0D0
+menu.border.color: #222222
 menu.border.width: 1
 
 menu.title.bg: flat solid
