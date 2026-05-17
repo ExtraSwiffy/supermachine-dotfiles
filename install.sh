@@ -3,6 +3,18 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+if [ "$EUID" -eq 0 ]; then
+    echo "Do not run this script with sudo or as root."
+    echo "Run it as your normal user: ./install.sh"
+    exit 1
+fi
+
+aur_packages=()
+while IFS= read -r package; do
+    [[ -z "$package" || "$package" == \#* ]] && continue
+    aur_packages+=("$package")
+done < aurlist.txt
+
 echo "Installing SuperMachine packages..."
 
 sudo pacman -S --needed - < pkglist.txt
@@ -68,6 +80,8 @@ fi
 
 echo "Installing AUR packages..."
 
-yay -S --needed - < aurlist.txt
+if [ "${#aur_packages[@]}" -gt 0 ]; then
+    yay -S --needed "${aur_packages[@]}"
+fi
 
 echo "Done."
