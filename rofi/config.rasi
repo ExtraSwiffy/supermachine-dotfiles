@@ -1,6 +1,6 @@
 * {
-    background: rgba(15, 15, 15, 0.35);
-    background-alt: rgba(30, 30, 30, 0.25);
+    background: rgba(15, 15, 15, 0.55);
+    background-alt: rgba(30, 30, 30, 0.35);
 
     foreground: #f2f2f2;
     accent: #88C0D0;
@@ -34,7 +34,7 @@ mainbox {
 }
 
 inputbar {
-    background-color: rgba(40, 40, 40, 0.25);
+    background-color: rgba(40, 40, 40, 0.38);
 
     border-radius: 14px;
 
@@ -113,7 +113,7 @@ element alternate.normal {
 }
 
 element selected.normal {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(136, 192, 208, 0.12);
 }
 
 element-text normal.normal,

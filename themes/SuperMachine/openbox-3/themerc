@@ -24,14 +24,14 @@ menu.overlap: 0
 
 ! Menu
 menu.border.color: #222222
-menu.border.width: 1
+menu.border.width: 0
 
 menu.title.bg: flat solid
 menu.title.bg.color: #0F0F0F
 menu.title.text.color: #88C0D0
 
 menu.items.bg: flat solid
-menu.items.bg.color: #111111
+menu.items.bg.color: #0F0F0F
 menu.items.text.color: #F2F2F2
 menu.items.disabled.text.color: #555555
 
@@ -42,7 +42,7 @@ menu.items.active.text.color: #88C0D0
 menu.separator.width: 1
 menu.separator.padding.width: 6
 menu.separator.padding.height: 4
-menu.separator.color: #333333
+menu.separator.color: #2A2A2A
 
 ! Window handles/grips
 window.*.handle.bg: flat solid

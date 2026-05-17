@@ -11,11 +11,13 @@
     </action>
   </item>
 
+  <!--
   <item label="Discord">
     <action name="Execute">
       <command>discord</command>
     </action>
   </item>
+  -->
 </menu>
 
 <menu id="development-menu" label="Development">
@@ -38,12 +40,6 @@
       <command>steam</command>
     </action>
   </item>
-
-  <item label="Moonlight">
-    <action name="Execute">
-      <command>moonlight</command>
-    </action>
-  </item>
 </menu>
 
 <menu id="media-menu" label="Media">
@@ -64,12 +60,6 @@
   <item label="Dolphin">
     <action name="Execute">
       <command>dolphin</command>
-    </action>
-  </item>
-
-  <item label="File System">
-    <action name="Execute">
-      <command>dolphin /</command>
     </action>
   </item>
 </menu>

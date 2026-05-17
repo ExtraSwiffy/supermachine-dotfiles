@@ -97,7 +97,7 @@
 
     (label
       :class "control-title"
-      :text "SuperMachine Panel")
+      :text "SuperMachine Control Center")
 
     (label
       :class "control-sub-title"

@@ -42,7 +42,7 @@
                   'Active' - where the active window is -->
   </placement>
   <theme>
-    <name>Clearlooks-Olive</name>
+    <name>SuperMachine</name>
     <titleLayout>NLIMC</titleLayout>
     <!--
       available characters are NDSLIMC, each can occur at most once.
@@ -186,26 +186,23 @@
       </action>
     </keybind>
     <keybind key="W-c">
-  <action name="Close"/>
-</keybind>
-<keybind key="XF86AudioRaiseVolume">
-  <action name="Execute">
-    <command>pamixer -i 5</command>
-  </action>
-</keybind>
-
-<keybind key="XF86AudioLowerVolume">
-  <action name="Execute">
-    <command>pamixer -d 5</command>
-  </action>
-</keybind>
-
-<keybind key="XF86AudioMute">
-  <action name="Execute">
-    <command>pamixer -t</command>
-  </action>
-</keybind>
-
+      <action name="Close"/>
+    </keybind>
+    <keybind key="XF86AudioRaiseVolume">
+      <action name="Execute">
+        <command>pamixer -i 5</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioLowerVolume">
+      <action name="Execute">
+        <command>pamixer -d 5</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioMute">
+      <action name="Execute">
+        <command>pamixer -t</command>
+      </action>
+    </keybind>
     <keybind key="C-A-Right">
       <action name="GoToDesktop">
         <to>right</to>
@@ -766,9 +763,9 @@
     <manageDesktops>yes</manageDesktops>
     <!-- show the manage desktops section in the client-list-(combined-)menu -->
   </menu>
-<applications>
-  <application class="*">
-    <decor>no</decor>
-  </application>
-</applications>
+  <applications>
+    <application class="*">
+      <decor>no</decor>
+    </application>
+  </applications>
 </openbox_config>
