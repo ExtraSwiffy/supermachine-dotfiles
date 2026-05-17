@@ -1,4 +1,7 @@
 #!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
 
 echo "Installing SuperMachine packages..."
 
@@ -25,6 +28,7 @@ cp -r picom ~/.config/
 cp -r alacritty ~/.config/
 
 cp .fehbg ~/
+cp .xinitrc ~/
 cp -r .screenlayout ~/
 
 echo "Copying cursor theme..."
@@ -42,6 +46,7 @@ echo "Making scripts executable..."
 chmod +x ~/.config/eww/scripts/*.sh
 chmod +x ~/.screenlayout/monitors.sh
 chmod +x ~/.fehbg
+chmod +x ~/.xinitrc
 
 echo "Loading i2c-dev for monitor brightness..."
 
@@ -54,6 +59,7 @@ if ! command -v yay &> /dev/null
 then
     sudo pacman -S --needed base-devel git
 
+    rm -rf /tmp/yay
     git clone https://aur.archlinux.org/yay.git /tmp/yay
     cd /tmp/yay
     makepkg -si

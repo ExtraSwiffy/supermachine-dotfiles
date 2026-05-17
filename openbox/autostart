@@ -2,11 +2,11 @@
 
 ~/.fehbg &
 alacritty &
-picom &
+# picom &
 nm-applet &
 kdeconnectd &
 
-killall eww &
+eww kill 2>/dev/null
 eww daemon &
 
 sleep 1

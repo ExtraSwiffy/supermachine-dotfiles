@@ -1,2 +1,2 @@
 #!/bin/sh
-feh --no-fehbg --bg-fill '/home/swiffy/Pictures/Wallpapers/wallpaper-blur.png' '/home/swiffy/Pictures/Wallpapers/wallpaper-blur.png' 
+feh --no-fehbg --bg-fill "$HOME/Pictures/wallpapers/wallpaper-blur.png" "$HOME/Pictures/wallpapers/wallpaper-blur.png"
