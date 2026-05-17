@@ -84,6 +84,12 @@
     </action>
   </item>
 
+  <item label="Openbox Theme">
+  <action name="Execute">
+    <command>code ~/.themes/SuperMachine/openbox-3/themerc</command>
+  </action>
+</item>
+
   <item label="Openbox Menu">
     <action name="Execute">
       <command>code ~/.config/openbox/menu.xml</command>
