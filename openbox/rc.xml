@@ -338,12 +338,22 @@
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>Konqueror</name>
+          <name>Dolphin</name>
         </startupnotify>
-        <command>kfmclient openProfile filemanagement</command>
+        <command>dolphin</command>
       </action>
     </keybind>
     <!-- Swiffy custom keybinds -->
+    <keybind key="W-Tab">
+      <action name="Execute">
+        <command>~/.config/eww/scripts/toggle-settings.sh</command>
+      </action>
+    </keybind>
+    <keybind key="Print">
+      <action name="Execute">
+        <command>flameshot gui</command>
+      </action>
+    </keybind>
     <keybind key="W-t">
       <action name="Execute">
         <command>alacritty</command>

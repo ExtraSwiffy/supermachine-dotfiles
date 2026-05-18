@@ -42,10 +42,13 @@
 (defpoll SHELL_NAME :interval "3600s" "basename \"$SHELL\"")
 (defpoll SESSION_NAME :interval "3600s" "printenv XDG_SESSION_TYPE 2>/dev/null || echo x11")
 (defpoll CPU_MODEL :interval "3600s" "awk -F': ' '/model name/ {gsub(/ CPU| Processor| with Radeon Graphics/, \"\", $2); print $2; exit}' /proc/cpuinfo")
+(defpoll GLOW_STATE :interval "2s" "test -f ~/.config/eww/state/glow-off && echo off || echo on")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
 (defvar BIBLE_TEXT_2 "")
 (defvar BIBLE_TEXT_3 "")
+(defvar KEY_CAPTURE_STATUS "Ready")
+(defvar KEY_CAPTURED_COMBO "None captured")
 
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
@@ -129,7 +132,7 @@
 
   (box
     :orientation "v"
-    :class "settings-border"
+    :class {GLOW_STATE == "on" ? "settings-border" : "settings-border-off"}
     :valign "fill"
     :vexpand true))
 
@@ -316,7 +319,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Bluetooth"
-        :onclick "eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle bluetoothsettings"
+        :onclick "eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle bluetoothsettings"
         (box
           :orientation "h"
           :spacing 8
@@ -331,7 +334,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Displays"
-        :onclick "eww close bluetoothsettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle displaysettings"
+        :onclick "eww close bluetoothsettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle displaysettings"
         (box
           :orientation "h"
           :spacing 8
@@ -346,7 +349,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Network"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle networksettings"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle networksettings"
         (box
           :orientation "h"
           :spacing 8
@@ -361,7 +364,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Audio"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle audiosettings"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle audiosettings"
         (box
           :orientation "h"
           :spacing 8
@@ -376,7 +379,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Performance Mode"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle powersettings"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle powersettings"
         (box
           :orientation "h"
           :spacing 8
@@ -391,7 +394,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Appearance"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close systeminfopanel; eww open --toggle appearancesettings"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle appearancesettings"
         (box
           :orientation "h"
           :spacing 8
@@ -403,10 +406,25 @@
             (label :class "settings-row-title" :halign "start" :text "Appearance")
             (label :class "settings-row-subtitle" :halign "start" :text THEME_NAME))))
 
+      (button
+        :class "settings-nav-item"
+        :tooltip "Keybinds"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle keybindsettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰌌")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Keybinds")
+            (label :class "settings-row-subtitle" :halign "start" :text KEY_CAPTURED_COMBO))))
+
         (button
           :class "settings-nav-item"
           :tooltip "System"
-          :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww open --toggle systeminfopanel"
+          :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww open --toggle systeminfopanel"
           (box
             :orientation "h"
             :spacing 8
@@ -715,7 +733,99 @@
       :spacing 10
         (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/theme-menu.sh" "Switch Openbox Theme")
         (button :class "settings-wide-action" :onclick "lxappearance" "GTK, Icons, Cursor")
-        (button :class "settings-wide-action" :onclick "obconf-qt" "Openbox Settings")))))
+        (button :class "settings-wide-action" :onclick "obconf-qt" "Openbox Settings"))
+
+    ; Glow colors update the SCSS variables and reload Eww.
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (label :class "settings-section-title" :halign "start" :text "Panel Glow")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-glow.sh" { "Panel Glow: " + GLOW_STATE })
+      (box
+        :orientation "h"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-color-chip settings-color-cyan" :tooltip "Cycle glow color 1" :onclick "~/.config/eww/scripts/set-glow-color.sh 1 cycle" "1")
+        (button :class "settings-color-chip settings-color-blue" :tooltip "Cycle glow color 2" :onclick "~/.config/eww/scripts/set-glow-color.sh 2 cycle" "2")
+        (button :class "settings-color-chip settings-color-purple" :tooltip "Cycle glow color 3" :onclick "~/.config/eww/scripts/set-glow-color.sh 3 cycle" "3")
+        (button :class "settings-color-chip settings-color-pink" :tooltip "Cycle glow color 4" :onclick "~/.config/eww/scripts/set-glow-color.sh 4 cycle" "4"))
+      (box
+        :orientation "h"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset default" "Default")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ice" "Ice")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset neon" "Neon"))))))
+
+; Keybind detail panel with a small live key capture helper.
+(defwindow keybindsettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Keybind detail content stays compact and readable.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Keybinds")
+    (label :class "settings-detail-subtitle" :halign "start" :text "Quick SuperMachine shortcuts")
+
+    (box
+      :orientation "v"
+      :class {KEY_CAPTURE_STATUS == "Waiting" ? "settings-capture-waiting" : "settings-capture"}
+      :spacing 6
+      (label :class "settings-section-title" :halign "start" :text {KEY_CAPTURE_STATUS == "Waiting" ? "Waiting for key combo..." : "Key Capture"})
+      (label :class "settings-row-subtitle" :halign "start" :text { "Last: " + KEY_CAPTURED_COMBO })
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/capture-keybind.sh" "Listen for Combo"))
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 8
+      (label :class "settings-section-title" :halign "start" :text "Core")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + Tab    System Settings")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + Space  App Launcher")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + T      Terminal")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + E      Files")
+      (label :class "settings-row-subtitle" :halign "start" :text "Print          Flameshot"))
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 8
+      (label :class "settings-section-title" :halign "start" :text "Windows")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + Arrows      Tile / maximize")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + 1-4         Switch workspace")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + C           Close window")
+      (label :class "settings-row-subtitle" :halign "start" :text "Alt + Tab           Next window")
+      (label :class "settings-row-subtitle" :halign "start" :text "Super + L           Lock screen"))
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (button :class "settings-wide-action" :onclick "code ~/.config/openbox/rc.xml" "Edit Openbox Keybinds")
+      (button :class "settings-wide-action" :onclick "openbox --reconfigure" "Reload Openbox")))))
 
 ; System detail panel with metrics and utility launchers.
 (defwindow systeminfopanel
