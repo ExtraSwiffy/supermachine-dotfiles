@@ -1,20 +1,53 @@
+; Clock and workspace values used by the left sidebar.
 (defpoll CLOCK_TIME :interval "1s" "date '+%I:%M'")
 (defpoll CLOCK_AMPM :interval "5s" "date '+%p'")
 (defpoll CURRENT_WS :interval "1s" "wmctrl -d | awk '/\\*/ {print $1 + 1}'")
 
+; Lightweight system stats used by the settings panels.
 (defpoll CPU_USAGE :interval "2s" "top -bn1 | grep 'Cpu(s)' | awk '{print int($2)}'")
 (defpoll CPU_FREQ :interval "2s" "grep 'cpu MHz' /proc/cpuinfo | head -1 | awk '{print int($4)}'")
 (defpoll RAM_USAGE :interval "2s" "free | awk '/Mem:/ {print int($3/$2 * 100)}'")
 (defpoll GPU_USAGE :interval "2s" "cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0")
 (defpoll CPU_TEMP :interval "5s" "sensors | awk '/Tctl:/ {print int($2)}' | tr -d '+'")
 
+; Quick control state for the top section of the settings panel.
 (defpoll PERF_STATE :interval "1s" "powerprofilesctl get | grep -q performance && echo on || echo off")
 (defpoll GAME_STATE :interval "1s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
 (defpoll VOLUME :interval "1s" "pamixer --get-volume")
 (defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs")
 
+; Deeper settings panel state summaries.
 (defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
+(defpoll BT_POWER :interval "3s" "bluetoothctl show 2>/dev/null | awk -F': ' '/Powered/ {print $2}'")
+(defpoll BT_CONNECTED :interval "5s" "bluetoothctl devices Connected 2>/dev/null | wc -l")
+(defpoll DISPLAY_SUMMARY :interval "5s" "xrandr --query 2>/dev/null | awk '/ connected/ {print $1 \"  \" $3}' | paste -sd '    ' -")
+(defpoll THEME_NAME :interval "5s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo SuperMachine")
+(defpoll NETWORK_NAME :interval "5s" "nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1==\"yes\" {print $2; found=1} END {if (!found) print \"offline\"}'")
+(defpoll AUDIO_STATE :interval "2s" "pamixer --get-mute | grep -q true && echo muted || echo \"$(pamixer --get-volume)%\"")
+(defpoll UPTIME_TEXT :interval "60s" "uptime -p | sed 's/^up //'")
+(defpoll KERNEL_TEXT :interval "60s" "uname -r | cut -d- -f1")
+(defpoll HEADER_TEXT :interval "3600s" "pacman -Q linux-lts-headers 2>/dev/null | awk '{print $2}' || pacman -Q linux-headers 2>/dev/null | awk '{print $2}' || echo missing")
+(defpoll INSTALL_DAYS :interval "3600s" "first=$(awk '/\\[ALPM\\]/ {gsub(/\\[/,\"\",$1); gsub(/\\]/,\"\",$1); print $1; exit}' /var/log/pacman.log 2>/dev/null); [ -n \"$first\" ] && echo $(( ($(date +%s) - $(date -d \"$first\" +%s)) / 86400 )) || echo ?")
+(defpoll PACKAGE_COUNT :interval "3600s" "pacman -Qq 2>/dev/null | wc -l")
+(defpoll ROOT_USAGE :interval "300s" "df -h / | awk 'NR==2 {print $3 \"/\" $2 \" \" $5}'")
+(defpoll HOME_USAGE :interval "300s" "df -h \"$HOME\" | awk 'NR==2 {print $3 \"/\" $2 \" \" $5}'")
+(defpoll BOOT_USAGE :interval "300s" "df -h /boot 2>/dev/null | awk 'NR==2 {print $3 \"/\" $2 \" \" $5}' || echo n/a")
+(defpoll MEM_TOTAL :interval "300s" "free -h | awk '/Mem:/ {print $3 \"/\" $2}'")
+(defpoll SWAP_TOTAL :interval "300s" "free -h | awk '/Swap:/ {print $3 \"/\" $2}'")
+(defpoll DISPLAY_COUNT :interval "300s" "xrandr --query 2>/dev/null | awk '/ connected/ {count++} END {print count+0}'")
+(defpoll IP_ADDR :interval "300s" "ip -o -4 addr show scope global 2>/dev/null | awk '{print $4; exit}' || echo offline")
+(defpoll HOST_NAME :interval "3600s" "hostname")
+(defpoll WM_THEME :interval "3600s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo unknown")
+(defpoll GPU_DRIVER :interval "3600s" "lspci -k 2>/dev/null | awk '/VGA|3D|Display/ {gpu=1} gpu && /Kernel driver in use/ {print $5; exit}' || echo unknown")
+(defpoll SHELL_NAME :interval "3600s" "basename \"$SHELL\"")
+(defpoll SESSION_NAME :interval "3600s" "printenv XDG_SESSION_TYPE 2>/dev/null || echo x11")
+(defpoll CPU_MODEL :interval "3600s" "awk -F': ' '/model name/ {gsub(/ CPU| Processor| with Radeon Graphics/, \"\", $2); print $2; exit}' /proc/cpuinfo")
+(defvar BIBLE_REF "John 14:6")
+(defvar BIBLE_TEXT "The way, the truth, and the life")
+(defvar BIBLE_TEXT_2 "")
+(defvar BIBLE_TEXT_3 "")
 
+; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
   :monitor 0
   :exclusive true
@@ -36,6 +69,7 @@
     :hexpand true
     :class "sidebar"
 
+    ; Workspace dots.
     (box
       :orientation "v"
       :spacing 18
@@ -48,6 +82,7 @@
       (button :class {CURRENT_WS == "4" ? "workspace-active" : "workspace"} :onclick "wmctrl -s 3" "•")
     )
 
+    ; Center Arch launcher.
     (box
       :orientation "v"
       :halign "center"
@@ -61,6 +96,7 @@
         "")
     )
 
+    ; Clock and settings entry point.
     (box
       :orientation "v"
       :halign "center"
@@ -72,12 +108,680 @@
 
       (button
         :class "settings-button"
-        :onclick "eww open --toggle controlcenter"
+        :onclick "~/.config/eww/scripts/toggle-settings.sh"
         "󰒓")
     )
   )
 )
 
+; Animated seam shown only while the settings panel is open.
+(defwindow settingsborder
+  :monitor 0
+  :stacking "fg"
+  :focusable false
+
+  :geometry (geometry
+    :x "88px"
+    :y "0px"
+    :width "8px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-border"
+    :valign "fill"
+    :vexpand true))
+
+; First settings panel: quick controls plus category navigation.
+(defwindow systemsettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "90px"
+    :y "0px"
+    :width "285px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Inner stack keeps controls near the top while the panel surface fills the screen.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 12
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    ; Header and close control for the full settings stack.
+    (box
+      :orientation "h"
+      :class "settings-header"
+      :halign "fill"
+      :vexpand false
+      :space-evenly false
+
+      (label
+        :class "settings-title"
+        :halign "start"
+        :hexpand true
+        :vexpand false
+        :text "System Settings")
+
+      (button
+        :class "settings-close"
+        :halign "end"
+        :valign "start"
+        :tooltip "Close"
+        :onclick "~/.config/eww/scripts/toggle-settings.sh"
+        "󰅖"))
+
+    ; Short verse keeps the top personal without taking over the panel.
+    (box
+      :orientation "v"
+      :class "settings-verse-box"
+      :spacing 1
+      :vexpand false
+      :space-evenly false
+      (label :class "settings-verse" :halign "start" :text BIBLE_REF)
+      (label :class "settings-verse" :halign "start" :text BIBLE_TEXT)
+      (label :class "settings-verse" :halign "start" :text BIBLE_TEXT_2)
+      (label :class "settings-verse" :halign "start" :text BIBLE_TEXT_3))
+
+    (label
+      :class "settings-subtitle"
+      :halign "start"
+      :vexpand false
+      :text "SuperMachine")
+
+    ; Top quick controls: mode toggles and hardware sliders.
+    (box
+      :orientation "v"
+      :class "quick-settings"
+      :spacing 5
+      :vexpand false
+      :space-evenly false
+
+      ; First quick-toggle row.
+      (box
+        :orientation "h"
+        :spacing 7
+        :halign "fill"
+        :valign "center"
+        :hexpand true
+        :vexpand false
+        :space-evenly true
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Performance Mode"
+          :onclick "~/.config/eww/scripts/toggle-performance.sh"
+          (label :class {PERF_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰓅"))
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Game Mode"
+          :onclick "~/.config/eww/scripts/toggle-gamemode.sh"
+          (label :class {GAME_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰊴"))
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Night Mode"
+          :onclick "~/.config/eww/scripts/toggle-nightmode.sh"
+          (label :class {NIGHT_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰖔")))
+
+      ; Second quick-toggle row.
+      (box
+        :orientation "h"
+        :spacing 7
+        :halign "fill"
+        :valign "center"
+        :hexpand true
+        :vexpand false
+        :space-evenly true
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Bluetooth"
+          :onclick "bash -c 'if bluetoothctl show | grep -q \"Powered: yes\"; then bluetoothctl power off; else bluetoothctl power on; fi'"
+          (label :class {BT_POWER == "yes" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰂯"))
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Wi-Fi"
+          :onclick "nm-connection-editor"
+          (label :class "quick-toggle-dot-on" :text "󰖩"))
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Audio"
+          :onclick "pavucontrol"
+          (label :class "quick-toggle-dot-off" :text "󰕾")))
+
+      ; Brightness and volume sliders.
+      (box
+        :orientation "v"
+        :class "quick-slider-box"
+        :spacing 3
+        :vexpand false
+        (label :class "quick-slider-label" :halign "start" :text "Brightness")
+        (scale
+          :class "quick-slider"
+          :min 1
+          :max 100
+          :value BRIGHTNESS
+          :onchange "bash -c 'sudo ddcutil --bus 10 setvcp 10 {}; sudo ddcutil --bus 7 setvcp 10 {}'")
+        (label :class "quick-slider-label" :halign "start" :text "Volume")
+        (scale
+          :class "quick-slider"
+          :min 0
+          :max 100
+          :value VOLUME
+          :onchange "pamixer --set-volume {}")))
+
+    ; Category rows open focused detail panels to the right.
+    (box
+      :orientation "v"
+      :spacing 6
+      :vexpand false
+      :space-evenly false
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Bluetooth"
+        :onclick "eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle bluetoothsettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰂯")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Bluetooth")
+            (label :class "settings-row-subtitle" :halign "start" :text {BT_POWER == "yes" ? BT_CONNECTED + " connected" : "Powered off"}))))
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Displays"
+        :onclick "eww close bluetoothsettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle displaysettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰍹")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Displays")
+            (label :class "settings-row-subtitle" :halign "start" :text "Resolution / Hz"))))
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Network"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle networksettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰖩")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Network")
+            (label :class "settings-row-subtitle" :halign "start" :text NETWORK_NAME))))
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Audio"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle audiosettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰕾")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Audio")
+            (label :class "settings-row-subtitle" :halign "start" :text AUDIO_STATE))))
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Performance Mode"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle powersettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰚥")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Perf Mode")
+            (label :class "settings-row-subtitle" :halign "start" :text PERF_STATE))))
+
+      (button
+        :class "settings-nav-item"
+        :tooltip "Appearance"
+        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close systeminfopanel; eww open --toggle appearancesettings"
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "fill"
+          (label :class "settings-icon" :text "󰔎")
+          (box
+            :orientation "v"
+            :hexpand true
+            (label :class "settings-row-title" :halign "start" :text "Appearance")
+            (label :class "settings-row-subtitle" :halign "start" :text THEME_NAME))))
+
+        (button
+          :class "settings-nav-item"
+          :tooltip "System"
+          :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww open --toggle systeminfopanel"
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "fill"
+            (label :class "settings-icon" :text "󰍛")
+            (box
+              :orientation "v"
+              :hexpand true
+              (label :class "settings-row-title" :halign "start" :text "System")
+              (label :class "settings-row-subtitle" :halign "start" :text { "CPU " + CPU_USAGE + "%  RAM " + RAM_USAGE + "%" }))))
+      )
+
+    ; Small identity card fills the lower rail with useful SuperMachine context.
+    (box
+      :orientation "v"
+      :class "settings-machine-card"
+      :spacing 4
+      :vexpand false
+      :space-evenly false
+      (label :class "settings-machine-title" :halign "start" :text "SuperMachine Openbox")
+      (label :class "settings-row-subtitle" :halign "start" :text { "Host " + HOST_NAME })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Kernel " + KERNEL_TEXT })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Headers " + HEADER_TEXT })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Installed " + INSTALL_DAYS + " days ago" })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Uptime " + UPTIME_TEXT })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Memory " + MEM_TOTAL })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Swap " + SWAP_TOTAL })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Root " + ROOT_USAGE })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Home " + HOME_USAGE })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Boot " + BOOT_USAGE })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Displays " + DISPLAY_COUNT + "  IP " + IP_ADDR })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Packages " + PACKAGE_COUNT + "  Theme " + WM_THEME })
+      (label :class "settings-row-subtitle" :halign "start" :text { "CPU " + CPU_MODEL })
+      (label :class "settings-row-subtitle" :halign "start" :text { "GPU driver " + GPU_DRIVER })
+      (label :class "settings-row-subtitle" :halign "start" :text { "Shell " + SHELL_NAME + "  Session " + SESSION_NAME }))
+
+    ; Public package identity card, separate from live system stats.
+    (box
+      :orientation "v"
+      :class "settings-release-box"
+      :spacing 2
+      :vexpand false
+      :space-evenly false
+      (label :class "settings-release-title" :halign "start" :text "SuperMachine V1.0.0")
+      (label :class "settings-release-copy" :halign "start" :text "Arch base/server install")
+      (label :class "settings-release-copy" :halign "start" :text "GitHub cloned config package")
+      (label :class "settings-release-copy" :halign "start" :text "Openbox desktop foundation")
+      (label :class "settings-release-copy" :halign "start" :text "Rofi, Eww, Picom, Alacritty")
+      (label :class "settings-release-copy" :halign "start" :text "Modern, minimal, low usage")
+      (label :class "settings-release-copy" :halign "start" :text "Middle ground: Hyprland feel")
+      (label :class "settings-release-copy" :halign "start" :text "Traditional floating workflow")
+      (label :class "settings-release-copy" :halign "start" :text "Curated keyboard shortcuts")
+      (label :class "settings-release-copy" :halign "start" :text "Right-click desktop configs")
+      (label :class "settings-release-copy" :halign "start" :text "Modify configs with Code")
+      (label :class "settings-release-copy" :halign "start" :text "Curated apps + custom configs")))
+  )
+)
+
+; Bluetooth detail panel opened from the category list.
+(defwindow bluetoothsettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Bluetooth detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Bluetooth")
+    (label :class "settings-detail-subtitle" :halign "start" :text {BT_POWER == "yes" ? BT_CONNECTED + " connected devices" : "Bluetooth is powered off"})
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/bluetooth-menu.sh" "Find and Connect Devices")
+        (button :class "settings-wide-action" :onclick "bash -c 'bluetoothctl power on || true'" "Power On")
+        (button :class "settings-wide-action" :onclick "bash -c 'bluetoothctl power off || true'" "Power Off")
+        (button :class "settings-wide-action" :onclick "alacritty -e bluetoothctl" "Open Bluetooth Terminal")))))
+
+; Display detail panel opened from the category list.
+(defwindow displaysettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Display detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Displays")
+    (label :class "settings-detail-subtitle" :halign "start" :text DISPLAY_SUMMARY)
+
+    ; Per-output mode pickers keep each monitor's resolutions separate.
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 8
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh DisplayPort-2" "DisplayPort-2")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh HDMI-A-0" "HDMI-A-0"))
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh" "All Display Modes")
+      (button :class "settings-wide-action" :onclick "arandr" "Open Layout Editor")
+      (button :class "settings-wide-action" :onclick "~/.screenlayout/monitors.sh" "Apply Saved Layout")))))
+
+; Network detail panel for frequently used NetworkManager actions.
+(defwindow networksettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Network detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Network")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "Wi-Fi: " + NETWORK_NAME })
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+        (button :class "settings-wide-action" :onclick "nm-connection-editor" "Connection Editor")
+        (button :class "settings-wide-action" :onclick "alacritty -e nmtui" "Network Terminal UI")
+        (button :class "settings-wide-action" :onclick "bash -c 'nmcli networking on; notify-send Network Enabled'" "Networking On")
+        (button :class "settings-wide-action" :onclick "bash -c 'nmcli networking off; notify-send Network Disabled'" "Networking Off")))))
+
+; Audio detail panel for mixer and mute controls.
+(defwindow audiosettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Audio detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Audio")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "Volume: " + AUDIO_STATE })
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+        (button :class "settings-wide-action" :onclick "pavucontrol" "Open Audio Mixer")
+        (button :class "settings-wide-action" :onclick "pamixer -t" "Toggle Mute")
+        (button :class "settings-wide-action" :onclick "pamixer --set-volume 50" "Set 50%")
+        (button :class "settings-wide-action" :onclick "pamixer --set-volume 100" "Set 100%")))))
+
+; Power detail panel for powerprofilesctl modes.
+(defwindow powersettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Power detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Performance Mode")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "Performance mode: " + PERF_STATE })
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+        (button :class "settings-wide-action" :onclick "powerprofilesctl set performance" "Performance")
+        (button :class "settings-wide-action" :onclick "powerprofilesctl set balanced" "Balanced")
+        (button :class "settings-wide-action" :onclick "powerprofilesctl set power-saver" "Power Saver")
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-nightmode.sh" "Toggle Night Mode")))))
+
+; Appearance detail panel for Openbox/GTK theme controls.
+(defwindow appearancesettings
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; Appearance detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "Appearance")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "Openbox: " + THEME_NAME })
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/theme-menu.sh" "Switch Openbox Theme")
+        (button :class "settings-wide-action" :onclick "lxappearance" "GTK, Icons, Cursor")
+        (button :class "settings-wide-action" :onclick "obconf-qt" "Openbox Settings")))))
+
+; System detail panel with metrics and utility launchers.
+(defwindow systeminfopanel
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "458px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    ; System detail content stays compact at the top of the full-height pane.
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+    (label :class "settings-title" :halign "start" :text "System")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "CPU " + CPU_USAGE + "%    RAM " + RAM_USAGE + "%    GPU " + GPU_USAGE + "%" })
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+
+      (box
+        :orientation "h"
+        :class "settings-metric-row"
+        :spacing 12
+        (label :class "settings-icon" :text "󰂯")
+        (label :class "settings-row-title" :text { "CPU  " + CPU_USAGE + "%  " + CPU_FREQ + " MHz" }))
+      (box
+        :orientation "h"
+        :class "settings-metric-row"
+        :spacing 12
+        (label :class "settings-icon" :text "󰘚")
+        (label :class "settings-row-title" :text { "RAM  " + RAM_USAGE + "%" }))
+      (box
+        :orientation "h"
+        :class "settings-metric-row"
+        :spacing 12
+        (label :class "settings-icon" :text "󰢮")
+        (label :class "settings-row-title" :text { "GPU  " + GPU_USAGE + "%" }))
+      (box
+        :orientation "h"
+        :class "settings-metric-row"
+        :spacing 12
+        (label :class "settings-icon" :text "󰔏")
+        (label :class "settings-row-title" :text { "TEMP " + CPU_TEMP + "°C" }))
+        (button :class "settings-wide-action" :onclick "alacritty -e btop" "Open Btop")
+        (button :class "settings-wide-action" :onclick "pavucontrol" "Open Audio Mixer")))))
+
+; Older compact control center kept available while the new panel evolves.
 (defwindow controlcenter
   :monitor 0
   :stacking "fg"

@@ -68,6 +68,14 @@
 
 <menu id="conf-menu" label="Conf Edits">
 
+  <item label="Whole System">
+    <action name="Execute">
+      <command>sh -c 'code ~/.config &amp;&amp; code --add ~/.themes ~/.config'</command>
+    </action>
+  </item>
+
+  <separator />
+
   <item label="Openbox RC">
     <action name="Execute">
       <command>code ~/.config/openbox/rc.xml</command>
@@ -234,7 +242,7 @@
 
 <menu id="root-menu" label="SuperMachine">
 
-  <separator label="Applications"/>
+  <separator label="Quick Menu"/>
 
   <menu id="internet-menu"/>
   <menu id="development-menu"/>

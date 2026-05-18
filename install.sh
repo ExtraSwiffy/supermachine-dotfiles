@@ -19,11 +19,17 @@ echo "Installing SuperMachine packages..."
 
 sudo pacman -S --needed - < pkglist.txt
 
+echo "Enabling desktop services..."
+
+sudo systemctl enable --now NetworkManager.service
+sudo systemctl enable --now bluetooth.service
+
 echo "Creating config folders..."
 
 mkdir -p ~/.config
 mkdir -p ~/Pictures/wallpapers
 mkdir -p ~/.icons
+mkdir -p ~/.themes
 mkdir -p ~/.config/gtk-3.0
 mkdir -p ~/.config/gtk-4.0
 
@@ -38,6 +44,7 @@ cp -r openbox ~/.config/
 cp -r rofi ~/.config/
 cp -r picom ~/.config/
 cp -r alacritty ~/.config/
+cp -r themes/* ~/.themes/
 
 cp .fehbg ~/
 cp .xinitrc ~/
