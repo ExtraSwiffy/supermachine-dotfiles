@@ -16,6 +16,7 @@ firefox
 gamemode
 git
 htop
+kdialog
 libnotify
 lm_sensors
 lxappearance
@@ -47,3 +48,4 @@ xorg-xauth
 xorg-xinit
 xorg-xinput
 xorg-xrandr
+zenity

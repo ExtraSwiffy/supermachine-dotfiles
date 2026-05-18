@@ -106,4 +106,8 @@ awk \
   { print }
 ' "$yuck" > "$tmp"
 
-mv "$tmp" "$yuck"
+if cmp -s "$tmp" "$yuck"; then
+  rm -f "$tmp"
+else
+  mv "$tmp" "$yuck"
+fi

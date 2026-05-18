@@ -759,6 +759,14 @@
         (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f lxappearance >/dev/null 2>&1'" "GTK, Icons, Cursor")
         (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f obconf-qt >/dev/null 2>&1'" "Openbox Settings"))
 
+    ; Wallpaper picker updates feh and ~/.fehbg so the choice survives reboot.
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (label :class "settings-section-title" :halign "start" :text "Wallpaper")
+      (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/wallpaper-picker.sh >/tmp/supermachine-wallpaper-picker.log 2>&1'" "Choose Picture"))
+
     ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box
       :orientation "v"
