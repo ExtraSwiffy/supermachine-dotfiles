@@ -1,4 +1,2 @@
 betterlockscreen
 eww
-pamac-aur
-protonup-qt
