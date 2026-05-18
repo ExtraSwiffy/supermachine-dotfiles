@@ -4,7 +4,7 @@ set -euo pipefail
 cfg="$HOME/.config/eww"
 
 close_settings() {
-  eww -c "$cfg" close \
+  for window in \
     settingsborder \
     systemsettings \
     bluetoothsettings \
@@ -13,12 +13,21 @@ close_settings() {
     audiosettings \
     powersettings \
     appearancesettings \
-    systeminfopanel >/dev/null 2>&1 || true
+    panelcustomization \
+    glowcolorpicker \
+    keybindsettings \
+    systeminfopanel; do
+    if eww -c "$cfg" active-windows | grep -q "^${window}:"; then
+      eww -c "$cfg" close "$window" >/dev/null 2>&1 || true
+    fi
+  done
 }
 
 if eww -c "$cfg" active-windows | grep -q '^systemsettings:'; then
   close_settings
 else
+  close_settings
+  "$cfg/scripts/panel-layout.sh"
   "$cfg/scripts/update-verse.sh"
   eww -c "$cfg" open settingsborder
   eww -c "$cfg" open systemsettings

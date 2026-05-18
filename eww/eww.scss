@@ -1,7 +1,16 @@
-$settings-glow-cyan: rgba(55, 210, 255, 0.54);
-$settings-glow-blue: rgba(136, 192, 208, 0.95);
-$settings-glow-purple: rgba(163, 104, 255, 0.72);
-$settings-glow-pink: rgba(255, 91, 180, 0.54);
+$settings-glow-cyan: rgba(55, 210, 255, 0.48);
+$settings-glow-blue: rgba(46, 255, 230, 0.46);
+$settings-glow-purple: rgba(92, 144, 255, 0.56);
+$settings-glow-pink: rgba(136, 192, 208, 0.64);
+$settings-glow-edge: rgba(55, 210, 255, 0.24);
+$settings-glow-thickness: 5px;
+$panel-accent: rgba(55, 210, 255, 0.82);
+$panel-header: rgba(235, 250, 255, 1);
+$panel-subtext: rgba(134, 174, 186, 1);
+$panel-accent-muted: rgba(55, 210, 255, 0.07);
+$panel-accent-soft: rgba(55, 210, 255, 0.18);
+$panel-accent-hover: rgba(55, 210, 255, 0.24);
+$panel-accent-dot: rgba(55, 210, 255, 0.28);
 
 /* Global reset and font. */
 * {
@@ -19,7 +28,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .launcher {
   font-size: 54px;
-  color: #88C0D0;
+  color: $panel-accent;
   padding: 0px;
   margin: 0px;
   margin-left: -20px;
@@ -37,12 +46,12 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .workspace-active {
   font-size: 32px;
-  color: #88C0D0;
+  color: $panel-accent;
 }
 
 .clock {
   font-size: 20px;
-  color: #88C0D0;
+  color: $panel-accent;
   min-width: 80px;
 }
 
@@ -58,7 +67,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-button:hover {
-  color: #88C0D0;
+  color: $panel-accent;
 }
 
 /* Animated seam between the sidebar and settings rail. */
@@ -79,27 +88,27 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
     180deg,
     rgba(0, 0, 0, 0) 0%,
     rgba(0, 0, 0, 0) 7%,
-    rgba(55, 210, 255, 0.08) 14%,
+    $settings-glow-edge 14%,
     $settings-glow-cyan 24%,
     $settings-glow-blue 38%,
     $settings-glow-purple 52%,
     $settings-glow-pink 66%,
-    rgba(55, 210, 255, 0.36) 78%,
+    $settings-glow-edge 78%,
     rgba(0, 0, 0, 0.06) 88%,
     rgba(0, 0, 0, 0) 94%,
     rgba(0, 0, 0, 0) 100%
   );
   background-size: 100% 100%;
   border-radius: 999px;
-  margin: 0px 1px;
-  min-width: 5px;
+  margin: 0px;
+  min-width: $settings-glow-thickness;
   animation: settings-border-flow 4s ease-in-out infinite;
 }
 
 .settings-border-off {
   background: transparent;
-  margin: 0px 1px;
-  min-width: 5px;
+  margin: 0px;
+  min-width: $settings-glow-thickness;
 }
 
 /* Legacy compact control center styles. */
@@ -112,7 +121,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .control-title {
   font-size: 17px;
-  color: #88C0D0;
+  color: $panel-accent;
   margin-bottom: 50px;
 }
 
@@ -135,8 +144,8 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .toggle-circle-on {
-  background: rgba(136, 192, 208, 0.28);
-  color: #88C0D0;
+  background: $panel-accent-dot;
+  color: $panel-accent;
 }
 
 .toggle-circle-off {
@@ -145,7 +154,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .toggle-circle-on:hover {
-  background: rgba(136, 192, 208, 0.45);
+  background: $panel-accent-hover;
   color: #ffffff;
 }
 
@@ -155,7 +164,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .slider-label {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 12px;
   margin-top: 0px;
   margin-bottom: -50px;
@@ -168,19 +177,19 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .quick-slider highlight {
-  background: #88C0D0;
+  background: $panel-accent;
   border-radius: 999px;
 }
 
 .quick-slider slider {
-  background: #88C0D0;
+  background: $panel-accent;
   border-radius: 999px;
   min-width: 10px;
   min-height: 10px;
 }
 
 .sys-title {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 13px;
   margin-top: 2px;
 }
@@ -201,7 +210,13 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 .settings-detail-panel {
   background: rgba(12, 14, 16, 0.9);
   padding: 24px;
-  min-width: 374px;
+  min-width: 0px;
+}
+
+.settings-picker-panel {
+  background: rgba(12, 14, 16, 0.92);
+  padding: 24px;
+  min-width: 0px;
 }
 
 /* Inner stack pins content to the top while panel backgrounds fill vertically. */
@@ -215,18 +230,18 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-title {
-  color: #f2f2f2;
+  color: $panel-header;
   font-size: 16px;
   min-width: 170px;
 }
 
 .settings-subtitle {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 10px;
 }
 
 .settings-verse {
-  color: #8c8c8c;
+  color: $panel-subtext;
   font-size: 11px;
 }
 
@@ -261,18 +276,18 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-nav-item:hover {
-  background: rgba(136, 192, 208, 0.18);
+  background: $panel-accent-soft;
 }
 
 /* Small status card at the bottom of the first settings rail. */
 .settings-machine-card {
-  background: rgba(136, 192, 208, 0.07);
+  background: $panel-accent-muted;
   border-radius: 8px;
   padding: 8px;
 }
 
 .settings-machine-title {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 11px;
 }
 
@@ -283,18 +298,23 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-release-title {
-  color: #f2f2f2;
+  color: $panel-header;
   font-size: 11px;
 }
 
 .settings-release-copy {
-  color: #8c8c8c;
+  color: $panel-subtext;
   font-size: 9px;
 }
 
 .settings-section-title {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 13px;
+}
+
+.settings-preset-name {
+  color: $panel-subtext;
+  font-size: 11px;
 }
 
 /* Shared row typography and icons. */
@@ -307,18 +327,18 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-icon {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 21px;
   min-width: 30px;
 }
 
 .settings-row-title {
-  color: #f2f2f2;
+  color: $panel-header;
   font-size: 13px;
 }
 
 .settings-row-subtitle {
-  color: #8c8c8c;
+  color: $panel-subtext;
   font-size: 10px;
 }
 
@@ -343,8 +363,8 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .quick-toggle-dot-on {
-  background: rgba(136, 192, 208, 0.28);
-  color: #88C0D0;
+  background: $panel-accent-dot;
+  color: $panel-accent;
 }
 
 .quick-toggle-dot-off {
@@ -353,7 +373,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .quick-toggle-button:hover .quick-toggle-dot-on {
-  background: rgba(136, 192, 208, 0.42);
+  background: $panel-accent-hover;
   color: #ffffff;
 }
 
@@ -368,12 +388,12 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .quick-slider-label {
-  color: #88C0D0;
+  color: $panel-accent;
   font-size: 10px;
 }
 
 .settings-detail-subtitle {
-  color: #8c8c8c;
+  color: $panel-subtext;
   font-size: 12px;
 }
 
@@ -388,7 +408,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-action:hover {
-  background: rgba(136, 192, 208, 0.24);
+  background: $panel-accent-hover;
   color: #ffffff;
 }
 
@@ -403,8 +423,20 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 }
 
 .settings-wide-action:hover {
-  background: rgba(136, 192, 208, 0.24);
+  background: $panel-accent-hover;
   color: #ffffff;
+}
+
+.settings-display-action {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  color: #e8e8e8;
+  min-height: 54px;
+  padding: 8px 14px;
+}
+
+.settings-display-action:hover {
+  background: $panel-accent-hover;
 }
 
 .settings-capture {
@@ -421,7 +453,7 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .settings-color-chip {
   border-radius: 999px;
-  color: #f2f2f2;
+  color: $panel-header;
   font-size: 10px;
   min-width: 70px;
   min-height: 32px;
@@ -430,6 +462,31 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .settings-color-chip:hover {
   opacity: 0.82;
+}
+
+.settings-stepper {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 999px;
+  padding: 5px;
+}
+
+.settings-step-button {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  color: $panel-header;
+  font-size: 15px;
+  min-width: 34px;
+  min-height: 30px;
+}
+
+.settings-step-button:hover {
+  background: $panel-accent-hover;
+}
+
+.settings-step-value {
+  color: $panel-accent;
+  font-size: 12px;
+  min-width: 54px;
 }
 
 .settings-color-cyan {
@@ -446,4 +503,124 @@ $settings-glow-pink: rgba(255, 91, 180, 0.54);
 
 .settings-color-pink {
   background: $settings-glow-pink;
+}
+
+.settings-palette-action {
+  border-radius: 6px;
+  color: $panel-header;
+  font-size: 11px;
+  min-height: 28px;
+  padding: 0px 12px;
+}
+
+.settings-palette-action:hover {
+  opacity: 0.84;
+}
+
+.palette-cyan {
+  background: rgba(55, 210, 255, 0.48);
+}
+
+.palette-ice {
+  background: rgba(136, 192, 208, 0.72);
+}
+
+.palette-purple {
+  background: rgba(163, 104, 255, 0.58);
+}
+
+.palette-pink {
+  background: rgba(255, 91, 180, 0.48);
+}
+
+.palette-white {
+  background: rgba(235, 245, 255, 0.32);
+}
+
+.palette-violet {
+  background: rgba(98, 72, 180, 0.58);
+}
+
+.palette-orange {
+  background: rgba(255, 127, 54, 0.52);
+}
+
+.palette-red {
+  background: rgba(255, 62, 62, 0.5);
+}
+
+.palette-gold {
+  background: rgba(255, 214, 77, 0.42);
+}
+
+.palette-green {
+  background: rgba(72, 255, 158, 0.44);
+}
+
+.palette-teal {
+  background: rgba(46, 255, 230, 0.48);
+}
+
+.palette-cobalt {
+  background: rgba(92, 144, 255, 0.52);
+}
+
+.palette-magenta {
+  background: rgba(255, 58, 140, 0.5);
+}
+
+.palette-pastel-cyan {
+  background: rgba(156, 232, 244, 0.58);
+}
+
+.palette-pastel-blue {
+  background: rgba(170, 202, 255, 0.58);
+}
+
+.palette-pastel-lavender {
+  background: rgba(205, 180, 255, 0.6);
+}
+
+.palette-pastel-pink {
+  background: rgba(255, 174, 214, 0.56);
+}
+
+.palette-pastel-peach {
+  background: rgba(255, 194, 153, 0.56);
+}
+
+.palette-pastel-mint {
+  background: rgba(166, 245, 205, 0.56);
+}
+
+.palette-bright-lime {
+  background: rgba(164, 255, 42, 0.58);
+}
+
+.palette-bright-yellow {
+  background: rgba(255, 239, 64, 0.56);
+}
+
+.palette-bright-aqua {
+  background: rgba(0, 255, 240, 0.56);
+}
+
+.palette-bright-blue {
+  background: rgba(45, 126, 255, 0.62);
+}
+
+.palette-bright-purple {
+  background: rgba(185, 72, 255, 0.62);
+}
+
+.palette-bright-rose {
+  background: rgba(255, 42, 112, 0.58);
+}
+
+.palette-black {
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.palette-clear {
+  background: rgba(255, 255, 255, 0.12);
 }

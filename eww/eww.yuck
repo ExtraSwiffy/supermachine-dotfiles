@@ -13,14 +13,18 @@
 ; Quick control state for the top section of the settings panel.
 (defpoll PERF_STATE :interval "1s" "powerprofilesctl get | grep -q performance && echo on || echo off")
 (defpoll GAME_STATE :interval "1s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
-(defpoll VOLUME :interval "1s" "pamixer --get-volume")
-(defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs")
+(defpoll VOLUME :interval "1s" "pamixer --get-volume 2>/dev/null || echo 0")
+(defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 2>/dev/null | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs | awk 'NF {print; found=1} END {if (!found) print 50}'")
 
 ; Deeper settings panel state summaries.
 (defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
 (defpoll BT_POWER :interval "3s" "bluetoothctl show 2>/dev/null | awk -F': ' '/Powered/ {print $2}'")
 (defpoll BT_CONNECTED :interval "5s" "bluetoothctl devices Connected 2>/dev/null | wc -l")
-(defpoll DISPLAY_SUMMARY :interval "5s" "xrandr --query 2>/dev/null | awk '/ connected/ {print $1 \"  \" $3}' | paste -sd '    ' -")
+(defpoll DISPLAY_SUMMARY :interval "5s" "~/.config/eww/scripts/display-info.sh summary")
+(defpoll DISPLAY_ONE_NAME :interval "5s" "~/.config/eww/scripts/display-info.sh name 1")
+(defpoll DISPLAY_ONE_MODE :interval "5s" "~/.config/eww/scripts/display-info.sh mode 1")
+(defpoll DISPLAY_TWO_NAME :interval "5s" "~/.config/eww/scripts/display-info.sh name 2")
+(defpoll DISPLAY_TWO_MODE :interval "5s" "~/.config/eww/scripts/display-info.sh mode 2")
 (defpoll THEME_NAME :interval "5s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo SuperMachine")
 (defpoll NETWORK_NAME :interval "5s" "nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1==\"yes\" {print $2; found=1} END {if (!found) print \"offline\"}'")
 (defpoll AUDIO_STATE :interval "2s" "pamixer --get-mute | grep -q true && echo muted || echo \"$(pamixer --get-volume)%\"")
@@ -36,19 +40,22 @@
 (defpoll SWAP_TOTAL :interval "300s" "free -h | awk '/Swap:/ {print $3 \"/\" $2}'")
 (defpoll DISPLAY_COUNT :interval "300s" "xrandr --query 2>/dev/null | awk '/ connected/ {count++} END {print count+0}'")
 (defpoll IP_ADDR :interval "300s" "ip -o -4 addr show scope global 2>/dev/null | awk '{print $4; exit}' || echo offline")
-(defpoll HOST_NAME :interval "3600s" "hostname")
+(defpoll HOST_NAME :interval "3600s" "cat /etc/hostname 2>/dev/null || uname -n 2>/dev/null || echo unknown")
 (defpoll WM_THEME :interval "3600s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo unknown")
 (defpoll GPU_DRIVER :interval "3600s" "lspci -k 2>/dev/null | awk '/VGA|3D|Display/ {gpu=1} gpu && /Kernel driver in use/ {print $5; exit}' || echo unknown")
 (defpoll SHELL_NAME :interval "3600s" "basename \"$SHELL\"")
 (defpoll SESSION_NAME :interval "3600s" "printenv XDG_SESSION_TYPE 2>/dev/null || echo x11")
 (defpoll CPU_MODEL :interval "3600s" "awk -F': ' '/model name/ {gsub(/ CPU| Processor| with Radeon Graphics/, \"\", $2); print $2; exit}' /proc/cpuinfo")
 (defpoll GLOW_STATE :interval "2s" "test -f ~/.config/eww/state/glow-off && echo off || echo on")
+(defpoll GLOW_THICKNESS :interval "2s" "awk -F': ' '/\\$settings-glow-thickness/ {gsub(/px;|;/,\"\",$2); print $2; exit}' ~/.config/eww/eww.scss 2>/dev/null || echo 5")
+(defpoll GLOW_PRESET :interval "2s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
 (defvar BIBLE_TEXT_2 "")
 (defvar BIBLE_TEXT_3 "")
 (defvar KEY_CAPTURE_STATUS "Ready")
 (defvar KEY_CAPTURED_COMBO "None captured")
+(defvar GLOW_SLOT "1")
 
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
@@ -124,15 +131,16 @@
   :focusable false
 
   :geometry (geometry
-    :x "88px"
+    :x "90px"
     :y "0px"
-    :width "8px"
+    :width "5px"
     :height "100%"
     :anchor "left center")
 
   (box
     :orientation "v"
     :class {GLOW_STATE == "on" ? "settings-border" : "settings-border-off"}
+    :halign "center"
     :valign "fill"
     :vexpand true))
 
@@ -143,7 +151,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "90px"
+    :x "95px"
     :y "0px"
     :width "285px"
     :height "100%"
@@ -299,14 +307,14 @@
           :class "quick-slider"
           :min 1
           :max 100
-          :value BRIGHTNESS
+          :value {BRIGHTNESS == "" ? 50 : BRIGHTNESS}
           :onchange "bash -c 'sudo ddcutil --bus 10 setvcp 10 {}; sudo ddcutil --bus 7 setvcp 10 {}'")
         (label :class "quick-slider-label" :halign "start" :text "Volume")
         (scale
           :class "quick-slider"
           :min 0
           :max 100
-          :value VOLUME
+          :value {VOLUME == "" ? 0 : VOLUME}
           :onchange "pamixer --set-volume {}")))
 
     ; Category rows open focused detail panels to the right.
@@ -319,7 +327,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Bluetooth"
-        :onclick "eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle bluetoothsettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh bluetoothsettings"
         (box
           :orientation "h"
           :spacing 8
@@ -334,7 +342,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Displays"
-        :onclick "eww close bluetoothsettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle displaysettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh displaysettings"
         (box
           :orientation "h"
           :spacing 8
@@ -349,7 +357,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Network"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle networksettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh networksettings"
         (box
           :orientation "h"
           :spacing 8
@@ -364,7 +372,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Audio"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle audiosettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh audiosettings"
         (box
           :orientation "h"
           :spacing 8
@@ -379,7 +387,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Performance Mode"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close appearancesettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle powersettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh powersettings"
         (box
           :orientation "h"
           :spacing 8
@@ -394,7 +402,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Appearance"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close keybindsettings; eww close systeminfopanel; eww open --toggle appearancesettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh appearancesettings"
         (box
           :orientation "h"
           :spacing 8
@@ -409,7 +417,7 @@
       (button
         :class "settings-nav-item"
         :tooltip "Keybinds"
-        :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close systeminfopanel; eww open --toggle keybindsettings"
+        :onclick "~/.config/eww/scripts/switch-settings-panel.sh keybindsettings"
         (box
           :orientation "h"
           :spacing 8
@@ -424,7 +432,7 @@
         (button
           :class "settings-nav-item"
           :tooltip "System"
-          :onclick "eww close bluetoothsettings; eww close displaysettings; eww close networksettings; eww close audiosettings; eww close powersettings; eww close appearancesettings; eww close keybindsettings; eww open --toggle systeminfopanel"
+          :onclick "~/.config/eww/scripts/switch-settings-panel.sh systeminfopanel"
           (box
             :orientation "h"
             :spacing 8
@@ -490,7 +498,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -531,7 +539,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -561,15 +569,31 @@
       :orientation "v"
       :class "settings-section"
       :spacing 8
-      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh DisplayPort-2" "DisplayPort-2")
-      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh HDMI-A-0" "HDMI-A-0"))
+      (button
+        :class "settings-display-action"
+        :onclick { "~/.config/eww/scripts/display-menu.sh " + DISPLAY_ONE_NAME }
+        (box
+          :orientation "v"
+          :spacing 3
+          :halign "start"
+          (label :class "settings-row-title" :halign "start" :text DISPLAY_ONE_NAME)
+          (label :class "settings-row-subtitle" :halign "start" :text DISPLAY_ONE_MODE)))
+      (button
+        :class "settings-display-action"
+        :onclick { "~/.config/eww/scripts/display-menu.sh " + DISPLAY_TWO_NAME }
+        (box
+          :orientation "v"
+          :spacing 3
+          :halign "start"
+          (label :class "settings-row-title" :halign "start" :text DISPLAY_TWO_NAME)
+          (label :class "settings-row-subtitle" :halign "start" :text DISPLAY_TWO_MODE))))
 
     (box
       :orientation "v"
       :class "settings-section"
       :spacing 10
       (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/display-menu.sh" "All Display Modes")
-      (button :class "settings-wide-action" :onclick "arandr" "Open Layout Editor")
+      (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f arandr >/dev/null 2>&1'" "Open Layout Editor")
       (button :class "settings-wide-action" :onclick "~/.screenlayout/monitors.sh" "Apply Saved Layout")))))
 
 ; Network detail panel for frequently used NetworkManager actions.
@@ -579,7 +603,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -608,8 +632,8 @@
       :orientation "v"
       :class "settings-section"
       :spacing 10
-        (button :class "settings-wide-action" :onclick "nm-connection-editor" "Connection Editor")
-        (button :class "settings-wide-action" :onclick "alacritty -e nmtui" "Network Terminal UI")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f nm-connection-editor >/dev/null 2>&1'" "Connection Editor")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f alacritty -e nmtui >/dev/null 2>&1'" "Network Terminal UI")
         (button :class "settings-wide-action" :onclick "bash -c 'nmcli networking on; notify-send Network Enabled'" "Networking On")
         (button :class "settings-wide-action" :onclick "bash -c 'nmcli networking off; notify-send Network Disabled'" "Networking Off")))))
 
@@ -620,7 +644,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -649,7 +673,7 @@
       :orientation "v"
       :class "settings-section"
       :spacing 10
-        (button :class "settings-wide-action" :onclick "pavucontrol" "Open Audio Mixer")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f pavucontrol >/dev/null 2>&1'" "Open Audio Mixer")
         (button :class "settings-wide-action" :onclick "pamixer -t" "Toggle Mute")
         (button :class "settings-wide-action" :onclick "pamixer --set-volume 50" "Set 50%")
         (button :class "settings-wide-action" :onclick "pamixer --set-volume 100" "Set 100%")))))
@@ -661,7 +685,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -702,7 +726,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -732,31 +756,274 @@
       :class "settings-section"
       :spacing 10
         (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/theme-menu.sh" "Switch Openbox Theme")
-        (button :class "settings-wide-action" :onclick "lxappearance" "GTK, Icons, Cursor")
-        (button :class "settings-wide-action" :onclick "obconf-qt" "Openbox Settings"))
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f lxappearance >/dev/null 2>&1'" "GTK, Icons, Cursor")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f obconf-qt >/dev/null 2>&1'" "Openbox Settings"))
 
-    ; Glow colors update the SCSS variables and reload Eww.
+    ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box
       :orientation "v"
       :class "settings-section"
       :spacing 10
-      (label :class "settings-section-title" :halign "start" :text "Panel Glow")
+      (label :class "settings-section-title" :halign "start" :text "Customize Panel")
+      (label :class "settings-preset-name" :halign "start" :text { "Preset: " + GLOW_PRESET })
       (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-glow.sh" { "Panel Glow: " + GLOW_STATE })
       (box
         :orientation "h"
+        :class "settings-stepper"
         :spacing 8
         :halign "center"
-        (button :class "settings-color-chip settings-color-cyan" :tooltip "Cycle glow color 1" :onclick "~/.config/eww/scripts/set-glow-color.sh 1 cycle" "1")
-        (button :class "settings-color-chip settings-color-blue" :tooltip "Cycle glow color 2" :onclick "~/.config/eww/scripts/set-glow-color.sh 2 cycle" "2")
-        (button :class "settings-color-chip settings-color-purple" :tooltip "Cycle glow color 3" :onclick "~/.config/eww/scripts/set-glow-color.sh 3 cycle" "3")
-        (button :class "settings-color-chip settings-color-pink" :tooltip "Cycle glow color 4" :onclick "~/.config/eww/scripts/set-glow-color.sh 4 cycle" "4"))
+        (button :class "settings-step-button" :tooltip "Thinner glow" :onclick "~/.config/eww/scripts/set-glow-thickness.sh down" "−")
+        (label :class "settings-step-value" :text { GLOW_THICKNESS + " px" })
+        (button :class "settings-step-button" :tooltip "Thicker glow" :onclick "~/.config/eww/scripts/set-glow-thickness.sh up" "+"))
+      (label :class "settings-section-title" :halign "start" :text "Quick Presets")
       (box
         :orientation "h"
-        :spacing 8
+        :spacing 6
         :halign "center"
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset default" "Default")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ice" "Ice")
-        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset neon" "Neon"))))))
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset neon" "Neon"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-cyan" "Cyan")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-orange" "Orange")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-lime" "Lime"))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-panel-customization.sh" "Advanced Customization")))))
+
+; Third drawer with full panel theme controls and preset library.
+(defwindow panelcustomization
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "810px"
+    :y "0px"
+    :width "430px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+      (label :class "settings-title" :halign "start" :text "Customize Panel")
+      (label :class "settings-detail-subtitle" :halign "start" :text { "Preset: " + GLOW_PRESET })
+
+      ; Full panel customization lives here so Appearance stays compact.
+      (box
+        :orientation "v"
+        :class "settings-section settings-preset-grid"
+        :spacing 10
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-glow.sh" { "Panel Glow: " + GLOW_STATE })
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "center"
+          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick panel accent color" :onclick "eww update GLOW_SLOT=accent; eww open glowcolorpicker" "Accent")
+          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick header text color" :onclick "eww update GLOW_SLOT=header; eww open glowcolorpicker" "Header")
+          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick sub text color" :onclick "eww update GLOW_SLOT=subtext; eww open glowcolorpicker" "Sub"))
+        (box
+          :orientation "h"
+          :spacing 8
+          :halign "center"
+          (button :class "settings-color-chip settings-color-cyan" :tooltip "Pick glow color 1" :onclick "eww update GLOW_SLOT=1; eww open glowcolorpicker" "1")
+          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick glow color 2" :onclick "eww update GLOW_SLOT=2; eww open glowcolorpicker" "2")
+          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick glow color 3" :onclick "eww update GLOW_SLOT=3; eww open glowcolorpicker" "3")
+          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick glow color 4" :onclick "eww update GLOW_SLOT=4; eww open glowcolorpicker" "4"))
+        (box
+          :orientation "h"
+          :class "settings-stepper"
+          :spacing 8
+          :halign "center"
+          (button :class "settings-step-button" :tooltip "Thinner glow" :onclick "~/.config/eww/scripts/set-glow-thickness.sh down" "−")
+          (label :class "settings-step-value" :text { GLOW_THICKNESS + " px" })
+          (button :class "settings-step-button" :tooltip "Thicker glow" :onclick "~/.config/eww/scripts/set-glow-thickness.sh up" "+"))
+      (label :class "settings-section-title" :halign "start" :text "Animated")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset default" "Default")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ice" "Ice")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset neon" "Neon"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset sunset" "Sunset")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset matrix" "Matrix")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset vapor" "Vapor"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset aurora" "Aurora")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ember" "Ember")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ocean" "Ocean"))
+      (label :class "settings-section-title" :halign "start" :text "Pastel Animated")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-dream" "Dream")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-sakura" "Sakura")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-mint" "Mint"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-cotton" "Cotton")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-sherbet" "Sherbet")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-orchid" "Orchid"))
+      (label :class "settings-section-title" :halign "start" :text "Bright Animated")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-candy" "Candy")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-plasma" "Plasma")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-arcade" "Arcade"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-hyper" "Hyper")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-rgb" "RGB")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-spark" "Spark"))
+      (label :class "settings-section-title" :halign "start" :text "Static")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-cyan" "Cyan")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-purple" "Purple")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-pink" "Pink"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-orange" "Orange")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-red" "Red")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-clear" "Clear"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-gold" "Gold")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-teal" "Teal")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-cobalt" "Cobalt"))
+      (label :class "settings-section-title" :halign "start" :text "Pastel Static")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-sky" "Sky")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-lavender" "Lavender")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-mint" "Mint"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-rose" "Rose")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-cyan" "Cyan")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset pastel-static-peach" "Peach"))
+      (label :class "settings-section-title" :halign "start" :text "Bright Static")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-lime" "Lime")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-aqua" "Aqua")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-rose" "Rose"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-yellow" "Yellow")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-blue" "Blue")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-purple" "Purple"))))))
+
+; Fourth drawer for picking one of the panel glow and text colors.
+(defwindow glowcolorpicker
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "1240px"
+    :y "0px"
+    :width "300px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-picker-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "start"
+      :vexpand false
+      :space-evenly false
+
+      (label :class "settings-title" :halign "start" :text { "Theme Color " + GLOW_SLOT })
+      (label :class "settings-detail-subtitle" :halign "start" :text "Pick a color for glow or panel text")
+
+      (box
+        :orientation "v"
+        :class "settings-section"
+        :spacing 6
+        (label :class "settings-section-title" :halign "start" :text "Core")
+        (button :class "settings-palette-action palette-cyan" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " cyan" } "SuperMachine Cyan")
+        (button :class "settings-palette-action palette-ice" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " ice" } "Ice Blue")
+        (button :class "settings-palette-action palette-purple" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " purple" } "Arc Purple")
+        (button :class "settings-palette-action palette-pink" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pink" } "Signal Pink")
+        (button :class "settings-palette-action palette-white" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " white" } "Soft White")
+        (button :class "settings-palette-action palette-violet" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " violet" } "Deep Violet")
+        (button :class "settings-palette-action palette-orange" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " orange" } "Signal Orange")
+        (button :class "settings-palette-action palette-red" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " red" } "Warning Red")
+        (button :class "settings-palette-action palette-gold" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " gold" } "Gold")
+        (button :class "settings-palette-action palette-green" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " green" } "Terminal Green")
+        (button :class "settings-palette-action palette-teal" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " teal" } "Cyber Teal")
+        (button :class "settings-palette-action palette-cobalt" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " cobalt" } "Cobalt")
+        (button :class "settings-palette-action palette-magenta" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " magenta" } "Hot Magenta")
+        (label :class "settings-section-title" :halign "start" :text "Pastel")
+        (button :class "settings-palette-action palette-pastel-cyan" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-cyan" } "Pastel Cyan")
+        (button :class "settings-palette-action palette-pastel-blue" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-blue" } "Pastel Sky")
+        (button :class "settings-palette-action palette-pastel-lavender" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-lavender" } "Pastel Lavender")
+        (button :class "settings-palette-action palette-pastel-pink" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-pink" } "Pastel Pink")
+        (button :class "settings-palette-action palette-pastel-peach" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-peach" } "Pastel Peach")
+        (button :class "settings-palette-action palette-pastel-mint" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " pastel-mint" } "Pastel Mint")
+        (label :class "settings-section-title" :halign "start" :text "Bright")
+        (button :class "settings-palette-action palette-bright-lime" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-lime" } "Bright Lime")
+        (button :class "settings-palette-action palette-bright-yellow" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-yellow" } "Bright Yellow")
+        (button :class "settings-palette-action palette-bright-aqua" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-aqua" } "Bright Aqua")
+        (button :class "settings-palette-action palette-bright-blue" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-blue" } "Bright Blue")
+        (button :class "settings-palette-action palette-bright-purple" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-purple" } "Bright Purple")
+        (button :class "settings-palette-action palette-bright-rose" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-rose" } "Bright Rose")
+        (button :class "settings-palette-action palette-black" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " black" } "Low Black")
+        (button :class "settings-palette-action palette-clear" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " clear" } "Almost Clear"))
+
+      (button :class "settings-wide-action" :onclick "eww close glowcolorpicker" "Close Picker"))))
 
 ; Keybind detail panel with a small live key capture helper.
 (defwindow keybindsettings
@@ -765,7 +1032,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -824,7 +1091,7 @@
       :orientation "v"
       :class "settings-section"
       :spacing 10
-      (button :class "settings-wide-action" :onclick "code ~/.config/openbox/rc.xml" "Edit Openbox Keybinds")
+      (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f code ~/.config/openbox/rc.xml >/dev/null 2>&1'" "Edit Openbox Keybinds")
       (button :class "settings-wide-action" :onclick "openbox --reconfigure" "Reload Openbox")))))
 
 ; System detail panel with metrics and utility launchers.
@@ -834,7 +1101,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "458px"
+    :x "380px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -888,8 +1155,8 @@
         :spacing 12
         (label :class "settings-icon" :text "󰔏")
         (label :class "settings-row-title" :text { "TEMP " + CPU_TEMP + "°C" }))
-        (button :class "settings-wide-action" :onclick "alacritty -e btop" "Open Btop")
-        (button :class "settings-wide-action" :onclick "pavucontrol" "Open Audio Mixer")))))
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f alacritty -e btop >/dev/null 2>&1'" "Open Btop")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f pavucontrol >/dev/null 2>&1'" "Open Audio Mixer")))))
 
 ; Older compact control center kept available while the new panel evolves.
 (defwindow controlcenter
