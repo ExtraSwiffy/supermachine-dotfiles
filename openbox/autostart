@@ -11,6 +11,7 @@ eww daemon &
 
 sleep 1
 eww open sidebar &
+~/.config/eww/scripts/first-run.sh &
 
 sleep 1
 "$HOME/.config/openbox/smart-place.sh" &

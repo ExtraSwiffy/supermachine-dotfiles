@@ -57,9 +57,8 @@
 (defpoll GLOW_PRESET :interval "2s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
 (defpoll WINDOW_GAP :interval "2s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
 (defpoll SMART_TILING_STATE :interval "2s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
-(defpoll WINDOW_BORDER_STATE :interval "2s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
-(defpoll WINDOW_BORDER_WIDTH :interval "2s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
 (defpoll WINDOW_RADIUS :interval "2s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
+(defpoll SUPERMACHINE_UPDATE_STATUS :interval "2s" "cat ~/.config/eww/state/supermachine-update-status 2>/dev/null || echo Ready")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
 (defvar BIBLE_TEXT_2 "")
@@ -831,15 +830,6 @@
         (button :class "settings-step-button" :tooltip "Smaller window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh down" "−")
         (label :class "settings-step-value" :text { WINDOW_GAP + " px" })
         (button :class "settings-step-button" :tooltip "Larger window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh up" "+"))
-      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/set-window-border.sh toggle" { "Window Border: " + WINDOW_BORDER_STATE })
-      (box
-        :orientation "h"
-        :class "settings-stepper"
-        :spacing 8
-        :halign "center"
-        (button :class "settings-step-button" :tooltip "Thinner window border" :onclick "~/.config/eww/scripts/set-window-border.sh thinner" "−")
-        (label :class "settings-step-value" :text { WINDOW_BORDER_WIDTH + " px" })
-        (button :class "settings-step-button" :tooltip "Thicker window border" :onclick "~/.config/eww/scripts/set-window-border.sh thicker" "+"))
       (box
         :orientation "h"
         :class "settings-stepper"
@@ -847,8 +837,7 @@
         :halign "center"
         (button :class "settings-step-button" :tooltip "Less rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh down" "−")
         (label :class "settings-step-value" :text { WINDOW_RADIUS + " r" })
-        (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+"))
-      (button :class "settings-wide-action" :onclick "eww update GLOW_SLOT=border; eww open glowcolorpicker" "Border Color"))
+        (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+")))
 
     ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box
@@ -1247,9 +1236,94 @@
         (label :class "settings-icon" :text "󰔏")
         (label :class "settings-row-title" :text { "TEMP " + CPU_TEMP + "°C" }))
         (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f alacritty -e btop >/dev/null 2>&1'" "Open Btop")
-        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f pavucontrol >/dev/null 2>&1'" "Open Audio Mixer")))))
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f pavucontrol >/dev/null 2>&1'" "Open Audio Mixer"))
+
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (label :class "settings-section-title" :halign "start" :text "SuperMachine")
+      (label :class "settings-row-subtitle" :halign "start" :text SUPERMACHINE_UPDATE_STATUS)
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/open-welcome.sh" "Open Welcome")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/update-supermachine.sh check" "Check for Updates")
+      (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/update-supermachine.sh update >/tmp/supermachine-update-launch.log 2>&1'" "Update SuperMachine")))))
 
 ; Older compact control center kept available while the new panel evolves.
+(defwindow supermachinewelcome
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :width "760px"
+    :height "620px"
+    :anchor "center")
+
+  (box
+    :orientation "v"
+    :class "welcome-panel"
+    :spacing 16
+    :valign "fill"
+    :vexpand true
+
+    (box
+      :orientation "h"
+      :class "settings-header"
+      :halign "fill"
+      (label :class "welcome-title" :halign "start" :hexpand true :text "SuperMachine V1.0.0")
+      (button :class "settings-close" :onclick "eww close supermachinewelcome" "×"))
+
+    (label :class "welcome-copy" :halign "start" :wrap true :text "A modern, minimal Openbox desktop built from Arch, Eww, Rofi, Picom, Alacritty, and curated configs. It is not a from-scratch OS; it is a lightweight desktop package designed to feel fast, personal, and easy to change.")
+
+    (box
+      :orientation "h"
+      :spacing 14
+      :homogeneous true
+      (box
+        :orientation "v"
+        :class "welcome-card"
+        :spacing 8
+        (label :class "settings-section-title" :halign "start" :text "Core Keys")
+        (label :class "settings-row-subtitle" :halign "start" :text "Super + Tab  Settings")
+        (label :class "settings-row-subtitle" :halign "start" :text "Super + Space  Apps")
+        (label :class "settings-row-subtitle" :halign "start" :text "Super + T  Terminal")
+        (label :class "settings-row-subtitle" :halign "start" :text "Print  Screenshot"))
+      (box
+        :orientation "v"
+        :class "welcome-card"
+        :spacing 8
+        (label :class "settings-section-title" :halign "start" :text "Sidebar")
+        (label :class "settings-row-subtitle" :halign "start" :text "Use the left rail for workspaces, time, launcher, and settings.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Appearance includes panel themes, radius, wallpaper, and tiling gaps.")))
+
+    (box
+      :orientation "h"
+      :spacing 14
+      :homogeneous true
+      (box
+        :orientation "v"
+        :class "welcome-card"
+        :spacing 8
+        (label :class "settings-section-title" :halign "start" :text "Performance")
+        (label :class "settings-row-subtitle" :halign "start" :text "Perf Mode changes power profile.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Fullscreen games auto-hide the sidebar.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Semi tiling can be toggled off anytime."))
+      (box
+        :orientation "v"
+        :class "welcome-card"
+        :spacing 8
+        (label :class "settings-section-title" :halign "start" :text "Updates")
+        (label :class "settings-row-subtitle" :halign "start" :text SUPERMACHINE_UPDATE_STATUS)
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/update-supermachine.sh check" "Check for Updates")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/update-supermachine.sh update >/tmp/supermachine-update-launch.log 2>&1'" "Update SuperMachine")))
+
+    (box
+      :orientation "h"
+      :spacing 12
+      :halign "end"
+      (button :class "settings-action" :onclick "bash -lc 'setsid -f code ~/dotfiles >/dev/null 2>&1'" "Open Repo")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/finish-welcome.sh" "Finish Setup"))))
+
 (defwindow controlcenter
   :monitor 0
   :stacking "fg"

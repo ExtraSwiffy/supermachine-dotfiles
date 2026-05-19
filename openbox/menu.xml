@@ -172,6 +172,42 @@
 
 <!-- SYSTEM -->
 
+<menu id="supermachine-menu" label="SuperMachine">
+  <item label="Open SuperMachine Welcome">
+    <action name="Execute">
+      <command>~/.config/eww/scripts/open-welcome.sh</command>
+    </action>
+  </item>
+
+  <item label="Open SuperMachine Settings">
+    <action name="Execute">
+      <command>~/.config/eww/scripts/toggle-settings.sh</command>
+    </action>
+  </item>
+
+  <separator />
+
+  <item label="Check for Updates">
+    <action name="Execute">
+      <command>~/.config/eww/scripts/update-supermachine.sh check</command>
+    </action>
+  </item>
+
+  <item label="Update SuperMachine">
+    <action name="Execute">
+      <command>~/.config/eww/scripts/update-supermachine.sh update</command>
+    </action>
+  </item>
+
+  <separator />
+
+  <item label="Open Dotfiles Repo in VS Code">
+    <action name="Execute">
+      <command>sh -c 'if [ -d ~/supermachine-dotfiles ]; then code ~/supermachine-dotfiles; else code ~/dotfiles; fi'</command>
+    </action>
+  </item>
+</menu>
+
 <menu id="system-menu" label="System">
   <item label="Reload Openbox">
     <action name="Reconfigure" />
@@ -252,6 +288,7 @@
 
   <separator label="System"/>
 
+  <menu id="supermachine-menu"/>
   <menu id="conf-menu"/>
   <menu id="system-menu"/>
 

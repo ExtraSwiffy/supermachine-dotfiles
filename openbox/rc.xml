@@ -791,7 +791,7 @@
   </menu>
   <applications>
     <application class="*">
-      <decor>yes</decor>
+      <decor>no</decor>
     </application>
   </applications>
 </openbox_config>
