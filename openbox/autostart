@@ -11,3 +11,6 @@ eww daemon &
 
 sleep 1
 eww open sidebar &
+
+sleep 1
+"$HOME/.config/openbox/smart-place.sh" &

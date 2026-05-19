@@ -15,6 +15,12 @@
 (defpoll GAME_STATE :interval "1s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
 (defpoll VOLUME :interval "1s" "pamixer --get-volume 2>/dev/null || echo 0")
 (defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 2>/dev/null | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs | awk 'NF {print; found=1} END {if (!found) print 50}'")
+(defpoll MEDIA_ACTIVE :interval "2s" "~/.config/eww/scripts/media-info.sh active")
+(defpoll MEDIA_ICON :interval "2s" "~/.config/eww/scripts/media-info.sh icon")
+(defpoll MEDIA_TITLE :interval "2s" "~/.config/eww/scripts/media-info.sh title")
+(defpoll MEDIA_SUBTITLE :interval "2s" "~/.config/eww/scripts/media-info.sh subtitle")
+(defpoll MEDIA_STATUS :interval "2s" "~/.config/eww/scripts/media-info.sh status")
+(defpoll MEDIA_VOLUME :interval "2s" "~/.config/eww/scripts/media-info.sh volume")
 
 ; Deeper settings panel state summaries.
 (defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
@@ -60,8 +66,7 @@
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
   :monitor 0
-  :exclusive true
-  :reserve (struts :side "left" :distance "90px")
+  :exclusive false
   :stacking "fg"
 
   :geometry (geometry
@@ -118,7 +123,7 @@
 
       (button
         :class "settings-button"
-        :onclick "~/.config/eww/scripts/toggle-settings.sh"
+        :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-settings.sh >/tmp/supermachine-settings-toggle.log 2>&1'"
         "󰒓")
     )
   )
@@ -316,6 +321,44 @@
           :max 100
           :value {VOLUME == "" ? 0 : VOLUME}
           :onchange "pamixer --set-volume {}")))
+
+    ; Media output card follows Spotify and browser players such as YouTube.
+    (box
+      :orientation "v"
+      :class "media-card"
+      :spacing 6
+      :vexpand false
+      :space-evenly false
+      (box
+        :orientation "h"
+        :spacing 8
+        :halign "fill"
+        :space-evenly false
+        (label :class {MEDIA_ACTIVE == "yes" ? "media-icon-on" : "media-icon-off"} :text MEDIA_ICON)
+        (box
+          :orientation "v"
+          :spacing 1
+          :hexpand true
+          :halign "fill"
+          (label :class "media-title" :halign "start" :limit-width 24 :text MEDIA_TITLE)
+          (label :class "media-subtitle" :halign "start" :limit-width 24 :text { MEDIA_STATUS + "  " + MEDIA_SUBTITLE })))
+      (box
+        :orientation "h"
+        :spacing 8
+        :halign "center"
+        (button :class "media-control-button" :tooltip "Previous" :onclick "~/.config/eww/scripts/media-control.sh previous" "󰒮")
+        (button :class "media-control-button media-play-button" :tooltip "Play / Pause" :onclick "~/.config/eww/scripts/media-control.sh play-pause" {MEDIA_STATUS == "Playing" ? "󰏤" : "󰐊"})
+        (button :class "media-control-button" :tooltip "Next" :onclick "~/.config/eww/scripts/media-control.sh next" "󰒭"))
+      (box
+        :orientation "v"
+        :spacing 2
+        (label :class "quick-slider-label" :halign "start" :text "Media Volume")
+        (scale
+          :class "quick-slider"
+          :min 0
+          :max 100
+          :value {MEDIA_VOLUME == "" ? 0 : MEDIA_VOLUME}
+          :onchange "~/.config/eww/scripts/media-control.sh volume {}")))
 
     ; Category rows open focused detail panels to the right.
     (box

@@ -365,28 +365,44 @@
       </action>
     </keybind>
     <keybind key="W-Left">
-      <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>0</x>
-        <y>0</y>
-        <width>50%</width>
-        <height>100%</height>
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --left</command>
       </action>
     </keybind>
     <keybind key="W-Right">
-      <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>50%</x>
-        <y>0</y>
-        <width>50%</width>
-        <height>100%</height>
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --right</command>
+      </action>
+    </keybind>
+    <keybind key="W-C-Left">
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --upper-left</command>
+      </action>
+    </keybind>
+    <keybind key="W-C-Right">
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --upper-right</command>
+      </action>
+    </keybind>
+    <keybind key="W-A-Left">
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --lower-left</command>
+      </action>
+    </keybind>
+    <keybind key="W-A-Right">
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --lower-right</command>
       </action>
     </keybind>
     <keybind key="W-Up">
-      <action name="MaximizeFull"/>
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --up</command>
+      </action>
     </keybind>
     <keybind key="W-Down">
-      <action name="UnmaximizeFull"/>
+      <action name="Execute">
+        <command>~/.config/openbox/smart-place.sh --down</command>
+      </action>
     </keybind>
     <keybind key="W-1">
       <action name="GoToDesktop">

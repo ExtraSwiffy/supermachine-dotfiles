@@ -34,6 +34,7 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+playerctl
 power-profiles-daemon
 rofi
 rsync
@@ -44,6 +45,7 @@ wmctrl
 woff2-font-awesome
 xorg-server
 xorg-xev
+xorg-xprop
 xorg-xauth
 xorg-xinit
 xorg-xinput

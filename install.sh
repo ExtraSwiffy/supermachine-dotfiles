@@ -63,6 +63,7 @@ cp gtk-4.0/settings.ini ~/.config/gtk-4.0/
 echo "Making scripts executable..."
 
 chmod +x ~/.config/eww/scripts/*.sh
+chmod +x ~/.config/openbox/*.sh
 chmod +x ~/.screenlayout/monitors.sh
 chmod +x ~/.fehbg
 chmod +x ~/.xinitrc

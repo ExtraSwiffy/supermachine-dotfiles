@@ -1,9 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 cfg="$HOME/.config/eww"
+lock_file="/tmp/supermachine-settings-toggle.lock"
+
+exec 9>"$lock_file"
+flock -n 9 || exit 0
 
 close_settings() {
+  local active
+  active="$(eww -c "$cfg" active-windows 2>/dev/null || true)"
+
   for window in \
     settingsborder \
     systemsettings \
@@ -17,13 +24,15 @@ close_settings() {
     glowcolorpicker \
     keybindsettings \
     systeminfopanel; do
-    if eww -c "$cfg" active-windows | grep -q "^${window}:"; then
+    if grep -q "^${window}:" <<< "$active"; then
       eww -c "$cfg" close "$window" >/dev/null 2>&1 || true
     fi
   done
 }
 
-if eww -c "$cfg" active-windows | grep -q '^systemsettings:'; then
+active_windows="$(eww -c "$cfg" active-windows 2>/dev/null || true)"
+
+if grep -q '^systemsettings:' <<< "$active_windows"; then
   close_settings
 else
   close_settings

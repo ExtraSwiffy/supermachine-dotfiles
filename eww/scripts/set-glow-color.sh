@@ -122,6 +122,7 @@ reload_eww() {
   mkdir -p "$state_dir"
   rm -f "$state_file"
   eww update GLOW_STATE=on GLOW_PRESET="$(cat "$preset_file" 2>/dev/null || echo CUSTOM)" >/dev/null 2>&1 || true
+  "$HOME/.config/eww/scripts/sync-openbox-theme.sh" >/dev/null 2>&1 || true
 
   if eww reload >/dev/null 2>&1; then
     notify-send "Panel Glow" "Updated settings glow." 2>/dev/null || true
