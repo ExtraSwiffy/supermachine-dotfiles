@@ -5,6 +5,7 @@ gap="${SUPERMACHINE_WINDOW_GAP:-5}"
 bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
 poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1}"
+fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
 
 case "${1:-}" in
   --once|--left|--right|--up|--down|--upper-left|--upper-right|--lower-left|--lower-right) ;;
@@ -196,9 +197,47 @@ window_ids() {
   local desktop="$1"
 
   wmctrl -lxG |
-    awk -v desktop="$desktop" '$2 == desktop {print $1, $6}' |
+    awk -v desktop="$desktop" '$2 == desktop {print $1, $7}' |
     while read -r id class; do
       if is_normal_window "$id" "$class"; then
+        printf '%s\n' "$id"
+      fi
+    done
+}
+
+window_ids_in_area() {
+  local desktop="$1"
+  local area_x="$2"
+  local area_y="$3"
+  local area_w="$4"
+  local area_h="$5"
+  local area_r area_b
+
+  area_r=$((area_x + area_w))
+  area_b=$((area_y + area_h))
+
+  wmctrl -lxG |
+    awk -v desktop="$desktop" '$2 == desktop {print $1, $3, $4, $5, $6, $7}' |
+    while read -r id win_x win_y win_w win_h class; do
+      local win_r win_b overlap_x overlap_y overlap_r overlap_b
+
+      if ! is_normal_window "$id" "$class"; then
+        continue
+      fi
+
+      win_r=$((win_x + win_w))
+      win_b=$((win_y + win_h))
+      overlap_x="$win_x"
+      overlap_y="$win_y"
+      overlap_r="$win_r"
+      overlap_b="$win_b"
+
+      [ "$overlap_x" -lt "$area_x" ] && overlap_x="$area_x"
+      [ "$overlap_y" -lt "$area_y" ] && overlap_y="$area_y"
+      [ "$overlap_r" -gt "$area_r" ] && overlap_r="$area_r"
+      [ "$overlap_b" -gt "$area_b" ] && overlap_b="$area_b"
+
+      if [ "$overlap_r" -gt "$overlap_x" ] && [ "$overlap_b" -gt "$overlap_y" ]; then
         printf '%s\n' "$id"
       fi
     done
@@ -248,17 +287,66 @@ focus_window() {
   wmctrl -ia "$id" >/dev/null 2>&1 || true
 }
 
+is_active_fullscreen() {
+  local id state type
+
+  id="$(active_window)"
+  [ -n "$id" ] || return 1
+
+  type="$(xprop -id "$id" _NET_WM_WINDOW_TYPE 2>/dev/null || true)"
+  state="$(xprop -id "$id" _NET_WM_STATE 2>/dev/null || true)"
+
+  grep -q '_NET_WM_WINDOW_TYPE_NORMAL' <<< "$type" || return 1
+  grep -q '_NET_WM_STATE_FULLSCREEN' <<< "$state"
+}
+
+sidebar_is_open() {
+  eww active-windows 2>/dev/null | grep -q '^sidebar:'
+}
+
+settings_are_open() {
+  eww active-windows 2>/dev/null | grep -q '^systemsettings:'
+}
+
+close_settings_windows() {
+  eww close settingsborder systemsettings bluetoothsettings displaysettings networksettings audiosettings \
+    powersettings appearancesettings panelcustomization glowcolorpicker keybindsettings systeminfopanel \
+    controlcenter >/dev/null 2>&1 || true
+}
+
+sync_sidebar_for_fullscreen() {
+  if is_active_fullscreen; then
+    if [ -f "$fullscreen_override" ] && settings_are_open; then
+      return 0
+    fi
+
+    rm -f "$fullscreen_override"
+    close_settings_windows
+    eww close sidebar >/dev/null 2>&1 || true
+    return 0
+  fi
+
+  rm -f "$fullscreen_override"
+  if ! sidebar_is_open; then
+    eww open sidebar >/dev/null 2>&1 || true
+  fi
+}
+
 tile_remaining_area() {
   local skip_id="$1"
-  local x="$2"
-  local y="$3"
-  local w="$4"
-  local h="$5"
+  local monitor_x="$2"
+  local monitor_y="$3"
+  local monitor_w="$4"
+  local monitor_h="$5"
+  local x="$6"
+  local y="$7"
+  local w="$8"
+  local h="$9"
   local desktop n index id rows cols row col cell_w cell_h
   local -a ids ordered
 
   desktop="$(current_desktop)"
-  mapfile -t ids < <(window_ids "$desktop" |
+  mapfile -t ids < <(window_ids_in_area "$desktop" "$monitor_x" "$monitor_y" "$monitor_w" "$monitor_h" |
     awk -v skip="$skip_id" '
       function norm(id) {
         id = tolower(id)
@@ -326,12 +414,12 @@ place_focused() {
   case "$mode" in
     left)
       move_window "$id" "$x" "$y" "$half_w" "$h"
-      tile_remaining_area "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
+      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
       focus_window "$id"
       ;;
     right)
       move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
-      tile_remaining_area "$id" "$x" "$y" "$half_w" "$h"
+      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$x" "$y" "$half_w" "$h"
       focus_window "$id"
       ;;
     up)
@@ -372,7 +460,7 @@ tile_windows() {
   read -r wx wy ww wh < <(active_monitor_area "$wx" "$wy" "$ww" "$wh" "$desktop" "$(active_window)")
   read -r wx wy ww wh < <(sidebar_safe_area "$wx" "$wy" "$ww" "$wh")
 
-  mapfile -t ids < <(window_ids "$desktop")
+  mapfile -t ids < <(window_ids_in_area "$desktop" "$wx" "$wy" "$ww" "$wh")
   n="${#ids[@]}"
   [ "$n" -gt 0 ] || return 0
 
@@ -474,6 +562,7 @@ esac
 last_signature=""
 
 while true; do
+  sync_sidebar_for_fullscreen
   current_signature="$(signature)"
   if [ "$current_signature" != "$last_signature" ]; then
     tile_windows

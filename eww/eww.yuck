@@ -68,6 +68,7 @@
   :monitor 0
   :exclusive false
   :stacking "fg"
+  :focusable false
 
   :geometry (geometry
     :x "0px"
