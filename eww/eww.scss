@@ -1,17 +1,17 @@
-$settings-glow-cyan: rgba(55, 210, 255, 0.54);
-$settings-glow-blue: rgba(136, 192, 208, 0.95);
-$settings-glow-purple: rgba(163, 104, 255, 0.72);
-$settings-glow-pink: rgba(255, 91, 180, 0.54);
-$settings-glow-edge: rgba(55, 210, 255, 0.36);
+$settings-glow-cyan: rgba(255, 194, 153, 0.62);
+$settings-glow-blue: rgba(255, 174, 214, 0.62);
+$settings-glow-purple: rgba(255, 239, 64, 0.32);
+$settings-glow-pink: rgba(166, 245, 205, 0.54);
+$settings-glow-edge: rgba(255, 194, 153, 0.22);
 $settings-glow-thickness: 5px;
-$panel-accent: rgba(136, 192, 208, 0.95);
-$panel-header: rgba(242, 242, 242, 1);
-$panel-subtext: rgba(140, 140, 140, 1);
-$panel-accent-muted: rgba(136, 192, 208, 0.07);
-$panel-accent-soft: rgba(136, 192, 208, 0.18);
-$panel-accent-hover: rgba(136, 192, 208, 0.24);
-$panel-accent-dot: rgba(136, 192, 208, 0.28);
-$window-border-accent: rgba(136, 192, 208, 0.95);
+$panel-accent: rgba(255, 194, 153, 0.82);
+$panel-header: rgba(255, 246, 238, 1);
+$panel-subtext: rgba(190, 164, 146, 1);
+$panel-accent-muted: rgba(255, 194, 153, 0.07);
+$panel-accent-soft: rgba(255, 194, 153, 0.18);
+$panel-accent-hover: rgba(255, 194, 153, 0.24);
+$panel-accent-dot: rgba(255, 194, 153, 0.28);
+$window-border-accent: rgba(255, 194, 153, 0.82);
 
 /* Global reset and font. */
 * {

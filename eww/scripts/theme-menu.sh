@@ -19,4 +19,5 @@ fi
 
 perl -0pi -e "s#<theme>\\s*<name>.*?</name>#<theme>\\n    <name>\\Q$theme\\E</name>#s" "$rc"
 openbox --reconfigure
+"$HOME/.config/eww/scripts/sync-openbox-theme.sh" >/dev/null 2>&1 || true
 notify-send "Theme applied" "$theme"

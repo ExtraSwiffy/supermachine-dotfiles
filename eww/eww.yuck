@@ -57,6 +57,8 @@
 (defpoll GLOW_PRESET :interval "2s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
 (defpoll WINDOW_GAP :interval "2s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
 (defpoll SMART_TILING_STATE :interval "2s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
+(defpoll WINDOW_BORDER_STATE :interval "2s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
+(defpoll WINDOW_BORDER_WIDTH :interval "2s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
 (defpoll WINDOW_RADIUS :interval "2s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
 (defpoll SUPERMACHINE_UPDATE_STATUS :interval "2s" "cat ~/.config/eww/state/supermachine-update-status 2>/dev/null || echo Ready")
 (defvar BIBLE_REF "John 14:6")
@@ -830,6 +832,15 @@
         (button :class "settings-step-button" :tooltip "Smaller window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh down" "−")
         (label :class "settings-step-value" :text { WINDOW_GAP + " px" })
         (button :class "settings-step-button" :tooltip "Larger window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh up" "+"))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/set-window-border.sh toggle" { "Window Border: " + WINDOW_BORDER_STATE })
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Thinner window border" :onclick "~/.config/eww/scripts/set-window-border.sh thinner" "−")
+        (label :class "settings-step-value" :text { WINDOW_BORDER_WIDTH + " px" })
+        (button :class "settings-step-button" :tooltip "Thicker window border" :onclick "~/.config/eww/scripts/set-window-border.sh thicker" "+"))
       (box
         :orientation "h"
         :class "settings-stepper"
@@ -837,7 +848,8 @@
         :halign "center"
         (button :class "settings-step-button" :tooltip "Less rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh down" "−")
         (label :class "settings-step-value" :text { WINDOW_RADIUS + " r" })
-        (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+")))
+        (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+"))
+      (button :class "settings-wide-action" :onclick "eww update GLOW_SLOT=border; eww open glowcolorpicker" "Border Color"))
 
     ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box
