@@ -55,6 +55,11 @@
 (defpoll GLOW_STATE :interval "2s" "test -f ~/.config/eww/state/glow-off && echo off || echo on")
 (defpoll GLOW_THICKNESS :interval "2s" "awk -F': ' '/\\$settings-glow-thickness/ {gsub(/px;|;/,\"\",$2); print $2; exit}' ~/.config/eww/eww.scss 2>/dev/null || echo 5")
 (defpoll GLOW_PRESET :interval "2s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
+(defpoll WINDOW_GAP :interval "2s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
+(defpoll SMART_TILING_STATE :interval "2s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
+(defpoll WINDOW_BORDER_STATE :interval "2s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
+(defpoll WINDOW_BORDER_WIDTH :interval "2s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
+(defpoll WINDOW_RADIUS :interval "2s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
 (defvar BIBLE_TEXT_2 "")
@@ -810,6 +815,40 @@
       :spacing 10
       (label :class "settings-section-title" :halign "start" :text "Wallpaper")
       (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/wallpaper-picker.sh >/tmp/supermachine-wallpaper-picker.log 2>&1'" "Choose Picture"))
+
+    ; Window layout controls feed the lightweight Openbox smart placement helper.
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (label :class "settings-section-title" :halign "start" :text "Window Layout")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-smart-tiling.sh" { "Semi Tiling: " + SMART_TILING_STATE })
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Smaller window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh down" "−")
+        (label :class "settings-step-value" :text { WINDOW_GAP + " px" })
+        (button :class "settings-step-button" :tooltip "Larger window gap" :onclick "~/.config/eww/scripts/set-window-gap.sh up" "+"))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/set-window-border.sh toggle" { "Window Border: " + WINDOW_BORDER_STATE })
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Thinner window border" :onclick "~/.config/eww/scripts/set-window-border.sh thinner" "−")
+        (label :class "settings-step-value" :text { WINDOW_BORDER_WIDTH + " px" })
+        (button :class "settings-step-button" :tooltip "Thicker window border" :onclick "~/.config/eww/scripts/set-window-border.sh thicker" "+"))
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Less rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh down" "−")
+        (label :class "settings-step-value" :text { WINDOW_RADIUS + " r" })
+        (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+"))
+      (button :class "settings-wide-action" :onclick "eww update GLOW_SLOT=border; eww open glowcolorpicker" "Border Color"))
 
     ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box

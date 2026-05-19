@@ -6,6 +6,9 @@ bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
 poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
+state_dir="$HOME/.config/eww/state"
+gap_file="$state_dir/window-gap"
+tiling_off_file="$state_dir/smart-tiling-off"
 
 case "${1:-}" in
   --once|--left|--right|--up|--down|--upper-left|--upper-right|--lower-left|--lower-right) ;;
@@ -17,6 +20,19 @@ esac
 
 current_desktop() {
   wmctrl -d | awk '$2 == "*" {print $1; exit}'
+}
+
+update_runtime_settings() {
+  local saved_gap
+
+  saved_gap="$(cat "$gap_file" 2>/dev/null || true)"
+  if [[ "$saved_gap" =~ ^[0-9]+$ ]] && [ "$saved_gap" -ge 0 ] && [ "$saved_gap" -le 40 ]; then
+    gap="$saved_gap"
+  fi
+}
+
+smart_tiling_enabled() {
+  [ ! -f "$tiling_off_file" ]
 }
 
 workarea() {
@@ -395,6 +411,7 @@ place_focused() {
   local mode="$1"
   local desktop wx wy ww wh x y w h id half_w half_h
 
+  update_runtime_settings
   id="$(active_window)"
   [ -n "$id" ] || return 0
 
@@ -452,6 +469,9 @@ place_focused() {
 tile_windows() {
   local desktop wx wy ww wh x y w h n id rows cols index row col cell_w cell_h
   local -a ids ordered
+
+  update_runtime_settings
+  smart_tiling_enabled || return 0
 
   desktop="$(current_desktop)"
   read -r wx wy ww wh < <(workarea)
@@ -520,6 +540,7 @@ signature() {
 }
 
 if [ "${1:-}" = "--once" ]; then
+  update_runtime_settings
   tile_windows
   exit 0
 fi
@@ -562,10 +583,13 @@ esac
 last_signature=""
 
 while true; do
+  update_runtime_settings
   sync_sidebar_for_fullscreen
   current_signature="$(signature)"
-  if [ "$current_signature" != "$last_signature" ]; then
+  if smart_tiling_enabled && [ "$current_signature" != "$last_signature" ]; then
     tile_windows
+    last_signature="$current_signature"
+  elif ! smart_tiling_enabled; then
     last_signature="$current_signature"
   fi
   sleep "$poll_interval"

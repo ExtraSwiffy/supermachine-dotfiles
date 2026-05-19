@@ -83,6 +83,7 @@ set_panel_theme() {
   set_var panel-accent-soft "${accent%, *}, 0.18)"
   set_var panel-accent-hover "${accent%, *}, 0.24)"
   set_var panel-accent-dot "${accent%, *}, 0.28)"
+  set_var window-border-accent "$accent"
 }
 
 set_glow_theme() {
@@ -359,6 +360,7 @@ case "$slot" in
   accent) var="panel-accent" ;;
   header) var="panel-header" ;;
   subtext) var="panel-subtext" ;;
+  border) var="window-border-accent" ;;
   preset)
     apply_preset "$mode"
     reload_eww
@@ -380,6 +382,7 @@ case "$mode" in
       set_var panel-accent-soft "${value%, *}, 0.18)"
       set_var panel-accent-hover "${value%, *}, 0.24)"
       set_var panel-accent-dot "${value%, *}, 0.28)"
+      set_var window-border-accent "$value"
     fi
     mkdir -p "$state_dir"
     printf '%s\n' "CUSTOM" > "$preset_file"

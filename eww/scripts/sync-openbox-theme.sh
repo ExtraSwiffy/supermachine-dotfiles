@@ -3,6 +3,7 @@ set -euo pipefail
 
 scss="${1:-$HOME/.config/eww/eww.scss}"
 themerc="${2:-$HOME/.themes/SuperMachine/openbox-3/themerc}"
+state_dir="$HOME/.config/eww/state"
 
 [ -f "$scss" ] || exit 0
 [ -f "$themerc" ] || exit 0
@@ -45,14 +46,29 @@ set_theme_value() {
 }
 
 accent="$(rgba_to_hex "$(scss_var panel-accent)")" || exit 0
+border="$(rgba_to_hex "$(scss_var window-border-accent)")" || border="$accent"
 header="$(rgba_to_hex "$(scss_var panel-header)")" || printf '%s\n' "#F2F2F2"
 subtext="$(rgba_to_hex "$(scss_var panel-subtext)")" || printf '%s\n' "#8C8C8C"
+border_width="$(cat "$state_dir/window-border-width" 2>/dev/null || echo 2)"
+[[ "$border_width" =~ ^[0-9]+$ ]] || border_width=2
+[ "$border_width" -lt 0 ] && border_width=0
+[ "$border_width" -gt 8 ] && border_width=8
 
 set_theme_value "menu.title.text.color" "$accent"
 set_theme_value "menu.items.text.color" "$header"
 set_theme_value "menu.items.active.text.color" "$accent"
 set_theme_value "menu.items.disabled.text.color" "$subtext"
-set_theme_value "window.active.border.color" "$accent"
+if [ -f "$state_dir/window-border-off" ]; then
+  set_theme_value "border.width" "0"
+  set_theme_value "padding.height" "0"
+  set_theme_value "padding.width" "0"
+  set_theme_value "window.active.border.color" "#111111"
+else
+  set_theme_value "border.width" "$border_width"
+  set_theme_value "padding.height" "0"
+  set_theme_value "padding.width" "0"
+  set_theme_value "window.active.border.color" "$border"
+fi
 set_theme_value "window.active.title.separator.color" "$accent"
 set_theme_value "window.active.button.*.image.color" "$accent"
 set_theme_value "window.active.button.hover.image.color" "#FFFFFF"
