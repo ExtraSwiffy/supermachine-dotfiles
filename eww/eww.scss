@@ -33,7 +33,7 @@ $sidebar-logo-y: -2px;
   background: $sidebar-bg;
   padding: 25px 0px;
   margin: 0px;
-  min-width: 105px;
+  min-width: 95px;
 }
 
 .launcher {
@@ -43,7 +43,7 @@ $sidebar-logo-y: -2px;
   margin: 0px;
   margin-left: $sidebar-logo-x;
   margin-top: $sidebar-logo-y;
-  min-width: 105px;
+  min-width: 95px;
 }
 
 .launcher:hover {
@@ -85,17 +85,17 @@ $sidebar-logo-y: -2px;
 .clock {
   font-size: 20px;
   color: $panel-accent;
-  min-width: 105px;
+  min-width: 95px;
 }
 
 .ampm {
   font-size: 13px;
   color: #777777;
-  min-width: 105px;
+  min-width: 95px;
 }
 
 .sidebar-actions {
-  min-width: 97px;
+  min-width: 87px;
 }
 
 .settings-button {

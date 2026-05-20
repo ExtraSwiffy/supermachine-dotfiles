@@ -86,7 +86,7 @@
   :geometry (geometry
     :x "0px"
     :y "0px"
-    :width "105px"
+    :width "95px"
     :height "100%"
     :anchor "left center")
 
@@ -164,7 +164,7 @@
   :geometry (geometry
     :x "0px"
     :y "0px"
-    :width "105px"
+    :width "95px"
     :height "100%"
     :anchor "left center")
 
@@ -195,7 +195,7 @@
   :focusable false
 
   :geometry (geometry
-    :x "105px"
+    :x "95px"
     :y "0px"
     :width "3px"
     :height "100%"
@@ -215,7 +215,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "108px"
+    :x "98px"
     :y "0px"
     :width "285px"
     :height "100%"
@@ -600,7 +600,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -641,7 +641,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -705,7 +705,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -746,7 +746,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -787,7 +787,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -828,7 +828,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -1005,7 +1005,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "823px"
+    :x "813px"
     :y "0px"
     :width "300px"
     :height "100%"
@@ -1357,7 +1357,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "823px"
+    :x "813px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -1592,7 +1592,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "1301px"
+    :x "1291px"
     :y "0px"
     :width "300px"
     :height "100%"
@@ -1681,7 +1681,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -1750,7 +1750,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "393px"
+    :x "383px"
     :y "0px"
     :width "430px"
     :height "100%"
