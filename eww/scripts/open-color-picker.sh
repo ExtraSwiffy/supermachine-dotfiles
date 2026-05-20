@@ -14,6 +14,7 @@ case "$depth" in
 esac
 
 printf '%s\n' "$depth" > "$state_dir/color-picker-depth"
+printf '%s\n' "$slot" > "$state_dir/glow-slot"
 
 eww -c "$cfg" update GLOW_SLOT="$slot" >/dev/null 2>&1 || true
 

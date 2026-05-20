@@ -74,7 +74,7 @@
 (defvar BIBLE_TEXT_3 "")
 (defvar KEY_CAPTURE_STATUS "Ready")
 (defvar KEY_CAPTURED_COMBO "None captured")
-(defvar GLOW_SLOT "1")
+(defpoll GLOW_SLOT :interval "1s" "cat ~/.config/eww/state/glow-slot 2>/dev/null || echo 1")
 
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
@@ -120,6 +120,7 @@
 
       (button
         :class "launcher"
+        :style { "font-size: " + SIDEBAR_LOGO_SIZE + "px; margin-left: " + SIDEBAR_LOGO_X + "px; margin-top: " + SIDEBAR_LOGO_Y + "px;" }
         :halign "center"
         :onclick "bash -c 'sleep 0.1; rofi -show drun &'"
         (label :text SIDEBAR_LOGO))
@@ -152,6 +153,40 @@
     )
   )
 )
+
+; Temporary guide shown while tuning the sidebar logo position.
+(defwindow logoalignmentguide
+  :monitor 0
+  :exclusive false
+  :stacking "overlay"
+  :focusable false
+
+  :geometry (geometry
+    :x "0px"
+    :y "0px"
+    :width "105px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "logo-guide-rail"
+    :halign "fill"
+    :valign "fill"
+    :vexpand true
+    :hexpand true
+
+    (box
+      :orientation "v"
+      :halign "center"
+      :valign "center"
+      :vexpand true
+      (box
+        :orientation "v"
+        :class "logo-guide-frame"
+        :halign "center"
+        :valign "center"
+        (box :class "logo-guide-dot")))))
 
 ; Animated seam shown only while the settings panel is open.
 (defwindow settingsborder

@@ -132,7 +132,7 @@ awk \
     }
   }
   /^[[:space:]]*:width "[0-9]+px"/ {
-    if (win == "sidebar") {
+    if (win == "sidebar" || win == "logoalignmentguide") {
       sub(/:width "[0-9]+px"/, ":width \"" sidebar_w "px\"")
     } else if (win == "settingsborder") {
       sub(/:width "[0-9]+px"/, ":width \"" glow "px\"")

@@ -4,6 +4,8 @@ set -euo pipefail
 gap="${SUPERMACHINE_WINDOW_GAP:-5}"
 bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
+right_edge_bleed="${SUPERMACHINE_WINDOW_RIGHT_EDGE_BLEED:-1}"
+placement_inset="${SUPERMACHINE_WINDOW_PLACEMENT_INSET:-1}"
 poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
 state_dir="$HOME/.config/eww/state"
@@ -30,6 +32,11 @@ update_runtime_settings() {
   if [[ "$saved_gap" =~ ^[0-9]+$ ]] && [ "$saved_gap" -ge 0 ] && [ "$saved_gap" -le 40 ]; then
     gap="$saved_gap"
   fi
+  bottom_gap="$gap"
+  [ "$right_edge_bleed" -gt "$((gap - 2))" ] && right_edge_bleed=$((gap - 2))
+  [ "$right_edge_bleed" -lt 0 ] && right_edge_bleed=0
+  [ "$placement_inset" -lt 0 ] && placement_inset=0
+  [ "$placement_inset" -gt 4 ] && placement_inset=4
 
   saved_sidebar_width="$(cat "$sidebar_width_file" 2>/dev/null || true)"
   if [[ "$saved_sidebar_width" =~ ^[0-9]+$ ]] && [ "$saved_sidebar_width" -ge 85 ] && [ "$saved_sidebar_width" -le 130 ]; then
@@ -197,6 +204,39 @@ sidebar_safe_area() {
   printf '%s %s %s %s\n' "$x" "$y" "$w" "$h"
 }
 
+monitor_areas() {
+  local wx="$1"
+  local wy="$2"
+  local ww="$3"
+  local wh="$4"
+
+  xrandr --query 2>/dev/null |
+    awk -v wx="$wx" -v wy="$wy" -v ww="$ww" -v wh="$wh" '
+      function max(a, b) { return a > b ? a : b }
+      function min(a, b) { return a < b ? a : b }
+      / connected/ && match($0, /[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/) {
+        geometry = substr($0, RSTART, RLENGTH)
+        split(geometry, parts, /x|\+/)
+        mx = parts[3]
+        my = parts[4]
+        mw = parts[1]
+        mh = parts[2]
+
+        ix = max(wx, mx)
+        iy = max(wy, my)
+        ir = min(wx + ww, mx + mw)
+        ib = min(wy + wh, my + mh)
+
+        if (ir > ix && ib > iy) {
+          print ix, iy, ir - ix, ib - iy
+        }
+      }
+    ' |
+    while read -r mx my mw mh; do
+      sidebar_safe_area "$mx" "$my" "$mw" "$mh"
+    done
+}
+
 is_normal_window() {
   local id="$1"
   local class="$2"
@@ -265,36 +305,78 @@ window_ids_in_area() {
     done
 }
 
-move_window() {
+current_geometry() {
   local id="$1"
-  local x="$2"
-  local y="$3"
-  local w="$4"
-  local h="$5"
-  local class trim
 
-  class="$(wmctrl -lxG |
+  wmctrl -lxG |
     awk -v target="$(normalize_id "$id")" '
       function norm(id) {
         id = tolower(id)
         sub(/^0x0*/, "0x", id)
         return id
       }
-      norm($1) == target {print $7; exit}
-    ')"
-  trim=0
+      norm($1) == target {
+        print $3, $4, $5, $6
+        exit
+      }
+    '
+}
 
-  case "$class" in
-    *.[Ff]irefox|*[Ff]irefox|Navigator.firefox) trim=2 ;;
-  esac
+abs() {
+  local n="$1"
+  if [ "$n" -lt 0 ]; then
+    printf '%s\n' "$((-n))"
+  else
+    printf '%s\n' "$n"
+  fi
+}
 
-  h=$((h - trim))
+move_window() {
+  local id="$1"
+  local x="$2"
+  local y="$3"
+  local w="$4"
+  local h="$5"
+  local req_x req_y req_w req_h actual ax ay aw ah dx dy dw dh pass
 
   [ "$w" -gt 80 ] || return 0
   [ "$h" -gt 80 ] || return 0
 
-  wmctrl -ir "$id" -b remove,maximized_vert,maximized_horz >/dev/null 2>&1 || true
-  wmctrl -ir "$id" -e "0,$x,$y,$w,$h" >/dev/null 2>&1 || true
+  wmctrl -ir "$id" -b remove,maximized_vert,maximized_horz,fullscreen >/dev/null 2>&1 || true
+
+  req_x="$x"
+  req_y="$y"
+  req_w="$w"
+  req_h="$h"
+
+  for pass in 1 2 3 4; do
+    [ "$req_w" -gt 80 ] || req_w=80
+    [ "$req_h" -gt 80 ] || req_h=80
+
+    wmctrl -ir "$id" -e "0,$req_x,$req_y,$req_w,$req_h" >/dev/null 2>&1 || true
+    sleep 0.05
+
+    actual="$(current_geometry "$id")"
+    [ -n "$actual" ] || return 0
+    read -r ax ay aw ah <<< "$actual"
+
+    dx=$((x - ax))
+    dy=$((y - ay))
+    dw=$((w - aw))
+    dh=$((h - ah))
+
+    if [ "$(abs "$dx")" -le 1 ] &&
+       [ "$(abs "$dy")" -le 1 ] &&
+       [ "$(abs "$dw")" -le 1 ] &&
+       [ "$(abs "$dh")" -le 1 ]; then
+      return 0
+    fi
+
+    req_x=$((req_x + dx))
+    req_y=$((req_y + dy))
+    req_w=$((req_w + dw))
+    req_h=$((req_h + dh))
+  done
 }
 
 active_window() {
@@ -331,7 +413,7 @@ settings_are_open() {
 }
 
 close_settings_windows() {
-  eww close settingsborder systemsettings bluetoothsettings displaysettings networksettings audiosettings \
+  eww close settingsborder logoalignmentguide systemsettings bluetoothsettings displaysettings networksettings audiosettings \
     powersettings appearancesettings panelcustomization glowcolorpicker keybindsettings systeminfopanel \
     controlcenter >/dev/null 2>&1 || true
 }
@@ -413,87 +495,23 @@ tile_remaining_area() {
   done
 }
 
-place_focused() {
-  local mode="$1"
-  local desktop wx wy ww wh x y w h id half_w half_h
-
-  update_runtime_settings
-  id="$(active_window)"
-  [ -n "$id" ] || return 0
-
-  desktop="$(current_desktop)"
-  read -r wx wy ww wh < <(workarea)
-  [ -n "${wx:-}" ] || return 0
-  read -r wx wy ww wh < <(active_monitor_area "$wx" "$wy" "$ww" "$wh" "$desktop" "$id")
-  read -r wx wy ww wh < <(sidebar_safe_area "$wx" "$wy" "$ww" "$wh")
-
-  x=$((wx + gap))
-  y=$((wy + gap))
-  w=$((ww - (gap * 2)))
-  h=$((wh - gap - bottom_gap))
-  half_w=$(((w - gap) / 2))
-  half_h=$(((h - gap) / 2))
-
-  case "$mode" in
-    left)
-      move_window "$id" "$x" "$y" "$half_w" "$h"
-      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
-      focus_window "$id"
-      ;;
-    right)
-      move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
-      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$x" "$y" "$half_w" "$h"
-      focus_window "$id"
-      ;;
-    up)
-      move_window "$id" "$x" "$y" "$w" "$h"
-      focus_window "$id"
-      ;;
-    down)
-      tile_windows
-      focus_window "$id"
-      ;;
-    upper-left)
-      move_window "$id" "$x" "$y" "$half_w" "$half_h"
-      focus_window "$id"
-      ;;
-    upper-right)
-      move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$half_h"
-      focus_window "$id"
-      ;;
-    lower-left)
-      move_window "$id" "$x" "$((y + half_h + gap))" "$half_w" "$((h - half_h - gap))"
-      focus_window "$id"
-      ;;
-    lower-right)
-      move_window "$id" "$((x + half_w + gap))" "$((y + half_h + gap))" "$((w - half_w - gap))" "$((h - half_h - gap))"
-      focus_window "$id"
-      ;;
-  esac
-}
-
-tile_windows() {
-  local desktop wx wy ww wh x y w h n id rows cols index row col cell_w cell_h
+tile_area() {
+  local desktop="$1"
+  local wx="$2"
+  local wy="$3"
+  local ww="$4"
+  local wh="$5"
+  local x y w h n id rows cols index row col cell_w cell_h
   local -a ids ordered
-
-  update_runtime_settings
-  smart_tiling_enabled || return 0
-
-  desktop="$(current_desktop)"
-  read -r wx wy ww wh < <(workarea)
-
-  [ -n "${wx:-}" ] || return 0
-  read -r wx wy ww wh < <(active_monitor_area "$wx" "$wy" "$ww" "$wh" "$desktop" "$(active_window)")
-  read -r wx wy ww wh < <(sidebar_safe_area "$wx" "$wy" "$ww" "$wh")
 
   mapfile -t ids < <(window_ids_in_area "$desktop" "$wx" "$wy" "$ww" "$wh")
   n="${#ids[@]}"
   [ "$n" -gt 0 ] || return 0
 
-  x=$((wx + gap))
-  y=$((wy + gap))
-  w=$((ww - (gap * 2)))
-  h=$((wh - gap - bottom_gap))
+  x=$((wx + gap + placement_inset))
+  y=$((wy + gap + placement_inset))
+  w=$((ww - (gap * 2) + right_edge_bleed - (placement_inset * 2)))
+  h=$((wh - (gap * 2) - (placement_inset * 2)))
 
   if [ "$n" -eq 1 ]; then
     move_window "${ids[0]}" "$x" "$y" "$w" "$h"
@@ -538,11 +556,96 @@ tile_windows() {
   done
 }
 
+place_focused() {
+  local mode="$1"
+  local desktop wx wy ww wh x y w h id half_w half_h
+
+  update_runtime_settings
+  id="$(active_window)"
+  [ -n "$id" ] || return 0
+
+  desktop="$(current_desktop)"
+  read -r wx wy ww wh < <(workarea)
+  [ -n "${wx:-}" ] || return 0
+  read -r wx wy ww wh < <(active_monitor_area "$wx" "$wy" "$ww" "$wh" "$desktop" "$id")
+  read -r wx wy ww wh < <(sidebar_safe_area "$wx" "$wy" "$ww" "$wh")
+
+  x=$((wx + gap + placement_inset))
+  y=$((wy + gap + placement_inset))
+  w=$((ww - (gap * 2) + right_edge_bleed - (placement_inset * 2)))
+  h=$((wh - (gap * 2) - (placement_inset * 2)))
+  half_w=$(((w - gap) / 2))
+  half_h=$(((h - gap) / 2))
+
+  case "$mode" in
+    left)
+      move_window "$id" "$x" "$y" "$half_w" "$h"
+      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
+      focus_window "$id"
+      ;;
+    right)
+      move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
+      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$x" "$y" "$half_w" "$h"
+      focus_window "$id"
+      ;;
+    up)
+      move_window "$id" "$x" "$y" "$w" "$h"
+      focus_window "$id"
+      ;;
+    down)
+      tile_windows
+      focus_window "$id"
+      ;;
+    upper-left)
+      move_window "$id" "$x" "$y" "$half_w" "$half_h"
+      focus_window "$id"
+      ;;
+    upper-right)
+      move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$half_h"
+      focus_window "$id"
+      ;;
+    lower-left)
+      move_window "$id" "$x" "$((y + half_h + gap))" "$half_w" "$((h - half_h - gap))"
+      focus_window "$id"
+      ;;
+    lower-right)
+      move_window "$id" "$((x + half_w + gap))" "$((y + half_h + gap))" "$((w - half_w - gap))" "$((h - half_h - gap))"
+      focus_window "$id"
+      ;;
+  esac
+}
+
+tile_windows() {
+  local desktop wx wy ww wh mx my mw mh
+
+  update_runtime_settings
+  smart_tiling_enabled || return 0
+
+  desktop="$(current_desktop)"
+  read -r wx wy ww wh < <(workarea)
+
+  [ -n "${wx:-}" ] || return 0
+  while read -r mx my mw mh; do
+    tile_area "$desktop" "$mx" "$my" "$mw" "$mh"
+  done < <(monitor_areas "$wx" "$wy" "$ww" "$wh")
+}
+
 signature() {
   local desktop
   desktop="$(current_desktop)"
   printf '%s:' "$desktop"
-  window_ids "$desktop" | paste -sd ',' -
+  wmctrl -lxG |
+    awk -v desktop="$desktop" '$2 == desktop {print $1, $3, $4, $5, $6, $7}' |
+    while read -r id x y w h class; do
+      if is_normal_window "$id" "$class"; then
+        state="$(xprop -id "$id" _NET_WM_STATE 2>/dev/null || true)"
+        flags=""
+        grep -q '_NET_WM_STATE_MAXIMIZED_HORZ' <<< "$state" && flags="${flags}H"
+        grep -q '_NET_WM_STATE_MAXIMIZED_VERT' <<< "$state" && flags="${flags}V"
+        printf '%s:%s,%s,%s,%s:%s\n' "$id" "$x" "$y" "$w" "$h" "$flags"
+      fi
+    done |
+    paste -sd ';' -
 }
 
 if [ "${1:-}" = "--once" ]; then
@@ -594,7 +697,7 @@ while true; do
   current_signature="$(signature)"
   if smart_tiling_enabled && [ "$current_signature" != "$last_signature" ]; then
     tile_windows
-    last_signature="$current_signature"
+    last_signature="$(signature)"
   elif ! smart_tiling_enabled; then
     last_signature="$current_signature"
   fi

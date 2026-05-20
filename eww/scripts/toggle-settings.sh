@@ -14,6 +14,7 @@ close_settings() {
 
   for window in \
     settingsborder \
+    logoalignmentguide \
     systemsettings \
     bluetoothsettings \
     displaysettings \

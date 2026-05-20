@@ -7,6 +7,7 @@ scss="$HOME/.config/eww/eww.scss"
 state_dir="$HOME/.config/eww/state"
 state_file="$state_dir/glow-off"
 preset_file="$state_dir/glow-preset"
+slot_file="$state_dir/glow-slot"
 
 palette=(
   "rgba(55, 210, 255, 0.54)"
@@ -136,7 +137,10 @@ next_color() {
 reload_eww() {
   mkdir -p "$state_dir"
   rm -f "$state_file"
-  eww update GLOW_STATE=on GLOW_PRESET="$(cat "$preset_file" 2>/dev/null || echo CUSTOM)" >/dev/null 2>&1 || true
+  eww update \
+    GLOW_STATE=on \
+    GLOW_PRESET="$(cat "$preset_file" 2>/dev/null || echo CUSTOM)" \
+    GLOW_SLOT="$(cat "$slot_file" 2>/dev/null || echo "$slot")" >/dev/null 2>&1 || true
   "$HOME/.config/eww/scripts/sync-openbox-theme.sh" >/dev/null 2>&1 || true
 
   if eww reload >/dev/null 2>&1; then
@@ -502,6 +506,9 @@ case "$slot" in
     ;;
   *) exit 1 ;;
 esac
+
+mkdir -p "$state_dir"
+printf '%s\n' "$slot" > "$slot_file"
 
 case "$mode" in
   cycle)

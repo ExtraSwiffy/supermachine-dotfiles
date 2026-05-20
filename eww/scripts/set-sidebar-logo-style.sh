@@ -4,15 +4,14 @@ set -euo pipefail
 field="${1:-size}"
 direction="${2:-up}"
 cfg="${EWW_CONFIG_DIR:-$HOME/.config/eww}"
-scss="$cfg/eww.scss"
 state_dir="$cfg/state"
+guide_stamp="$state_dir/sidebar-logo-guide-stamp"
 
 mkdir -p "$state_dir"
 
 case "$field" in
   size)
     state_file="$state_dir/sidebar-logo-size"
-    var="sidebar-logo-size"
     default=54
     min=34
     max=78
@@ -20,7 +19,6 @@ case "$field" in
     ;;
   x)
     state_file="$state_dir/sidebar-logo-x"
-    var="sidebar-logo-x"
     default=-20
     min=-45
     max=25
@@ -28,7 +26,6 @@ case "$field" in
     ;;
   y)
     state_file="$state_dir/sidebar-logo-y"
-    var="sidebar-logo-y"
     default=0
     min=-35
     max=35
@@ -65,16 +62,18 @@ esac
 
 printf '%s\n' "$next" > "$state_file"
 
-if grep -qF "\$${var}:" "$scss"; then
-  sed -i -E "s|^[$]${var}:.*;|\$${var}: ${next}px;|" "$scss"
-else
-  sed -i "1i \$${var}: ${next}px;" "$scss"
-fi
-
 case "$field" in
   size) eww -c "$cfg" update SIDEBAR_LOGO_SIZE="$next" >/dev/null 2>&1 || true ;;
   x) eww -c "$cfg" update SIDEBAR_LOGO_X="$next" >/dev/null 2>&1 || true ;;
   y) eww -c "$cfg" update SIDEBAR_LOGO_Y="$next" >/dev/null 2>&1 || true ;;
 esac
 
-eww -c "$cfg" reload >/dev/null 2>&1 || true
+date +%s%N > "$guide_stamp"
+stamp="$(cat "$guide_stamp")"
+eww -c "$cfg" open logoalignmentguide >/dev/null 2>&1 || true
+(
+  sleep 1.1
+  if [ "$(cat "$guide_stamp" 2>/dev/null || true)" = "$stamp" ]; then
+    eww -c "$cfg" close logoalignmentguide >/dev/null 2>&1 || true
+  fi
+) &
