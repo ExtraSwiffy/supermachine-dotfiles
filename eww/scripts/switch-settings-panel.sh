@@ -21,7 +21,8 @@ for window in \
   keybindsettings \
   systeminfopanel \
   panelcustomization \
-  glowcolorpicker; do
+  glowcolorpicker \
+  sidebarlogopicker; do
   [ "$window" = "$target" ] && continue
 
   if grep -q "^${window}:" <<< "$active"; then

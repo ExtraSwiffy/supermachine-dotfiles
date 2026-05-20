@@ -53,6 +53,20 @@ color_value() {
     bright-blue) printf '%s\n' "rgba(45, 126, 255, 0.72)" ;;
     bright-purple) printf '%s\n' "rgba(185, 72, 255, 0.72)" ;;
     bright-rose) printf '%s\n' "rgba(255, 42, 112, 0.68)" ;;
+    slate) printf '%s\n' "rgba(100, 116, 139, 0.72)" ;;
+    graphite) printf '%s\n' "rgba(55, 65, 81, 0.78)" ;;
+    cream) printf '%s\n' "rgba(255, 244, 214, 0.7)" ;;
+    coffee) printf '%s\n' "rgba(132, 88, 62, 0.68)" ;;
+    forest) printf '%s\n' "rgba(34, 139, 86, 0.68)" ;;
+    olive) printf '%s\n' "rgba(128, 148, 64, 0.68)" ;;
+    crimson) printf '%s\n' "rgba(220, 38, 78, 0.7)" ;;
+    coral) printf '%s\n' "rgba(255, 111, 97, 0.7)" ;;
+    amber) printf '%s\n' "rgba(245, 158, 11, 0.68)" ;;
+    lime) printf '%s\n' "rgba(132, 204, 22, 0.7)" ;;
+    mint) printf '%s\n' "rgba(52, 211, 153, 0.7)" ;;
+    sky) printf '%s\n' "rgba(56, 189, 248, 0.7)" ;;
+    navy) printf '%s\n' "rgba(30, 64, 175, 0.72)" ;;
+    indigo) printf '%s\n' "rgba(99, 102, 241, 0.72)" ;;
     black) printf '%s\n' "rgba(0, 0, 0, 0.34)" ;;
     clear) printf '%s\n' "rgba(255, 255, 255, 0.12)" ;;
     rgba*) printf '%s\n' "$1" ;;
@@ -240,6 +254,96 @@ apply_preset() {
       set_glow_theme "rgba(255, 239, 64, 0.7)" "rgba(255, 127, 54, 0.58)" "rgba(185, 72, 255, 0.68)" "rgba(0, 255, 240, 0.58)" "rgba(255, 239, 64, 0.24)"
       set_panel_theme "rgba(255, 239, 64, 0.8)" "rgba(255, 252, 220, 1)" "rgba(188, 180, 120, 1)"
       ;;
+    midnight)
+      preset_name="Midnight"
+      set_glow_theme "rgba(30, 64, 175, 0.58)" "rgba(99, 102, 241, 0.62)" "rgba(98, 72, 180, 0.62)" "rgba(56, 189, 248, 0.42)" "rgba(30, 64, 175, 0.22)"
+      set_panel_theme "rgba(99, 102, 241, 0.82)" "rgba(238, 242, 255, 1)" "rgba(146, 154, 190, 1)"
+      ;;
+    cyberpunk)
+      preset_name="Cyberpunk"
+      set_glow_theme "rgba(255, 239, 64, 0.62)" "rgba(255, 42, 112, 0.66)" "rgba(185, 72, 255, 0.72)" "rgba(0, 255, 240, 0.62)" "rgba(255, 239, 64, 0.22)"
+      set_panel_theme "rgba(255, 42, 112, 0.86)" "rgba(255, 245, 250, 1)" "rgba(194, 148, 170, 1)"
+      ;;
+    royal)
+      preset_name="Royal"
+      set_glow_theme "rgba(163, 104, 255, 0.68)" "rgba(255, 214, 77, 0.42)" "rgba(99, 102, 241, 0.64)" "rgba(205, 180, 255, 0.48)" "rgba(163, 104, 255, 0.22)"
+      set_panel_theme "rgba(163, 104, 255, 0.86)" "rgba(250, 246, 255, 1)" "rgba(170, 155, 190, 1)"
+      ;;
+    lagoon)
+      preset_name="Lagoon"
+      set_glow_theme "rgba(34, 139, 86, 0.58)" "rgba(46, 255, 230, 0.52)" "rgba(56, 189, 248, 0.58)" "rgba(30, 64, 175, 0.46)" "rgba(34, 139, 86, 0.22)"
+      set_panel_theme "rgba(46, 255, 230, 0.82)" "rgba(235, 255, 252, 1)" "rgba(130, 184, 178, 1)"
+      ;;
+    firefly)
+      preset_name="Firefly"
+      set_glow_theme "rgba(245, 158, 11, 0.62)" "rgba(255, 239, 64, 0.58)" "rgba(132, 204, 22, 0.46)" "rgba(255, 111, 97, 0.54)" "rgba(245, 158, 11, 0.22)"
+      set_panel_theme "rgba(245, 158, 11, 0.84)" "rgba(255, 246, 230, 1)" "rgba(188, 158, 120, 1)"
+      ;;
+    rose-gold)
+      preset_name="Rose Gold"
+      set_glow_theme "rgba(255, 174, 214, 0.58)" "rgba(255, 194, 153, 0.58)" "rgba(255, 214, 77, 0.4)" "rgba(220, 38, 78, 0.5)" "rgba(255, 174, 214, 0.22)"
+      set_panel_theme "rgba(255, 174, 214, 0.84)" "rgba(255, 246, 250, 1)" "rgba(190, 158, 176, 1)"
+      ;;
+    berry-crunch)
+      preset_name="Berry Crunch"
+      set_glow_theme "rgba(255, 42, 112, 0.64)" "rgba(185, 72, 255, 0.6)" "rgba(56, 189, 248, 0.48)" "rgba(255, 174, 214, 0.56)" "rgba(255, 42, 112, 0.22)"
+      set_panel_theme "rgba(255, 42, 112, 0.86)" "rgba(255, 242, 248, 1)" "rgba(190, 148, 170, 1)"
+      ;;
+    frosted-milk)
+      preset_name="Frosted Milk"
+      set_glow_theme "rgba(235, 245, 255, 0.62)" "rgba(170, 202, 255, 0.58)" "rgba(156, 232, 244, 0.5)" "rgba(205, 180, 255, 0.46)" "rgba(235, 245, 255, 0.18)"
+      set_panel_theme "rgba(235, 245, 255, 0.8)" "rgba(255, 255, 255, 1)" "rgba(170, 182, 194, 1)"
+      ;;
+    honey-loop)
+      preset_name="Honey Loop"
+      set_glow_theme "rgba(255, 214, 77, 0.58)" "rgba(245, 158, 11, 0.56)" "rgba(255, 194, 153, 0.44)" "rgba(132, 88, 62, 0.42)" "rgba(255, 214, 77, 0.2)"
+      set_panel_theme "rgba(255, 214, 77, 0.82)" "rgba(255, 250, 226, 1)" "rgba(188, 166, 120, 1)"
+      ;;
+    cocoa-byte)
+      preset_name="Cocoa Byte"
+      set_glow_theme "rgba(132, 88, 62, 0.62)" "rgba(255, 194, 153, 0.5)" "rgba(245, 158, 11, 0.44)" "rgba(55, 65, 81, 0.48)" "rgba(132, 88, 62, 0.2)"
+      set_panel_theme "rgba(255, 194, 153, 0.8)" "rgba(255, 246, 238, 1)" "rgba(190, 164, 146, 1)"
+      ;;
+    arcade-slush)
+      preset_name="Arcade Slush"
+      set_glow_theme "rgba(0, 255, 240, 0.64)" "rgba(164, 255, 42, 0.62)" "rgba(255, 42, 112, 0.6)" "rgba(255, 239, 64, 0.54)" "rgba(0, 255, 240, 0.24)"
+      set_panel_theme "rgba(0, 255, 240, 0.86)" "rgba(238, 255, 254, 1)" "rgba(132, 190, 190, 1)"
+      ;;
+    galaxy-pop)
+      preset_name="Galaxy Pop"
+      set_glow_theme "rgba(30, 64, 175, 0.58)" "rgba(99, 102, 241, 0.66)" "rgba(255, 58, 140, 0.56)" "rgba(255, 239, 64, 0.36)" "rgba(30, 64, 175, 0.22)"
+      set_panel_theme "rgba(99, 102, 241, 0.86)" "rgba(238, 242, 255, 1)" "rgba(146, 154, 190, 1)"
+      ;;
+    toxic-limeade)
+      preset_name="Toxic Limeade"
+      set_glow_theme "rgba(164, 255, 42, 0.72)" "rgba(72, 255, 158, 0.58)" "rgba(255, 239, 64, 0.54)" "rgba(0, 0, 0, 0.34)" "rgba(164, 255, 42, 0.26)"
+      set_panel_theme "rgba(164, 255, 42, 0.84)" "rgba(246, 255, 235, 1)" "rgba(158, 190, 135, 1)"
+      ;;
+    midnight-oil)
+      preset_name="Midnight Oil"
+      set_glow_theme "rgba(0, 0, 0, 0.44)" "rgba(30, 64, 175, 0.56)" "rgba(245, 158, 11, 0.42)" "rgba(255, 214, 77, 0.36)" "rgba(30, 64, 175, 0.18)"
+      set_panel_theme "rgba(245, 158, 11, 0.78)" "rgba(255, 246, 230, 1)" "rgba(188, 158, 120, 1)"
+      ;;
+    synthwave-night)
+      preset_name="Synthwave Night"
+      set_glow_theme "rgba(255, 42, 112, 0.64)" "rgba(185, 72, 255, 0.68)" "rgba(45, 126, 255, 0.62)" "rgba(255, 127, 54, 0.46)" "rgba(255, 42, 112, 0.24)"
+      set_panel_theme "rgba(255, 42, 112, 0.84)" "rgba(255, 242, 248, 1)" "rgba(194, 148, 170, 1)"
+      ;;
+    polar-bites)
+      preset_name="Polar Bites"
+      set_glow_theme "rgba(202, 232, 240, 0.7)" "rgba(156, 232, 244, 0.6)" "rgba(170, 202, 255, 0.56)" "rgba(235, 245, 255, 0.5)" "rgba(202, 232, 240, 0.22)"
+      set_panel_theme "rgba(202, 232, 240, 0.88)" "rgba(245, 252, 255, 1)" "rgba(146, 178, 186, 1)"
+      ;;
+    grape-soda)
+      preset_name="Grape Soda"
+      set_glow_theme "rgba(163, 104, 255, 0.66)" "rgba(255, 91, 180, 0.52)" "rgba(205, 180, 255, 0.56)" "rgba(46, 255, 230, 0.34)" "rgba(163, 104, 255, 0.22)"
+      set_panel_theme "rgba(163, 104, 255, 0.84)" "rgba(250, 246, 255, 1)" "rgba(170, 155, 190, 1)"
+      ;;
+    cherry-bomb)
+      preset_name="Cherry Bomb"
+      set_glow_theme "rgba(220, 38, 78, 0.68)" "rgba(255, 62, 62, 0.58)" "rgba(255, 127, 54, 0.46)" "rgba(0, 0, 0, 0.34)" "rgba(220, 38, 78, 0.22)"
+      set_panel_theme "rgba(220, 38, 78, 0.86)" "rgba(255, 238, 244, 1)" "rgba(190, 142, 158, 1)"
+      ;;
     static-cyan)
       preset_name="Static Cyan"
       set_glow_theme "rgba(55, 210, 255, 0.54)" "rgba(55, 210, 255, 0.54)" "rgba(55, 210, 255, 0.54)" "rgba(55, 210, 255, 0.54)" "rgba(55, 210, 255, 0.24)"
@@ -344,6 +448,36 @@ apply_preset() {
       preset_name="Bright Purple"
       set_glow_theme "rgba(185, 72, 255, 0.72)" "rgba(185, 72, 255, 0.72)" "rgba(185, 72, 255, 0.72)" "rgba(185, 72, 255, 0.72)" "rgba(185, 72, 255, 0.26)"
       set_panel_theme "rgba(185, 72, 255, 0.86)" "rgba(248, 238, 255, 1)" "rgba(170, 142, 194, 1)"
+      ;;
+    static-slate)
+      preset_name="Static Slate"
+      set_glow_theme "rgba(100, 116, 139, 0.72)" "rgba(100, 116, 139, 0.72)" "rgba(100, 116, 139, 0.72)" "rgba(100, 116, 139, 0.72)" "rgba(100, 116, 139, 0.22)"
+      set_panel_theme "rgba(100, 116, 139, 0.86)" "rgba(242, 246, 250, 1)" "rgba(152, 162, 176, 1)"
+      ;;
+    static-forest)
+      preset_name="Static Forest"
+      set_glow_theme "rgba(34, 139, 86, 0.68)" "rgba(34, 139, 86, 0.68)" "rgba(34, 139, 86, 0.68)" "rgba(34, 139, 86, 0.68)" "rgba(34, 139, 86, 0.22)"
+      set_panel_theme "rgba(34, 139, 86, 0.84)" "rgba(235, 255, 246, 1)" "rgba(132, 178, 156, 1)"
+      ;;
+    static-amber)
+      preset_name="Static Amber"
+      set_glow_theme "rgba(245, 158, 11, 0.68)" "rgba(245, 158, 11, 0.68)" "rgba(245, 158, 11, 0.68)" "rgba(245, 158, 11, 0.68)" "rgba(245, 158, 11, 0.22)"
+      set_panel_theme "rgba(245, 158, 11, 0.84)" "rgba(255, 246, 230, 1)" "rgba(188, 158, 120, 1)"
+      ;;
+    static-crimson)
+      preset_name="Static Crimson"
+      set_glow_theme "rgba(220, 38, 78, 0.7)" "rgba(220, 38, 78, 0.7)" "rgba(220, 38, 78, 0.7)" "rgba(220, 38, 78, 0.7)" "rgba(220, 38, 78, 0.22)"
+      set_panel_theme "rgba(220, 38, 78, 0.86)" "rgba(255, 238, 244, 1)" "rgba(190, 142, 158, 1)"
+      ;;
+    static-indigo)
+      preset_name="Static Indigo"
+      set_glow_theme "rgba(99, 102, 241, 0.72)" "rgba(99, 102, 241, 0.72)" "rgba(99, 102, 241, 0.72)" "rgba(99, 102, 241, 0.72)" "rgba(99, 102, 241, 0.24)"
+      set_panel_theme "rgba(99, 102, 241, 0.84)" "rgba(238, 242, 255, 1)" "rgba(146, 154, 190, 1)"
+      ;;
+    static-mint)
+      preset_name="Static Mint"
+      set_glow_theme "rgba(52, 211, 153, 0.7)" "rgba(52, 211, 153, 0.7)" "rgba(52, 211, 153, 0.7)" "rgba(52, 211, 153, 0.7)" "rgba(52, 211, 153, 0.22)"
+      set_panel_theme "rgba(52, 211, 153, 0.84)" "rgba(238, 255, 247, 1)" "rgba(132, 184, 166, 1)"
       ;;
     *) exit 0 ;;
   esac

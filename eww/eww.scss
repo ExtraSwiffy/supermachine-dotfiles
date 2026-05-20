@@ -1,17 +1,26 @@
-$settings-glow-cyan: rgba(255, 194, 153, 0.62);
-$settings-glow-blue: rgba(255, 174, 214, 0.62);
-$settings-glow-purple: rgba(255, 239, 64, 0.32);
-$settings-glow-pink: rgba(166, 245, 205, 0.54);
-$settings-glow-edge: rgba(255, 194, 153, 0.22);
-$settings-glow-thickness: 5px;
-$panel-accent: rgba(255, 194, 153, 0.82);
-$panel-header: rgba(255, 246, 238, 1);
-$panel-subtext: rgba(190, 164, 146, 1);
-$panel-accent-muted: rgba(255, 194, 153, 0.07);
-$panel-accent-soft: rgba(255, 194, 153, 0.18);
-$panel-accent-hover: rgba(255, 194, 153, 0.24);
-$panel-accent-dot: rgba(255, 194, 153, 0.28);
-$window-border-accent: rgba(255, 194, 153, 0.82);
+$settings-glow-cyan: rgba(55, 210, 255, 0.54);
+$settings-glow-blue: rgba(136, 192, 208, 0.95);
+$settings-glow-purple: rgba(163, 104, 255, 0.72);
+$settings-glow-pink: rgba(255, 91, 180, 0.54);
+$settings-glow-edge: rgba(55, 210, 255, 0.36);
+$settings-glow-thickness: 3px;
+$panel-accent: rgba(136, 192, 208, 0.95);
+$panel-header: rgba(242, 242, 242, 1);
+$panel-subtext: rgba(140, 140, 140, 1);
+$panel-accent-muted: rgba(136, 192, 208, 0.07);
+$panel-accent-soft: rgba(136, 192, 208, 0.18);
+$panel-accent-hover: rgba(136, 192, 208, 0.24);
+$panel-accent-dot: rgba(136, 192, 208, 0.28);
+$window-border-accent: rgba(136, 192, 208, 0.95);
+$sidebar-bg: rgba(15, 15, 15, 0.225);
+$settings-panel-bg: rgba(12, 14, 16, 0.5);
+$settings-detail-bg: rgba(12, 14, 16, 0.54);
+$settings-picker-bg: rgba(12, 14, 16, 0.56);
+$settings-section-bg: rgba(255, 255, 255, 0.026);
+$welcome-bg: rgba(12, 14, 16, 0.58);
+$sidebar-logo-size: 54px;
+$sidebar-logo-x: -2px;
+$sidebar-logo-y: -2px;
 
 /* Global reset and font. */
 * {
@@ -21,19 +30,20 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 
 /* Permanent left sidebar. */
 .sidebar {
-  background: rgba(15, 15, 15, 0.35);
+  background: $sidebar-bg;
   padding: 25px 0px;
   margin: 0px;
-  min-width: 90px;
+  min-width: 105px;
 }
 
 .launcher {
-  font-size: 54px;
+  font-size: $sidebar-logo-size;
   color: $panel-accent;
   padding: 0px;
   margin: 0px;
-  margin-left: -20px;
-  min-width: 90px;
+  margin-left: $sidebar-logo-x;
+  margin-top: $sidebar-logo-y;
+  min-width: 105px;
 }
 
 .launcher:hover {
@@ -53,22 +63,58 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 .clock {
   font-size: 20px;
   color: $panel-accent;
-  min-width: 80px;
+  min-width: 105px;
 }
 
 .ampm {
   font-size: 13px;
   color: #777777;
-  min-width: 80px;
+  min-width: 105px;
+}
+
+.sidebar-actions {
+  min-width: 97px;
 }
 
 .settings-button {
-  font-size: 24px;
+  font-size: 23px;
   color: #777777;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0px;
 }
 
 .settings-button:hover {
   color: $panel-accent;
+}
+
+.updates-button,
+.updates-button-alert {
+  border-radius: 999px;
+  font-size: 16px;
+  min-width: 48px;
+  min-height: 32px;
+  padding: 0px;
+}
+
+.updates-button {
+  background: rgba(255, 255, 255, 0.035);
+  color: $panel-accent;
+}
+
+.updates-button:hover {
+  background: $panel-accent-soft;
+  color: #ffffff;
+}
+
+.updates-button-alert {
+  background: rgba(255, 62, 62, 0.18);
+  color: #ff6262;
+}
+
+.updates-button-alert:hover {
+  background: rgba(255, 62, 62, 0.28);
+  color: #ffffff;
 }
 
 /* Animated seam between the sidebar and settings rail. */
@@ -114,7 +160,7 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 
 /* Legacy compact control center styles. */
 .controlcenter {
-  background: rgba(15, 15, 15, 0.35);
+  background: $sidebar-bg;
   border-radius: 22px;
   padding: 20px;
   min-width: 300px;
@@ -202,28 +248,52 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 
 /* First settings rail beside the sidebar. */
 .settings-panel {
-  background: rgba(12, 14, 16, 0.86);
+  background: $settings-panel-bg;
   padding: 12px;
   min-width: 253px;
 }
 
 /* Detail panels that attach to the right edge of the first settings panel. */
 .settings-detail-panel {
-  background: rgba(12, 14, 16, 0.9);
+  background: $settings-detail-bg;
   border-left: 1px solid $panel-accent-soft;
   padding: 24px;
   min-width: 0px;
 }
 
 .settings-picker-panel {
-  background: rgba(12, 14, 16, 0.92);
+  background: $settings-picker-bg;
   border-left: 1px solid $panel-accent-soft;
-  padding: 24px;
+  padding: 24px 18px 24px 24px;
   min-width: 0px;
 }
 
+.settings-scroll trough {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 999px;
+  min-width: 4px;
+}
+
+.settings-scroll slider {
+  background: $panel-accent-soft;
+  border-radius: 999px;
+  min-width: 4px;
+}
+
+.settings-preset-scroll {
+  min-height: 1280px;
+}
+
+.settings-picker-scroll {
+  min-height: 1280px;
+}
+
+.settings-detail-scroll {
+  min-height: 1280px;
+}
+
 .welcome-panel {
-  background: rgba(12, 14, 16, 0.94);
+  background: $welcome-bg;
   border: 1px solid $panel-accent-soft;
   border-radius: 8px;
   padding: 24px;
@@ -240,7 +310,7 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 }
 
 .welcome-card {
-  background: rgba(255, 255, 255, 0.045);
+  background: $settings-section-bg;
   border-radius: 8px;
   padding: 16px;
 }
@@ -288,14 +358,14 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 }
 
 .settings-section {
-  background: rgba(255, 255, 255, 0.045);
+  background: $settings-section-bg;
   border-radius: 8px;
   padding: 16px;
 }
 
 /* Category cards in the first settings panel. */
 .settings-nav-item {
-  background: rgba(255, 255, 255, 0.045);
+  background: $settings-section-bg;
   border-radius: 8px;
   min-height: 34px;
   padding: 5px 8px;
@@ -318,7 +388,7 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 }
 
 .settings-release-box {
-  background: rgba(255, 255, 255, 0.045);
+  background: $settings-section-bg;
   border-radius: 8px;
   padding: 8px;
 }
@@ -489,6 +559,21 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 .settings-action:hover {
   background: $panel-accent-hover;
   color: #ffffff;
+}
+
+.logo-choice {
+  background: rgba(255, 255, 255, 0.055);
+  border-radius: 8px;
+  color: $panel-accent;
+  font-size: 28px;
+  min-width: 70px;
+  min-height: 58px;
+  padding: 0px;
+}
+
+.logo-choice:hover {
+  background: $panel-accent-hover;
+  color: $panel-header;
 }
 
 /* Larger buttons inside the right-side detail panels. */
@@ -694,6 +779,62 @@ $window-border-accent: rgba(255, 194, 153, 0.82);
 
 .palette-bright-rose {
   background: rgba(255, 42, 112, 0.58);
+}
+
+.palette-slate {
+  background: rgba(100, 116, 139, 0.62);
+}
+
+.palette-graphite {
+  background: rgba(55, 65, 81, 0.72);
+}
+
+.palette-cream {
+  background: rgba(255, 244, 214, 0.58);
+}
+
+.palette-coffee {
+  background: rgba(132, 88, 62, 0.62);
+}
+
+.palette-forest {
+  background: rgba(34, 139, 86, 0.58);
+}
+
+.palette-olive {
+  background: rgba(128, 148, 64, 0.58);
+}
+
+.palette-crimson {
+  background: rgba(220, 38, 78, 0.58);
+}
+
+.palette-coral {
+  background: rgba(255, 111, 97, 0.6);
+}
+
+.palette-amber {
+  background: rgba(245, 158, 11, 0.58);
+}
+
+.palette-lime {
+  background: rgba(132, 204, 22, 0.58);
+}
+
+.palette-mint {
+  background: rgba(52, 211, 153, 0.58);
+}
+
+.palette-sky {
+  background: rgba(56, 189, 248, 0.58);
+}
+
+.palette-navy {
+  background: rgba(30, 64, 175, 0.62);
+}
+
+.palette-indigo {
+  background: rgba(99, 102, 241, 0.62);
 }
 
 .palette-black {

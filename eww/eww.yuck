@@ -21,6 +21,7 @@
 (defpoll MEDIA_SUBTITLE :interval "2s" "~/.config/eww/scripts/media-info.sh subtitle")
 (defpoll MEDIA_STATUS :interval "2s" "~/.config/eww/scripts/media-info.sh status")
 (defpoll MEDIA_VOLUME :interval "2s" "~/.config/eww/scripts/media-info.sh volume")
+(defpoll PACMAN_UPDATE_COUNT :interval "1800s" "~/.config/eww/scripts/package-updates.sh count")
 
 ; Deeper settings panel state summaries.
 (defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
@@ -60,6 +61,12 @@
 (defpoll WINDOW_BORDER_STATE :interval "2s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
 (defpoll WINDOW_BORDER_WIDTH :interval "2s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
 (defpoll WINDOW_RADIUS :interval "2s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
+(defpoll SIDEBAR_WIDTH :interval "2s" "cat ~/.config/eww/state/sidebar-width 2>/dev/null || echo 90")
+(defpoll SIDEBAR_LOGO :interval "2s" "cat ~/.config/eww/state/sidebar-logo 2>/dev/null || echo ")
+(defpoll SIDEBAR_LOGO_SIZE :interval "2s" "cat ~/.config/eww/state/sidebar-logo-size 2>/dev/null || echo 54")
+(defpoll SIDEBAR_LOGO_X :interval "2s" "cat ~/.config/eww/state/sidebar-logo-x 2>/dev/null || echo -20")
+(defpoll SIDEBAR_LOGO_Y :interval "2s" "cat ~/.config/eww/state/sidebar-logo-y 2>/dev/null || echo 0")
+(defpoll PANEL_TRANSPARENCY :interval "2s" "cat ~/.config/eww/state/panel-transparency 2>/dev/null || echo 86")
 (defpoll SUPERMACHINE_UPDATE_STATUS :interval "2s" "cat ~/.config/eww/state/supermachine-update-status 2>/dev/null || echo Ready")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
@@ -79,7 +86,7 @@
   :geometry (geometry
     :x "0px"
     :y "0px"
-    :width "90px"
+    :width "105px"
     :height "100%"
     :anchor "left center")
 
@@ -115,7 +122,7 @@
         :class "launcher"
         :halign "center"
         :onclick "bash -c 'sleep 0.1; rofi -show drun &'"
-        "")
+        (label :text SIDEBAR_LOGO))
     )
 
     ; Clock and settings entry point.
@@ -128,10 +135,20 @@
       (label :class "clock" :text CLOCK_TIME)
       (label :class "ampm" :text CLOCK_AMPM)
 
-      (button
-        :class "settings-button"
-        :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-settings.sh >/tmp/supermachine-settings-toggle.log 2>&1'"
-        "󰒓")
+      (box
+        :orientation "h"
+        :class "sidebar-actions"
+        :spacing 0
+        :halign "center"
+        (button
+          :class {PACMAN_UPDATE_COUNT == "0" ? "updates-button" : "updates-button-alert"}
+          :tooltip {PACMAN_UPDATE_COUNT == "0" ? "System packages are up to date" : PACMAN_UPDATE_COUNT + " package updates available"}
+          :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/package-updates.sh open >/tmp/supermachine-package-update.log 2>&1'"
+          {PACMAN_UPDATE_COUNT == "0" ? "󰚰" : "󰚰 " + PACMAN_UPDATE_COUNT})
+        (button
+          :class "settings-button"
+          :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-settings.sh >/tmp/supermachine-settings-toggle.log 2>&1'"
+          "󰒓"))
     )
   )
 )
@@ -143,9 +160,9 @@
   :focusable false
 
   :geometry (geometry
-    :x "90px"
+    :x "105px"
     :y "0px"
-    :width "5px"
+    :width "3px"
     :height "100%"
     :anchor "left center")
 
@@ -163,7 +180,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "95px"
+    :x "108px"
     :y "0px"
     :width "285px"
     :height "100%"
@@ -548,7 +565,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -566,8 +583,8 @@
       :orientation "v"
       :class "settings-content"
       :spacing 14
-      :valign "start"
-      :vexpand false
+      :valign "fill"
+      :vexpand true
       :space-evenly false
 
     (label :class "settings-title" :halign "start" :text "Bluetooth")
@@ -589,7 +606,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -608,7 +625,7 @@
       :class "settings-content"
       :spacing 14
       :valign "start"
-      :vexpand false
+      :vexpand true
       :space-evenly false
 
     (label :class "settings-title" :halign "start" :text "Displays")
@@ -653,7 +670,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -694,7 +711,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -735,7 +752,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -776,7 +793,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -794,12 +811,25 @@
       :orientation "v"
       :class "settings-content"
       :spacing 14
-      :valign "start"
-      :vexpand false
+      :valign "fill"
+      :vexpand true
       :space-evenly false
 
     (label :class "settings-title" :halign "start" :text "Appearance")
     (label :class "settings-detail-subtitle" :halign "start" :text { "Openbox: " + THEME_NAME })
+
+    (scroll
+      :class "settings-scroll settings-detail-scroll"
+      :vscroll true
+      :hscroll false
+      :valign "fill"
+      :vexpand true
+      (box
+        :orientation "v"
+        :spacing 14
+        :valign "start"
+        :vexpand true
+        :space-evenly false
 
     (box
       :orientation "v"
@@ -849,7 +879,7 @@
         (button :class "settings-step-button" :tooltip "Less rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh down" "−")
         (label :class "settings-step-value" :text { WINDOW_RADIUS + " r" })
         (button :class "settings-step-button" :tooltip "More rounded windows" :onclick "~/.config/eww/scripts/set-window-radius.sh up" "+"))
-      (button :class "settings-wide-action" :onclick "eww update GLOW_SLOT=border; eww open glowcolorpicker" "Border Color"))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/open-color-picker.sh border detail" "Border Color"))
 
     ; Lightweight panel theme controls stay in Appearance for quick changes.
     (box
@@ -882,7 +912,408 @@
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-cyan" "Cyan")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-orange" "Orange")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-lime" "Lime"))
-      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-panel-customization.sh" "Advanced Customization")))))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-panel-customization.sh" "Advanced Customization"))
+
+    ; Sidebar controls keep the permanent rail adjustable without editing yuck/scss.
+    (box
+      :orientation "v"
+      :class "settings-section"
+      :spacing 10
+      (label :class "settings-section-title" :halign "start" :text "Side Panel")
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Thinner sidebar" :onclick "~/.config/eww/scripts/set-sidebar-width.sh down" "−")
+        (label :class "settings-step-value" :text { SIDEBAR_WIDTH + " px" })
+        (button :class "settings-step-button" :tooltip "Wider sidebar" :onclick "~/.config/eww/scripts/set-sidebar-width.sh up" "+"))
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "More transparent" :onclick "~/.config/eww/scripts/set-panel-transparency.sh down" "−")
+        (label :class "settings-step-value" :text { PANEL_TRANSPARENCY + "%" })
+        (button :class "settings-step-button" :tooltip "Less transparent" :onclick "~/.config/eww/scripts/set-panel-transparency.sh up" "+"))
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Smaller logo" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh size down" "−")
+        (label :class "settings-step-value" :text { "Logo " + SIDEBAR_LOGO_SIZE })
+        (button :class "settings-step-button" :tooltip "Larger logo" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh size up" "+"))
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Move logo left" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh x down" "←")
+        (label :class "settings-step-value" :text { "X " + SIDEBAR_LOGO_X })
+        (button :class "settings-step-button" :tooltip "Move logo right" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh x up" "→"))
+      (box
+        :orientation "h"
+        :class "settings-stepper"
+        :spacing 8
+        :halign "center"
+        (button :class "settings-step-button" :tooltip "Move logo up" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh y down" "↑")
+        (label :class "settings-step-value" :text { "Y " + SIDEBAR_LOGO_Y })
+        (button :class "settings-step-button" :tooltip "Move logo down" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh y up" "↓"))
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/set-sidebar-logo-style.sh reset" "Reset Logo Position")
+      (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/open-sidebar-logo-panel.sh" "Logo Picker")))))))
+
+; Third drawer with visual sidebar logo choices.
+(defwindow sidebarlogopicker
+  :monitor 0
+  :stacking "fg"
+  :focusable true
+
+  :geometry (geometry
+    :x "823px"
+    :y "0px"
+    :width "300px"
+    :height "100%"
+    :anchor "left center")
+
+  (box
+    :orientation "v"
+    :class "settings-detail-panel"
+    :valign "fill"
+    :vexpand true
+    :space-evenly false
+
+    (box
+      :orientation "v"
+      :class "settings-content"
+      :spacing 14
+      :valign "fill"
+      :vexpand true
+      :space-evenly false
+
+      (label :class "settings-title" :halign "start" :text "Sidebar Logo")
+      (label :class "settings-detail-subtitle" :halign "start" :text "Pick a launcher mark")
+
+      (scroll
+        :class "settings-scroll settings-picker-scroll"
+        :vscroll true
+        :hscroll false
+        :vexpand true
+        (box
+          :orientation "v"
+          :class "settings-section"
+          :spacing 8
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Arch" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Arch" "")
+            (button :class "logo-choice" :tooltip "SuperMachine" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh SuperMachine" "󰣇")
+            (button :class "logo-choice" :tooltip "Linux" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Linux" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Terminal" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Terminal" "")
+            (button :class "logo-choice" :tooltip "Code" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Code" "󰨞")
+            (button :class "logo-choice" :tooltip "Star" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Star" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Lightning" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Lightning" "")
+            (button :class "logo-choice" :tooltip "Fire" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Fire" "")
+            (button :class "logo-choice" :tooltip "Rocket" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Rocket" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Gear" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Gear" "󰒓")
+            (button :class "logo-choice" :tooltip "Diamond" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Diamond" "◆")
+            (button :class "logo-choice" :tooltip "Cross" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Cross" "✚"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Heart" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Heart" "")
+            (button :class "logo-choice" :tooltip "Shield" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Shield" "󰞀")
+            (button :class "logo-choice" :tooltip "Crown" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Crown" "󰯆"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Cube" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Cube" "")
+            (button :class "logo-choice" :tooltip "Circle" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Circle" "●")
+            (button :class "logo-choice" :tooltip "Triangle" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Triangle" "▲"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Hex" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Hex" "⬢")
+            (button :class "logo-choice" :tooltip "Wave" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Wave" "≋")
+            (button :class "logo-choice" :tooltip "Eye" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Eye" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Compass" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Compass" "")
+            (button :class "logo-choice" :tooltip "Atom" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Atom" "")
+            (button :class "logo-choice" :tooltip "Chip" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Chip" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Keyboard" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Keyboard" "")
+            (button :class "logo-choice" :tooltip "Monitor" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Monitor" "󰍹")
+            (button :class "logo-choice" :tooltip "Gamepad" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Gamepad" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Headphones" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Headphones" "")
+            (button :class "logo-choice" :tooltip "Music" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Music" "")
+            (button :class "logo-choice" :tooltip "Coffee" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Coffee" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Mug" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Mug" "☕")
+            (button :class "logo-choice" :tooltip "Tea" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Tea" "◔")
+            (button :class "logo-choice" :tooltip "Cocoa" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Cocoa" "♨"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Lightbulb" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Lightbulb" "")
+            (button :class "logo-choice" :tooltip "Bookmark" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bookmark" "")
+            (button :class "logo-choice" :tooltip "Pen" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Pen" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Magic" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Magic" "")
+            (button :class "logo-choice" :tooltip "Sliders" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Sliders" "")
+            (button :class "logo-choice" :tooltip "Prompt" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Prompt" "❯"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Moon" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Moon" "")
+            (button :class "logo-choice" :tooltip "Sun" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Sun" "")
+            (button :class "logo-choice" :tooltip "Cloud" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Cloud" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Sparkle" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Sparkle" "✦")
+            (button :class "logo-choice" :tooltip "Bolt Circle" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh BoltCircle" "󱐋")
+            (button :class "logo-choice" :tooltip "Flame Alt" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh FlameAlt" "󰈸"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Skull" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Skull" "󰚌")
+            (button :class "logo-choice" :tooltip "Ghost" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Ghost" "󰊠")
+            (button :class "logo-choice" :tooltip "Circuit" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Circuit" "󰘚"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Planet" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Planet" "󰯉")
+            (button :class "logo-choice" :tooltip "Anchor" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Anchor" "")
+            (button :class "logo-choice" :tooltip "Leaf" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Leaf" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Snow" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Snow" "")
+            (button :class "logo-choice" :tooltip "Radioactive" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Radioactive" "☢")
+            (button :class "logo-choice" :tooltip "Biohazard" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Biohazard" "☣"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Smile" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Smile" "")
+            (button :class "logo-choice" :tooltip "Target" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Target" "󰀘")
+            (button :class "logo-choice" :tooltip "Key" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Key" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Lock" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Lock" "")
+            (button :class "logo-choice" :tooltip "Home" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Home" "")
+            (button :class "logo-choice" :tooltip "Folder" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Folder" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Wifi" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Wifi" "")
+            (button :class "logo-choice" :tooltip "Bluetooth" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bluetooth" "")
+            (button :class "logo-choice" :tooltip "Power" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Power" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Bell" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bell" "")
+            (button :class "logo-choice" :tooltip "Book" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Book" "")
+            (button :class "logo-choice" :tooltip "Bible" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bible" "✝"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Flower" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Flower" "✿")
+            (button :class "logo-choice" :tooltip "Peace" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Peace" "☮")
+            (button :class "logo-choice" :tooltip "Yin Yang" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh YinYang" "☯"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Aries" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Aries" "♈")
+            (button :class "logo-choice" :tooltip "Leo" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Leo" "♌")
+            (button :class "logo-choice" :tooltip "Pisces" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Pisces" "♓"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Chess" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Chess" "♞")
+            (button :class "logo-choice" :tooltip "Club" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Club" "♣")
+            (button :class "logo-choice" :tooltip "Spade" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Spade" "♠"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Infinity" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Infinity" "∞")
+            (button :class "logo-choice" :tooltip "Check" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Check" "✓")
+            (button :class "logo-choice" :tooltip "X Mark" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh XMark" "✕"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Circle Star" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh CircleStar" "✪")
+            (button :class "logo-choice" :tooltip "Eight Star" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh EightStar" "✸")
+            (button :class "logo-choice" :tooltip "North Star" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh NorthStar" "✧"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Comet" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Comet" "☄")
+            (button :class "logo-choice" :tooltip "Umbrella" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Umbrella" "☂")
+            (button :class "logo-choice" :tooltip "Snowman" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Snowman" "☃"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Phone" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Phone" "")
+            (button :class "logo-choice" :tooltip "Camera" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Camera" "")
+            (button :class "logo-choice" :tooltip "Paint" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Paint" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Flask" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Flask" "")
+            (button :class "logo-choice" :tooltip "Wrench" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Wrench" "")
+            (button :class "logo-choice" :tooltip "Bug" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bug" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Database" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Database" "")
+            (button :class "logo-choice" :tooltip "Server" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Server" "")
+            (button :class "logo-choice" :tooltip "Globe" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Globe" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Git" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Git" "")
+            (button :class "logo-choice" :tooltip "Github" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Github" "")
+            (button :class "logo-choice" :tooltip "Branch" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Branch" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Desktop" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Desktop" "")
+            (button :class "logo-choice" :tooltip "Grid" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Grid" "▦")
+            (button :class "logo-choice" :tooltip "Panel" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Panel" "▌"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Stack" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Stack" "▤")
+            (button :class "logo-choice" :tooltip "Layers" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Layers" "")
+            (button :class "logo-choice" :tooltip "Package" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Package" "󰏗"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Map" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Map" "")
+            (button :class "logo-choice" :tooltip "Flag" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Flag" "")
+            (button :class "logo-choice" :tooltip "Trophy" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Trophy" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Gift" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Gift" "")
+            (button :class "logo-choice" :tooltip "Puzzle" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Puzzle" "")
+            (button :class "logo-choice" :tooltip "Magnet" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Magnet" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Train" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Train" "")
+            (button :class "logo-choice" :tooltip "Car" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Car" "")
+            (button :class "logo-choice" :tooltip "Plane" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Plane" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Ship" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Ship" "")
+            (button :class "logo-choice" :tooltip "Clock" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Clock" "")
+            (button :class "logo-choice" :tooltip "Calendar" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Calendar" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Signal" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Signal" "")
+            (button :class "logo-choice" :tooltip "Bars" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Bars" "")
+            (button :class "logo-choice" :tooltip "Layers" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Layers" ""))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Package" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Package" "󰏗")
+            (button :class "logo-choice" :tooltip "Hollow Star" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh HollowStar" "☆")
+            (button :class "logo-choice" :tooltip "Double Diamond" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh DoubleDiamond" "❖"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Dice One" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh DiceOne" "⚀")
+            (button :class "logo-choice" :tooltip "Dice Three" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh DiceThree" "⚂")
+            (button :class "logo-choice" :tooltip "Dice Six" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh DiceSix" "⚅"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Warning" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Warning" "⚠")
+            (button :class "logo-choice" :tooltip "Swords" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Swords" "⚔")
+            (button :class "logo-choice" :tooltip "Scales" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Scales" "⚖"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Fleur" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Fleur" "⚜")
+            (button :class "logo-choice" :tooltip "Soccer" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Soccer" "⚽")
+            (button :class "logo-choice" :tooltip "Baseball" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Baseball" "⚾"))
+          (box
+            :orientation "h"
+            :spacing 8
+            :halign "center"
+            (button :class "logo-choice" :tooltip "Thunder" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Thunder" "ϟ")
+            (button :class "logo-choice" :tooltip "Lambda" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Lambda" "λ")
+            (button :class "logo-choice" :tooltip "Omega" :onclick "~/.config/eww/scripts/set-sidebar-logo.sh Omega" "Ω"))
+          (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/logo-picker.sh" "Custom Text")))
+
+      (button :class "settings-wide-action" :onclick "eww close sidebarlogopicker" "Close Picker"))))
 
 ; Third drawer with full panel theme controls and preset library.
 (defwindow panelcustomization
@@ -891,7 +1322,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "810px"
+    :x "823px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -908,12 +1339,25 @@
       :orientation "v"
       :class "settings-content"
       :spacing 14
-      :valign "start"
-      :vexpand false
+      :valign "fill"
+      :vexpand true
       :space-evenly false
 
       (label :class "settings-title" :halign "start" :text "Customize Panel")
       (label :class "settings-detail-subtitle" :halign "start" :text { "Preset: " + GLOW_PRESET })
+
+      (scroll
+        :class "settings-scroll settings-preset-scroll"
+        :vscroll true
+        :hscroll false
+        :valign "fill"
+        :vexpand true
+        (box
+          :orientation "v"
+          :spacing 14
+          :valign "start"
+          :vexpand true
+          :space-evenly false
 
       ; Full panel customization lives here so Appearance stays compact.
       (box
@@ -925,17 +1369,17 @@
           :orientation "h"
           :spacing 8
           :halign "center"
-          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick panel accent color" :onclick "eww update GLOW_SLOT=accent; eww open glowcolorpicker" "Accent")
-          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick header text color" :onclick "eww update GLOW_SLOT=header; eww open glowcolorpicker" "Header")
-          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick sub text color" :onclick "eww update GLOW_SLOT=subtext; eww open glowcolorpicker" "Sub"))
+          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick panel accent color" :onclick "~/.config/eww/scripts/open-color-picker.sh accent advanced" "Accent")
+          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick header text color" :onclick "~/.config/eww/scripts/open-color-picker.sh header advanced" "Header")
+          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick sub text color" :onclick "~/.config/eww/scripts/open-color-picker.sh subtext advanced" "Sub"))
         (box
           :orientation "h"
           :spacing 8
           :halign "center"
-          (button :class "settings-color-chip settings-color-cyan" :tooltip "Pick glow color 1" :onclick "eww update GLOW_SLOT=1; eww open glowcolorpicker" "1")
-          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick glow color 2" :onclick "eww update GLOW_SLOT=2; eww open glowcolorpicker" "2")
-          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick glow color 3" :onclick "eww update GLOW_SLOT=3; eww open glowcolorpicker" "3")
-          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick glow color 4" :onclick "eww update GLOW_SLOT=4; eww open glowcolorpicker" "4"))
+          (button :class "settings-color-chip settings-color-cyan" :tooltip "Pick glow color 1" :onclick "~/.config/eww/scripts/open-color-picker.sh 1 advanced" "1")
+          (button :class "settings-color-chip settings-color-blue" :tooltip "Pick glow color 2" :onclick "~/.config/eww/scripts/open-color-picker.sh 2 advanced" "2")
+          (button :class "settings-color-chip settings-color-purple" :tooltip "Pick glow color 3" :onclick "~/.config/eww/scripts/open-color-picker.sh 3 advanced" "3")
+          (button :class "settings-color-chip settings-color-pink" :tooltip "Pick glow color 4" :onclick "~/.config/eww/scripts/open-color-picker.sh 4 advanced" "4"))
         (box
           :orientation "h"
           :class "settings-stepper"
@@ -966,6 +1410,49 @@
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset aurora" "Aurora")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ember" "Ember")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset ocean" "Ocean"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset midnight" "Midnight")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset cyberpunk" "Cyber")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset royal" "Royal"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset lagoon" "Lagoon")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset firefly" "Firefly")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset rose-gold" "Rose Gold"))
+      (label :class "settings-section-title" :halign "start" :text "Special Themes")
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset berry-crunch" "Berry")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset frosted-milk" "Frosted")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset honey-loop" "Honey"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset cocoa-byte" "Cocoa")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset arcade-slush" "Slush")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset galaxy-pop" "Galaxy"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset toxic-limeade" "Toxic")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset midnight-oil" "Oil")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset synthwave-night" "Synth"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset polar-bites" "Polar")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset grape-soda" "Grape")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset cherry-bomb" "Cherry"))
       (label :class "settings-section-title" :halign "start" :text "Pastel Animated")
       (box
         :orientation "h"
@@ -1018,6 +1505,20 @@
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-gold" "Gold")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-teal" "Teal")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-cobalt" "Cobalt"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-slate" "Slate")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-forest" "Forest")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-amber" "Amber"))
+      (box
+        :orientation "h"
+        :spacing 6
+        :halign "center"
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-crimson" "Crimson")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-indigo" "Indigo")
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset static-mint" "Mint"))
       (label :class "settings-section-title" :halign "start" :text "Pastel Static")
       (box
         :orientation "h"
@@ -1047,7 +1548,7 @@
         :halign "center"
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-yellow" "Yellow")
         (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-blue" "Blue")
-        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-purple" "Purple"))))))
+        (button :class "settings-action" :onclick "~/.config/eww/scripts/set-glow-color.sh preset bright-static-purple" "Purple"))))))))
 
 ; Fourth drawer for picking one of the panel glow and text colors.
 (defwindow glowcolorpicker
@@ -1056,7 +1557,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "1240px"
+    :x "1301px"
     :y "0px"
     :width "300px"
     :height "100%"
@@ -1074,16 +1575,21 @@
       :class "settings-content"
       :spacing 14
       :valign "start"
-      :vexpand false
+      :vexpand true
       :space-evenly false
 
       (label :class "settings-title" :halign "start" :text { "Theme Color " + GLOW_SLOT })
       (label :class "settings-detail-subtitle" :halign "start" :text "Pick a color for glow or panel text")
 
-      (box
-        :orientation "v"
-        :class "settings-section"
-        :spacing 6
+      (scroll
+        :class "settings-scroll settings-picker-scroll"
+        :vscroll true
+        :hscroll false
+        :vexpand true
+        (box
+          :orientation "v"
+          :class "settings-section"
+          :spacing 6
         (label :class "settings-section-title" :halign "start" :text "Core")
         (button :class "settings-palette-action palette-cyan" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " cyan" } "SuperMachine Cyan")
         (button :class "settings-palette-action palette-ice" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " ice" } "Ice Blue")
@@ -1112,8 +1618,24 @@
         (button :class "settings-palette-action palette-bright-blue" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-blue" } "Bright Blue")
         (button :class "settings-palette-action palette-bright-purple" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-purple" } "Bright Purple")
         (button :class "settings-palette-action palette-bright-rose" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " bright-rose" } "Bright Rose")
-        (button :class "settings-palette-action palette-black" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " black" } "Low Black")
-        (button :class "settings-palette-action palette-clear" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " clear" } "Almost Clear"))
+          (label :class "settings-section-title" :halign "start" :text "Natural")
+          (button :class "settings-palette-action palette-slate" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " slate" } "Slate")
+          (button :class "settings-palette-action palette-graphite" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " graphite" } "Graphite")
+          (button :class "settings-palette-action palette-cream" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " cream" } "Cream")
+          (button :class "settings-palette-action palette-coffee" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " coffee" } "Coffee")
+          (button :class "settings-palette-action palette-forest" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " forest" } "Forest")
+          (button :class "settings-palette-action palette-olive" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " olive" } "Olive")
+          (label :class "settings-section-title" :halign "start" :text "Extra")
+          (button :class "settings-palette-action palette-crimson" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " crimson" } "Crimson")
+          (button :class "settings-palette-action palette-coral" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " coral" } "Coral")
+          (button :class "settings-palette-action palette-amber" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " amber" } "Amber")
+          (button :class "settings-palette-action palette-lime" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " lime" } "Lime")
+          (button :class "settings-palette-action palette-mint" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " mint" } "Mint")
+          (button :class "settings-palette-action palette-sky" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " sky" } "Sky")
+          (button :class "settings-palette-action palette-navy" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " navy" } "Navy")
+          (button :class "settings-palette-action palette-indigo" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " indigo" } "Indigo")
+          (button :class "settings-palette-action palette-black" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " black" } "Low Black")
+          (button :class "settings-palette-action palette-clear" :onclick { "~/.config/eww/scripts/set-glow-color.sh " + GLOW_SLOT + " clear" } "Almost Clear")))
 
       (button :class "settings-wide-action" :onclick "eww close glowcolorpicker" "Close Picker"))))
 
@@ -1124,7 +1646,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -1193,7 +1715,7 @@
   :focusable true
 
   :geometry (geometry
-    :x "380px"
+    :x "393px"
     :y "0px"
     :width "430px"
     :height "100%"
@@ -1283,7 +1805,7 @@
       :class "settings-header"
       :halign "fill"
       (label :class "welcome-title" :halign "start" :hexpand true :text "SuperMachine V1.0.0")
-      (button :class "settings-close" :onclick "eww close supermachinewelcome" "×"))
+      (button :class "settings-close" :onclick "~/.config/eww/scripts/close-welcome.sh" "×"))
 
     (label :class "welcome-copy" :halign "start" :wrap true :text "A modern, minimal Openbox desktop built from Arch, Eww, Rofi, Picom, Alacritty, and curated configs. It is not a from-scratch OS; it is a lightweight desktop package designed to feel fast, personal, and easy to change.")
 

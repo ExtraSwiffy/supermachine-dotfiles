@@ -8,6 +8,7 @@ poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
 state_dir="$HOME/.config/eww/state"
 gap_file="$state_dir/window-gap"
+sidebar_width_file="$state_dir/sidebar-width"
 tiling_off_file="$state_dir/smart-tiling-off"
 
 case "${1:-}" in
@@ -23,11 +24,16 @@ current_desktop() {
 }
 
 update_runtime_settings() {
-  local saved_gap
+  local saved_gap saved_sidebar_width
 
   saved_gap="$(cat "$gap_file" 2>/dev/null || true)"
   if [[ "$saved_gap" =~ ^[0-9]+$ ]] && [ "$saved_gap" -ge 0 ] && [ "$saved_gap" -le 40 ]; then
     gap="$saved_gap"
+  fi
+
+  saved_sidebar_width="$(cat "$sidebar_width_file" 2>/dev/null || true)"
+  if [[ "$saved_sidebar_width" =~ ^[0-9]+$ ]] && [ "$saved_sidebar_width" -ge 85 ] && [ "$saved_sidebar_width" -le 130 ]; then
+    sidebar_width="$saved_sidebar_width"
   fi
 }
 

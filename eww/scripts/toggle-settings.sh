@@ -23,6 +23,7 @@ close_settings() {
     appearancesettings \
     panelcustomization \
     glowcolorpicker \
+    sidebarlogopicker \
     keybindsettings \
     systeminfopanel; do
     if grep -q "^${window}:" <<< "$active"; then
