@@ -10,6 +10,9 @@ alacritty &
 picom &
 nm-applet &
 kdeconnectd &
+if [ -x /usr/lib/polkit-kde-authentication-agent-1 ]; then
+  /usr/lib/polkit-kde-authentication-agent-1 &
+fi
 
 killall eww &
 eww daemon &
