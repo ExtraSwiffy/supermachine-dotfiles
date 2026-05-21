@@ -138,7 +138,7 @@ run_console_session() {
   {
     printf 'Starting SuperMachine Console Mode at %s\n' "$(date)"
     printf 'Resolution: %sx%s @ %s\n' "$width" "$height" "$refresh"
-    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 1 -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 1 --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
     printf 'Console Mode exited at %s\n' "$(date)"
   } >> "$log" 2>&1 || true
 
