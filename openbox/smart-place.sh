@@ -6,12 +6,13 @@ bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
 right_edge_bleed="${SUPERMACHINE_WINDOW_RIGHT_EDGE_BLEED:-1}"
 placement_inset="${SUPERMACHINE_WINDOW_PLACEMENT_INSET:-1}"
-poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1}"
+poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1.5}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
 state_dir="$HOME/.config/eww/state"
 gap_file="$state_dir/window-gap"
 sidebar_width_file="$state_dir/sidebar-width"
 tiling_off_file="$state_dir/smart-tiling-off"
+game_state_file="$HOME/.cache/eww-gamemode"
 
 case "${1:-}" in
   --once|--left|--right|--up|--down|--upper-left|--upper-right|--lower-left|--lower-right) ;;
@@ -42,10 +43,22 @@ update_runtime_settings() {
   if [[ "$saved_sidebar_width" =~ ^[0-9]+$ ]] && [ "$saved_sidebar_width" -ge 85 ] && [ "$saved_sidebar_width" -le 130 ]; then
     sidebar_width="$saved_sidebar_width"
   fi
+
+  if game_mode_enabled; then
+    gap=0
+    bottom_gap=0
+    sidebar_width=0
+    right_edge_bleed=0
+    placement_inset=0
+  fi
+}
+
+game_mode_enabled() {
+  [ -f "$game_state_file" ]
 }
 
 smart_tiling_enabled() {
-  [ ! -f "$tiling_off_file" ]
+  [ ! -f "$tiling_off_file" ] && ! game_mode_enabled
 }
 
 workarea() {
@@ -182,6 +195,11 @@ sidebar_safe_area() {
   local w="$3"
   local h="$4"
   local primary
+
+  if game_mode_enabled; then
+    printf '%s %s %s %s\n' "$x" "$y" "$w" "$h"
+    return 0
+  fi
 
   primary="$(xrandr --query 2>/dev/null |
     awk '
@@ -419,6 +437,11 @@ close_settings_windows() {
 }
 
 sync_sidebar_for_fullscreen() {
+  if game_mode_enabled; then
+    rm -f "$fullscreen_override"
+    return 0
+  fi
+
   if is_active_fullscreen; then
     if [ -f "$fullscreen_override" ] && settings_are_open; then
       return 0
@@ -580,12 +603,12 @@ place_focused() {
   case "$mode" in
     left)
       move_window "$id" "$x" "$y" "$half_w" "$h"
-      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
+      game_mode_enabled || tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
       focus_window "$id"
       ;;
     right)
       move_window "$id" "$((x + half_w + gap))" "$y" "$((w - half_w - gap))" "$h"
-      tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$x" "$y" "$half_w" "$h"
+      game_mode_enabled || tile_remaining_area "$id" "$wx" "$wy" "$ww" "$wh" "$x" "$y" "$half_w" "$h"
       focus_window "$id"
       ;;
     up)
@@ -593,7 +616,7 @@ place_focused() {
       focus_window "$id"
       ;;
     down)
-      tile_windows
+      game_mode_enabled || tile_windows
       focus_window "$id"
       ;;
     upper-left)

@@ -4,6 +4,7 @@ set -euo pipefail
 scss="${1:-$HOME/.config/eww/eww.scss}"
 themerc="${2:-$HOME/.themes/SuperMachine/openbox-3/themerc}"
 state_dir="$HOME/.config/eww/state"
+game_state="$HOME/.cache/eww-gamemode"
 
 [ -f "$scss" ] || exit 0
 [ -f "$themerc" ] || exit 0
@@ -58,7 +59,7 @@ set_theme_value "menu.title.text.color" "$accent"
 set_theme_value "menu.items.text.color" "$header"
 set_theme_value "menu.items.active.text.color" "$accent"
 set_theme_value "menu.items.disabled.text.color" "$subtext"
-if [ -f "$state_dir/window-border-off" ]; then
+if [ -f "$game_state" ] || [ -f "$state_dir/window-border-off" ]; then
   set_theme_value "border.width" "0"
   set_theme_value "padding.height" "0"
   set_theme_value "padding.width" "0"

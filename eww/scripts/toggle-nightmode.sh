@@ -14,9 +14,11 @@ if [ -f "$STATE" ]; then
     [ -n "$output" ] && xrandr --output "$output" --gamma 1:1:1
   done <<< "$outputs"
   rm -f "$STATE"
+  eww update NIGHT_STATE=off >/dev/null 2>&1 || true
 else
   while read -r output; do
     [ -n "$output" ] && xrandr --output "$output" --gamma 1.0:0.92:0.78
   done <<< "$outputs"
   touch "$STATE"
+  eww update NIGHT_STATE=on >/dev/null 2>&1 || true
 fi

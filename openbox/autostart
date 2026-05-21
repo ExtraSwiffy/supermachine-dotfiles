@@ -1,6 +1,11 @@
 ~/.screenlayout/monitors.sh &
 
-~/.fehbg &
+if [ -f "$HOME/.cache/eww-gamemode" ]; then
+  "$HOME/.config/eww/scripts/toggle-gamemode.sh" resume &
+  exit 0
+fi
+
+#~/.fehbg &
 alacritty &
 picom &
 nm-applet &

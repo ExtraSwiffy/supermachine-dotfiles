@@ -1,40 +1,40 @@
 ; Clock and workspace values used by the left sidebar.
-(defpoll CLOCK_TIME :interval "1s" "date '+%I:%M'")
-(defpoll CLOCK_AMPM :interval "5s" "date '+%p'")
+(defpoll CLOCK_TIME :interval "30s" "date '+%I:%M'")
+(defpoll CLOCK_AMPM :interval "60s" "date '+%p'")
 (defpoll CURRENT_WS :interval "1s" "wmctrl -d | awk '/\\*/ {print $1 + 1}'")
 
 ; Lightweight system stats used by the settings panels.
-(defpoll CPU_USAGE :interval "2s" "top -bn1 | grep 'Cpu(s)' | awk '{print int($2)}'")
-(defpoll CPU_FREQ :interval "2s" "grep 'cpu MHz' /proc/cpuinfo | head -1 | awk '{print int($4)}'")
-(defpoll RAM_USAGE :interval "2s" "free | awk '/Mem:/ {print int($3/$2 * 100)}'")
-(defpoll GPU_USAGE :interval "2s" "cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0")
-(defpoll CPU_TEMP :interval "5s" "sensors | awk '/Tctl:/ {print int($2)}' | tr -d '+'")
+(defpoll CPU_USAGE :interval "10s" "top -bn1 | awk '/Cpu\\(s\\)/ {print int($2); exit}'")
+(defpoll CPU_FREQ :interval "30s" "awk '/cpu MHz/ {print int($4); exit}' /proc/cpuinfo")
+(defpoll RAM_USAGE :interval "10s" "free | awk '/Mem:/ {print int($3/$2 * 100)}'")
+(defpoll GPU_USAGE :interval "10s" "cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0")
+(defpoll CPU_TEMP :interval "30s" "sensors 2>/dev/null | awk '/Tctl:/ {print int($2); exit}' | tr -d '+'")
 
 ; Quick control state for the top section of the settings panel.
-(defpoll PERF_STATE :interval "1s" "powerprofilesctl get | grep -q performance && echo on || echo off")
-(defpoll GAME_STATE :interval "1s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
-(defpoll VOLUME :interval "1s" "pamixer --get-volume 2>/dev/null || echo 0")
-(defpoll BRIGHTNESS :interval "2s" "sudo ddcutil --bus 10 getvcp 10 2>/dev/null | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs | awk 'NF {print; found=1} END {if (!found) print 50}'")
-(defpoll MEDIA_ACTIVE :interval "2s" "~/.config/eww/scripts/media-info.sh active")
-(defpoll MEDIA_ICON :interval "2s" "~/.config/eww/scripts/media-info.sh icon")
-(defpoll MEDIA_TITLE :interval "2s" "~/.config/eww/scripts/media-info.sh title")
-(defpoll MEDIA_SUBTITLE :interval "2s" "~/.config/eww/scripts/media-info.sh subtitle")
-(defpoll MEDIA_STATUS :interval "2s" "~/.config/eww/scripts/media-info.sh status")
-(defpoll MEDIA_VOLUME :interval "2s" "~/.config/eww/scripts/media-info.sh volume")
+(defpoll PERF_STATE :interval "10s" "powerprofilesctl get 2>/dev/null | grep -q performance && echo on || echo off")
+(defpoll GAME_STATE :interval "10s" "test -f ~/.cache/eww-gamemode && echo on || echo off")
+(defpoll VOLUME :interval "3s" "pamixer --get-volume 2>/dev/null || echo 0")
+(defpoll BRIGHTNESS :interval "30s" "sudo ddcutil --bus 10 getvcp 10 2>/dev/null | awk -F'current value = ' '{print $2}' | awk -F',' '{print $1}' | xargs | awk 'NF {print; found=1} END {if (!found) print 50}'")
+(defpoll MEDIA_ACTIVE :interval "10s" "~/.config/eww/scripts/media-info.sh active")
+(defpoll MEDIA_ICON :interval "10s" "~/.config/eww/scripts/media-info.sh icon")
+(defpoll MEDIA_TITLE :interval "10s" "~/.config/eww/scripts/media-info.sh title")
+(defpoll MEDIA_SUBTITLE :interval "10s" "~/.config/eww/scripts/media-info.sh subtitle")
+(defpoll MEDIA_STATUS :interval "10s" "~/.config/eww/scripts/media-info.sh status")
+(defpoll MEDIA_VOLUME :interval "10s" "~/.config/eww/scripts/media-info.sh volume")
 (defpoll PACMAN_UPDATE_COUNT :interval "1800s" "~/.config/eww/scripts/package-updates.sh count")
 
 ; Deeper settings panel state summaries.
-(defpoll NIGHT_STATE :interval "1s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
-(defpoll BT_POWER :interval "3s" "bluetoothctl show 2>/dev/null | awk -F': ' '/Powered/ {print $2}'")
-(defpoll BT_CONNECTED :interval "5s" "bluetoothctl devices Connected 2>/dev/null | wc -l")
-(defpoll DISPLAY_SUMMARY :interval "5s" "~/.config/eww/scripts/display-info.sh summary")
-(defpoll DISPLAY_ONE_NAME :interval "5s" "~/.config/eww/scripts/display-info.sh name 1")
-(defpoll DISPLAY_ONE_MODE :interval "5s" "~/.config/eww/scripts/display-info.sh mode 1")
-(defpoll DISPLAY_TWO_NAME :interval "5s" "~/.config/eww/scripts/display-info.sh name 2")
-(defpoll DISPLAY_TWO_MODE :interval "5s" "~/.config/eww/scripts/display-info.sh mode 2")
-(defpoll THEME_NAME :interval "5s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo SuperMachine")
-(defpoll NETWORK_NAME :interval "5s" "nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1==\"yes\" {print $2; found=1} END {if (!found) print \"offline\"}'")
-(defpoll AUDIO_STATE :interval "2s" "pamixer --get-mute | grep -q true && echo muted || echo \"$(pamixer --get-volume)%\"")
+(defpoll NIGHT_STATE :interval "10s" "test -f ~/.config/eww/state/nightmode && echo on || echo off")
+(defpoll BT_POWER :interval "10s" "bluetoothctl show 2>/dev/null | awk -F': ' '/Powered/ {print $2}'")
+(defpoll BT_CONNECTED :interval "10s" "bluetoothctl devices Connected 2>/dev/null | wc -l")
+(defpoll DISPLAY_SUMMARY :interval "30s" "~/.config/eww/scripts/display-info.sh summary")
+(defpoll DISPLAY_ONE_NAME :interval "30s" "~/.config/eww/scripts/display-info.sh name 1")
+(defpoll DISPLAY_ONE_MODE :interval "30s" "~/.config/eww/scripts/display-info.sh mode 1")
+(defpoll DISPLAY_TWO_NAME :interval "30s" "~/.config/eww/scripts/display-info.sh name 2")
+(defpoll DISPLAY_TWO_MODE :interval "30s" "~/.config/eww/scripts/display-info.sh mode 2")
+(defpoll THEME_NAME :interval "30s" "awk -F'[<>]' '/<name>/ {print $3; exit}' ~/.config/openbox/rc.xml 2>/dev/null || echo SuperMachine")
+(defpoll NETWORK_NAME :interval "15s" "nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1==\"yes\" {print $2; found=1} END {if (!found) print \"offline\"}'")
+(defpoll AUDIO_STATE :interval "3s" "pamixer --get-mute | grep -q true && echo muted || echo \"$(pamixer --get-volume)%\"")
 (defpoll UPTIME_TEXT :interval "60s" "uptime -p | sed 's/^up //'")
 (defpoll KERNEL_TEXT :interval "60s" "uname -r | cut -d- -f1")
 (defpoll HEADER_TEXT :interval "3600s" "pacman -Q linux-lts-headers 2>/dev/null | awk '{print $2}' || pacman -Q linux-headers 2>/dev/null | awk '{print $2}' || echo missing")
@@ -53,28 +53,28 @@
 (defpoll SHELL_NAME :interval "3600s" "basename \"$SHELL\"")
 (defpoll SESSION_NAME :interval "3600s" "printenv XDG_SESSION_TYPE 2>/dev/null || echo x11")
 (defpoll CPU_MODEL :interval "3600s" "awk -F': ' '/model name/ {gsub(/ CPU| Processor| with Radeon Graphics/, \"\", $2); print $2; exit}' /proc/cpuinfo")
-(defpoll GLOW_STATE :interval "2s" "test -f ~/.config/eww/state/glow-off && echo off || echo on")
-(defpoll GLOW_THICKNESS :interval "2s" "awk -F': ' '/\\$settings-glow-thickness/ {gsub(/px;|;/,\"\",$2); print $2; exit}' ~/.config/eww/eww.scss 2>/dev/null || echo 5")
-(defpoll GLOW_PRESET :interval "2s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
-(defpoll WINDOW_GAP :interval "2s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
-(defpoll SMART_TILING_STATE :interval "2s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
-(defpoll WINDOW_BORDER_STATE :interval "2s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
-(defpoll WINDOW_BORDER_WIDTH :interval "2s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
-(defpoll WINDOW_RADIUS :interval "2s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
-(defpoll SIDEBAR_WIDTH :interval "2s" "cat ~/.config/eww/state/sidebar-width 2>/dev/null || echo 90")
-(defpoll SIDEBAR_LOGO :interval "2s" "cat ~/.config/eww/state/sidebar-logo 2>/dev/null || echo ")
-(defpoll SIDEBAR_LOGO_SIZE :interval "2s" "cat ~/.config/eww/state/sidebar-logo-size 2>/dev/null || echo 54")
-(defpoll SIDEBAR_LOGO_X :interval "2s" "cat ~/.config/eww/state/sidebar-logo-x 2>/dev/null || echo -20")
-(defpoll SIDEBAR_LOGO_Y :interval "2s" "cat ~/.config/eww/state/sidebar-logo-y 2>/dev/null || echo 0")
-(defpoll PANEL_TRANSPARENCY :interval "2s" "cat ~/.config/eww/state/panel-transparency 2>/dev/null || echo 86")
-(defpoll SUPERMACHINE_UPDATE_STATUS :interval "2s" "cat ~/.config/eww/state/supermachine-update-status 2>/dev/null || echo Ready")
+(defpoll GLOW_STATE :interval "30s" "test -f ~/.config/eww/state/glow-off && echo off || echo on")
+(defpoll GLOW_THICKNESS :interval "30s" "awk -F': ' '/\\$settings-glow-thickness/ {gsub(/px;|;/,\"\",$2); print $2; exit}' ~/.config/eww/eww.scss 2>/dev/null || echo 5")
+(defpoll GLOW_PRESET :interval "30s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
+(defpoll WINDOW_GAP :interval "30s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
+(defpoll SMART_TILING_STATE :interval "30s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
+(defpoll WINDOW_BORDER_STATE :interval "30s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
+(defpoll WINDOW_BORDER_WIDTH :interval "30s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
+(defpoll WINDOW_RADIUS :interval "30s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")
+(defpoll SIDEBAR_WIDTH :interval "30s" "cat ~/.config/eww/state/sidebar-width 2>/dev/null || echo 90")
+(defpoll SIDEBAR_LOGO :interval "30s" "cat ~/.config/eww/state/sidebar-logo 2>/dev/null || echo ")
+(defpoll SIDEBAR_LOGO_SIZE :interval "30s" "cat ~/.config/eww/state/sidebar-logo-size 2>/dev/null || echo 54")
+(defpoll SIDEBAR_LOGO_X :interval "30s" "cat ~/.config/eww/state/sidebar-logo-x 2>/dev/null || echo -20")
+(defpoll SIDEBAR_LOGO_Y :interval "30s" "cat ~/.config/eww/state/sidebar-logo-y 2>/dev/null || echo 0")
+(defpoll PANEL_TRANSPARENCY :interval "30s" "cat ~/.config/eww/state/panel-transparency 2>/dev/null || echo 86")
+(defpoll SUPERMACHINE_UPDATE_STATUS :interval "30s" "cat ~/.config/eww/state/supermachine-update-status 2>/dev/null || echo Ready")
 (defvar BIBLE_REF "John 14:6")
 (defvar BIBLE_TEXT "The way, the truth, and the life")
 (defvar BIBLE_TEXT_2 "")
 (defvar BIBLE_TEXT_3 "")
 (defvar KEY_CAPTURE_STATUS "Ready")
 (defvar KEY_CAPTURED_COMBO "None captured")
-(defpoll GLOW_SLOT :interval "1s" "cat ~/.config/eww/state/glow-slot 2>/dev/null || echo 1")
+(defpoll GLOW_SLOT :interval "30s" "cat ~/.config/eww/state/glow-slot 2>/dev/null || echo 1")
 
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
@@ -257,7 +257,7 @@
         :halign "end"
         :valign "start"
         :tooltip "Close"
-        :onclick "~/.config/eww/scripts/toggle-settings.sh"
+        :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-settings.sh >/tmp/supermachine-settings-toggle.log 2>&1'"
         "󰅖"))
 
     ; Short verse keeps the top personal without taking over the panel.
@@ -301,17 +301,8 @@
           :valign "center"
           :hexpand false
           :vexpand false
-          :tooltip "Performance Mode"
-          :onclick "~/.config/eww/scripts/toggle-performance.sh"
-          (label :class {PERF_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰓅"))
-        (button
-          :class "quick-toggle-button"
-          :halign "center"
-          :valign "center"
-          :hexpand false
-          :vexpand false
           :tooltip "Game Mode"
-          :onclick "~/.config/eww/scripts/toggle-gamemode.sh"
+          :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-gamemode.sh >/tmp/supermachine-gamemode-toggle.log 2>&1'"
           (label :class {GAME_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰊴"))
         (button
           :class "quick-toggle-button"
@@ -488,7 +479,7 @@
 
       (button
         :class "settings-nav-item"
-        :tooltip "Performance Mode"
+        :tooltip "Game Mode"
         :onclick "~/.config/eww/scripts/switch-settings-panel.sh powersettings"
         (box
           :orientation "h"
@@ -498,8 +489,8 @@
           (box
             :orientation "v"
             :hexpand true
-            (label :class "settings-row-title" :halign "start" :text "Perf Mode")
-            (label :class "settings-row-subtitle" :halign "start" :text PERF_STATE))))
+            (label :class "settings-row-title" :halign "start" :text "Game Mode")
+            (label :class "settings-row-subtitle" :halign "start" :text GAME_STATE))))
 
       (button
         :class "settings-nav-item"
@@ -809,16 +800,16 @@
       :vexpand false
       :space-evenly false
 
-    (label :class "settings-title" :halign "start" :text "Performance Mode")
-    (label :class "settings-detail-subtitle" :halign "start" :text { "Performance mode: " + PERF_STATE })
+    (label :class "settings-title" :halign "start" :text "Game Mode")
+    (label :class "settings-detail-subtitle" :halign "start" :text { "Game Mode: " + GAME_STATE + "    Profile: " + PERF_STATE })
 
     (box
       :orientation "v"
       :class "settings-section"
       :spacing 10
-        (button :class "settings-wide-action" :onclick "powerprofilesctl set performance" "Performance")
-        (button :class "settings-wide-action" :onclick "powerprofilesctl set balanced" "Balanced")
-        (button :class "settings-wide-action" :onclick "powerprofilesctl set power-saver" "Power Saver")
+        (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-gamemode.sh >/tmp/supermachine-gamemode-toggle.log 2>&1'" { "Game Mode: " + GAME_STATE })
+        (label :class "settings-row-subtitle" :halign "start" :text "On: performance profile, Picom off, sidebar off, tiler paused.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Off: restores Picom, sidebar, tiler, and balanced/profile state.")
         (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/toggle-nightmode.sh" "Toggle Night Mode")))))
 
 ; Appearance detail panel for Openbox/GTK theme controls.
@@ -1874,9 +1865,9 @@
         :class "welcome-card"
         :spacing 8
         (label :class "settings-section-title" :halign "start" :text "Performance")
-        (label :class "settings-row-subtitle" :halign "start" :text "Perf Mode changes power profile.")
-        (label :class "settings-row-subtitle" :halign "start" :text "Fullscreen games auto-hide the sidebar.")
-        (label :class "settings-row-subtitle" :halign "start" :text "Semi tiling can be toggled off anytime."))
+        (label :class "settings-row-subtitle" :halign "start" :text "Game Mode frees desktop resources.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Performance profile is enabled while gaming.")
+        (label :class "settings-row-subtitle" :halign "start" :text "Super + Tab can reopen settings anytime."))
       (box
         :orientation "v"
         :class "welcome-card"
@@ -1925,15 +1916,9 @@
       :valign "center"
 
       (button
-        :class {PERF_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}
-        :tooltip "Performance Mode"
-        :onclick "~/.config/eww/scripts/toggle-performance.sh"
-        "󰓅")
-
-      (button
         :class {GAME_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}
         :tooltip "Game Mode"
-        :onclick "~/.config/eww/scripts/toggle-gamemode.sh"
+        :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-gamemode.sh >/tmp/supermachine-gamemode-toggle.log 2>&1'"
         "󰊴")
 
       (button

@@ -2,17 +2,20 @@
 set -euo pipefail
 
 cfg="$HOME/.config/eww"
-lock_file="/tmp/supermachine-settings-toggle.lock"
+lock_dir="/tmp/supermachine-settings-toggle.lockdir"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
+game_state="$HOME/.cache/eww-gamemode"
 
-exec 9>"$lock_file"
-flock -n 9 || exit 0
+mkdir "$lock_dir" 2>/dev/null || exit 0
+trap 'rmdir "$lock_dir" 2>/dev/null || true' EXIT
+
+if ! eww -c "$cfg" active-windows >/dev/null 2>&1; then
+  eww -c "$cfg" daemon >/dev/null 2>&1 || true
+  sleep 0.2
+fi
 
 close_settings() {
-  local active
-  active="$(eww -c "$cfg" active-windows 2>/dev/null || true)"
-
-  for window in \
+  eww -c "$cfg" close \
     settingsborder \
     logoalignmentguide \
     systemsettings \
@@ -26,18 +29,20 @@ close_settings() {
     glowcolorpicker \
     sidebarlogopicker \
     keybindsettings \
-    systeminfopanel; do
-    if grep -q "^${window}:" <<< "$active"; then
-      eww -c "$cfg" close "$window" >/dev/null 2>&1 || true
-    fi
-  done
+    systeminfopanel \
+    controlcenter >/dev/null 2>&1 || true
 }
 
 active_windows="$(eww -c "$cfg" active-windows 2>/dev/null || true)"
 
-if grep -q '^systemsettings:' <<< "$active_windows"; then
+if grep -Eq '^(settingsborder|systemsettings|bluetoothsettings|displaysettings|networksettings|audiosettings|powersettings|appearancesettings|panelcustomization|glowcolorpicker|sidebarlogopicker|keybindsettings|systeminfopanel|controlcenter):' <<< "$active_windows"; then
   close_settings
   rm -f "$fullscreen_override"
+  if [ -f "$game_state" ]; then
+    eww -c "$cfg" close sidebar >/dev/null 2>&1 || true
+    sleep 0.05
+    eww -c "$cfg" kill >/dev/null 2>&1 || true
+  fi
 else
   close_settings
   "$cfg/scripts/panel-layout.sh"

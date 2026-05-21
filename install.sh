@@ -17,6 +17,12 @@ done < aurlist.txt
 
 echo "Installing SuperMachine packages..."
 
+if ! grep -Eq '^\[multilib\]' /etc/pacman.conf; then
+    echo "Enabling pacman multilib repo for Steam/Wine 32-bit gaming packages..."
+    sudo sed -i '/^#\[multilib\]/{s/^#//; n; s/^#//;}' /etc/pacman.conf
+    sudo pacman -Sy
+fi
+
 sudo pacman -S --needed - < pkglist.txt
 
 echo "Enabling desktop services..."
