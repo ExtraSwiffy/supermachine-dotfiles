@@ -30,6 +30,7 @@ close_settings() {
     sidebarlogopicker \
     keybindsettings \
     systeminfopanel \
+    consoleconfirm \
     controlcenter >/dev/null 2>&1 || true
 }
 

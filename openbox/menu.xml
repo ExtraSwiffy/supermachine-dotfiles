@@ -187,6 +187,20 @@
 
   <separator />
 
+  <item label="Steam Console Mode">
+    <action name="Execute">
+      <command>~/.config/openbox/console-mode.sh enter</command>
+    </action>
+  </item>
+
+  <item label="Return to Desktop Mode">
+    <action name="Execute">
+      <command>~/.config/openbox/console-mode.sh return</command>
+    </action>
+  </item>
+
+  <separator />
+
   <item label="Check for Updates">
     <action name="Execute">
       <command>~/.config/eww/scripts/update-supermachine.sh check</command>

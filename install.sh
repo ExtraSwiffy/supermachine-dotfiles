@@ -38,6 +38,7 @@ mkdir -p ~/.icons
 mkdir -p ~/.themes
 mkdir -p ~/.config/gtk-3.0
 mkdir -p ~/.config/gtk-4.0
+mkdir -p ~/.local/bin
 
 echo "Copying wallpaper..."
 
@@ -51,6 +52,9 @@ cp -r rofi ~/.config/
 cp -r picom ~/.config/
 cp -r alacritty ~/.config/
 cp -r themes/* ~/.themes/
+if [ -d local/bin ]; then
+    cp -r local/bin/* ~/.local/bin/
+fi
 
 cp .fehbg ~/
 cp .xinitrc ~/
@@ -70,6 +74,9 @@ echo "Making scripts executable..."
 
 chmod +x ~/.config/eww/scripts/*.sh
 chmod +x ~/.config/openbox/*.sh
+if [ -d ~/.local/bin ]; then
+    chmod +x ~/.local/bin/* 2>/dev/null || true
+fi
 chmod +x ~/.screenlayout/monitors.sh
 chmod +x ~/.fehbg
 chmod +x ~/.xinitrc

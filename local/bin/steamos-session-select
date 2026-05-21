@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state="$HOME/.cache/supermachine-console-mode"
+log="$HOME/.cache/supermachine-console-mode.log"
+
+printf 'Steam requested desktop mode at %s: %s\n' "$(date)" "$*" >> "$log"
+rm -f "$state"
+
+timeout 6 steam -shutdown >/dev/null 2>&1 || true
+pkill -x steamwebhelper >/dev/null 2>&1 || true
+pkill -x steam >/dev/null 2>&1 || true
+pkill -x gamescope >/dev/null 2>&1 || true
+
+exit 0

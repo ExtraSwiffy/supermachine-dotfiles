@@ -349,6 +349,16 @@
         <command>~/.config/eww/scripts/toggle-settings.sh</command>
       </action>
     </keybind>
+    <keybind key="W-s">
+      <action name="Execute">
+        <command>~/.config/openbox/console-mode.sh enter</command>
+      </action>
+    </keybind>
+    <keybind key="W-r">
+      <action name="Execute">
+        <command>~/.config/openbox/console-mode.sh return</command>
+      </action>
+    </keybind>
     <keybind key="Print">
       <action name="Execute">
         <command>flameshot gui</command>

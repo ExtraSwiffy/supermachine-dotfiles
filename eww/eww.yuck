@@ -208,6 +208,51 @@
     :valign "fill"
     :vexpand true))
 
+; Confirmation dialog before leaving Openbox for the Gamescope console session.
+(defwindow consoleconfirm
+  :monitor 0
+  :stacking "overlay"
+  :exclusive false
+  :focusable true
+
+  :geometry (geometry
+    :x "0px"
+    :y "0px"
+    :width "430px"
+    :height "220px"
+    :anchor "center")
+
+  (box
+    :orientation "v"
+    :class "console-confirm"
+    :spacing 14
+    :halign "fill"
+    :valign "center"
+
+    (label
+      :class "console-confirm-title"
+      :halign "start"
+      :text "Switch to Console Mode?")
+
+    (label
+      :class "console-confirm-text"
+      :halign "start"
+      :wrap true
+      :text "This closes the Openbox desktop and starts Steam Big Picture inside Gamescope. Use Steam's Desktop Mode option to return.")
+
+    (box
+      :orientation "h"
+      :spacing 10
+      :halign "end"
+      (button
+        :class "settings-wide-action"
+        :onclick "eww close consoleconfirm"
+        "No")
+      (button
+        :class "settings-wide-action console-confirm-yes"
+        :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/start-console-mode.sh >/tmp/supermachine-console-mode-launch.log 2>&1'"
+        "Yes"))))
+
 ; First settings panel: quick controls plus category navigation.
 (defwindow systemsettings
   :monitor 0
@@ -304,6 +349,15 @@
           :tooltip "Game Mode"
           :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-gamemode.sh >/tmp/supermachine-gamemode-toggle.log 2>&1'"
           (label :class {GAME_STATE == "on" ? "quick-toggle-dot-on" : "quick-toggle-dot-off"} :text "󰊴"))
+        (button
+          :class "quick-toggle-button"
+          :halign "center"
+          :valign "center"
+          :hexpand false
+          :vexpand false
+          :tooltip "Console Mode"
+          :onclick "~/.config/eww/scripts/open-console-confirm.sh"
+          (label :class "quick-toggle-dot-off" :text "󰐥"))
         (button
           :class "quick-toggle-button"
           :halign "center"
@@ -1920,6 +1974,12 @@
         :tooltip "Game Mode"
         :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/toggle-gamemode.sh >/tmp/supermachine-gamemode-toggle.log 2>&1'"
         "󰊴")
+
+      (button
+        :class "toggle-circle-off"
+        :tooltip "Console Mode"
+        :onclick "~/.config/eww/scripts/open-console-confirm.sh"
+        "󰐥")
 
       (button
   :class {NIGHT_STATE == "on" ? "toggle-circle-on" : "toggle-circle-off"}

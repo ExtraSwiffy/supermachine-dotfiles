@@ -613,6 +613,28 @@ $sidebar-logo-y: -2px;
   color: #ffffff;
 }
 
+.console-confirm {
+  background: $settings-detail-bg;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 26px $panel-accent-soft;
+}
+
+.console-confirm-title {
+  color: $panel-header;
+  font-size: 18px;
+}
+
+.console-confirm-text {
+  color: $panel-subtext;
+  font-size: 12px;
+}
+
+.console-confirm-yes {
+  background: $panel-accent-dot;
+  color: $panel-header;
+}
+
 .settings-display-action {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 6px;

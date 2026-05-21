@@ -11,6 +11,8 @@ EWW_STATE="$HOME/.cache/eww-gamemode-eww-was-running"
 BORDER_OFF_STATE="$HOME/.cache/eww-gamemode-window-border-was-off"
 BORDER_ON_STATE="$HOME/.cache/eww-gamemode-window-border-was-on"
 STEAM_STATE="$HOME/.cache/eww-gamemode-steam-started"
+NM_APPLET_STATE="$HOME/.cache/eww-gamemode-nm-applet-was-running"
+KDECONNECT_STATE="$HOME/.cache/eww-gamemode-kdeconnectd-was-running"
 
 sync_openbox_theme() {
   "$HOME/.config/eww/scripts/sync-openbox-theme.sh" >/dev/null 2>&1 || true
@@ -33,8 +35,26 @@ close_eww_windows() {
     sidebarlogopicker \
     keybindsettings \
     systeminfopanel \
+    consoleconfirm \
     supermachinewelcome \
     controlcenter >/dev/null 2>&1 || true
+}
+
+close_regular_windows() {
+  command -v wmctrl >/dev/null 2>&1 || return 0
+
+  wmctrl -lx 2>/dev/null |
+    while read -r id desktop x y w h host class title; do
+      case "$class" in
+        *.[Ee]ww|*[Ee]ww|*.[Rr]ofi|*[Rr]ofi|*.[Dd]unst|*[Dd]unst|*.[Ss]team|*[Ss]team|*.[Ss]teamwebhelper|*[Ss]teamwebhelper) continue ;;
+      esac
+
+      if xprop -id "$id" _NET_WM_WINDOW_TYPE 2>/dev/null | grep -q '_NET_WM_WINDOW_TYPE_NORMAL'; then
+        wmctrl -ic "$id" >/dev/null 2>&1 || true
+      fi
+    done
+
+  sleep 0.6
 }
 
 stop_smart_place() {
@@ -51,6 +71,34 @@ start_smart_place() {
   [ -f "$HOME/.config/eww/state/smart-tiling-off" ] && return 0
   if ! pgrep -f "^bash $HOME/.config/openbox/smart-place.sh$" >/dev/null 2>&1; then
     nohup "$HOME/.config/openbox/smart-place.sh" >/tmp/supermachine-smart-place.log 2>&1 &
+  fi
+}
+
+stop_desktop_helpers() {
+  if pgrep -x nm-applet >/dev/null 2>&1; then
+    touch "$NM_APPLET_STATE"
+    pkill -x nm-applet >/dev/null 2>&1 || true
+  fi
+
+  if pgrep -x kdeconnectd >/dev/null 2>&1; then
+    touch "$KDECONNECT_STATE"
+    pkill -x kdeconnectd >/dev/null 2>&1 || true
+  fi
+}
+
+start_desktop_helpers() {
+  if [ -f "$NM_APPLET_STATE" ]; then
+    rm -f "$NM_APPLET_STATE"
+    if command -v nm-applet >/dev/null 2>&1 && ! pgrep -x nm-applet >/dev/null 2>&1; then
+      setsid -f nm-applet >/tmp/supermachine-nm-applet.log 2>&1
+    fi
+  fi
+
+  if [ -f "$KDECONNECT_STATE" ]; then
+    rm -f "$KDECONNECT_STATE"
+    if command -v kdeconnectd >/dev/null 2>&1 && ! pgrep -x kdeconnectd >/dev/null 2>&1; then
+      setsid -f kdeconnectd >/tmp/supermachine-kdeconnectd.log 2>&1
+    fi
   fi
 }
 
@@ -97,6 +145,7 @@ enable_gamemode() {
   fi
 
   stop_smart_place
+  stop_desktop_helpers
 
   if command -v dunstctl >/dev/null 2>&1; then
     if dunstctl is-paused 2>/dev/null | grep -q false; then
@@ -114,6 +163,7 @@ enable_gamemode() {
     eww kill >/dev/null 2>&1 || true
   fi
 
+  close_regular_windows
   start_steam_bigpicture
 }
 
@@ -143,6 +193,7 @@ disable_gamemode() {
   fi
 
   start_smart_place
+  start_desktop_helpers
 
   if [ -f "$DUNST_STATE" ] && command -v dunstctl >/dev/null 2>&1; then
     dunstctl set-paused false >/dev/null 2>&1 || true
