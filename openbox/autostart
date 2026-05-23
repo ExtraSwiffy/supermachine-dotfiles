@@ -1,5 +1,9 @@
 ~/.screenlayout/monitors.sh &
 
+xset s off &
+xset -dpms &
+xset s noblank &
+
 if [ -f "$HOME/.cache/eww-gamemode" ]; then
   "$HOME/.config/eww/scripts/toggle-gamemode.sh" resume &
   exit 0
@@ -23,3 +27,4 @@ eww open sidebar &
 
 sleep 1
 "$HOME/.config/openbox/smart-place.sh" &
+
