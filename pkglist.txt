@@ -43,6 +43,7 @@ networkmanager
 obconf-qt
 openal
 openbox
+openssh
 pacman-contrib
 pamixer
 papirus-icon-theme
@@ -57,6 +58,7 @@ playerctl
 polkit-kde-agent
 power-profiles-daemon
 protontricks
+remmina
 rofi
 rsync
 steam
@@ -73,6 +75,7 @@ wireplumber
 wmctrl
 woff2-font-awesome
 wpa_supplicant
+x11vnc
 xorg-server
 xorg-xauth
 xorg-xev
