@@ -29,6 +29,7 @@ echo "Enabling desktop services..."
 
 sudo systemctl enable --now NetworkManager.service
 sudo systemctl enable --now bluetooth.service
+sudo systemctl enable --now power-profiles-daemon.service
 
 echo "Creating config folders..."
 
