@@ -46,7 +46,7 @@ close_regular_windows() {
   wmctrl -lx 2>/dev/null |
     while read -r id desktop x y w h host class title; do
       case "$class" in
-        *.[Ee]ww|*[Ee]ww|*.[Rr]ofi|*[Rr]ofi|*.[Dd]unst|*[Dd]unst|*.[Ss]team|*[Ss]team|*.[Ss]teamwebhelper|*[Ss]teamwebhelper) continue ;;
+        *.[Ee]ww|*[Ee]ww|*.[Rr]ofi|*[Rr]ofi|*.[Dd]unst|*[Dd]unst|*.[Ss]team|*[Ss]team|*.[Ss]teamwebhelper|*[Ss]teamwebhelper|*.[Ff]irefox|*[Ff]irefox|*.[Nn]avigator|*[Nn]avigator) continue ;;
       esac
 
       if xprop -id "$id" _NET_WM_WINDOW_TYPE 2>/dev/null | grep -q '_NET_WM_WINDOW_TYPE_NORMAL'; then

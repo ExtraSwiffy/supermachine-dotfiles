@@ -95,6 +95,19 @@ console_resolution() {
   printf '%s %s %s\n' "${width:-1920}" "${height:-1080}" "${refresh:-60}"
 }
 
+hidden_cursor_file() {
+  local cursor="$HOME/.cache/supermachine-hidden-cursor.png"
+
+  if [ ! -s "$cursor" ]; then
+    mkdir -p "$(dirname "$cursor")"
+    base64 -d > "$cursor" <<'PNG'
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8AABQMBgAb+5qYAAAAASUVORK5CYII=
+PNG
+  fi
+
+  printf '%s\n' "$cursor"
+}
+
 enter_console_mode() {
   if ! has_console_deps; then
     notify "Install gamescope and steam first. Fresh SuperMachine installs include them in pkglist.txt."
@@ -119,7 +132,7 @@ return_to_desktop() {
 }
 
 run_console_session() {
-  local width height refresh
+  local width height refresh cursor
 
   if ! has_console_deps; then
     rm -f "$state"
@@ -134,11 +147,12 @@ run_console_session() {
   export STEAMOS=1
   configure_console_display
   read -r width height refresh < <(console_resolution)
+  cursor="$(hidden_cursor_file)"
 
   {
     printf 'Starting SuperMachine Console Mode at %s\n' "$(date)"
     printf 'Resolution: %sx%s @ %s\n' "$width" "$height" "$refresh"
-    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 1 --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 1 --cursor "$cursor" --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
     printf 'Console Mode exited at %s\n' "$(date)"
   } >> "$log" 2>&1 || true
 
