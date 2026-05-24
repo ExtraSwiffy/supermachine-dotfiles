@@ -3,6 +3,7 @@ set -euo pipefail
 
 state="$HOME/.cache/supermachine-console-mode"
 power_state="$HOME/.cache/supermachine-console-mode-power-profile"
+pointer_state="$HOME/.cache/supermachine-console-disabled-pointers"
 log="$HOME/.cache/supermachine-console-mode.log"
 
 notify() {
@@ -108,6 +109,39 @@ PNG
   printf '%s\n' "$cursor"
 }
 
+disable_console_pointers() {
+  command -v xinput >/dev/null 2>&1 || return 0
+
+  : > "$pointer_state"
+  xinput --list --short 2>/dev/null |
+    awk '/slave[[:space:]]+pointer/ {
+      if (match($0, /id=[0-9]+/)) {
+        print substr($0, RSTART + 3, RLENGTH - 3)
+      }
+    }' |
+    while read -r id; do
+      [ -n "$id" ] || continue
+      if xinput --disable "$id" >/dev/null 2>&1; then
+        printf '%s\n' "$id" >> "$pointer_state"
+      fi
+    done
+}
+
+restore_console_pointers() {
+  command -v xinput >/dev/null 2>&1 || {
+    rm -f "$pointer_state"
+    return 0
+  }
+
+  if [ -s "$pointer_state" ]; then
+    while read -r id; do
+      [ -n "$id" ] && xinput --enable "$id" >/dev/null 2>&1 || true
+    done < "$pointer_state"
+  fi
+
+  rm -f "$pointer_state"
+}
+
 enter_console_mode() {
   if ! has_console_deps; then
     notify "Install gamescope and steam first. Fresh SuperMachine installs include them in pkglist.txt."
@@ -124,6 +158,7 @@ enter_console_mode() {
 
 return_to_desktop() {
   rm -f "$state"
+  restore_console_pointers
   restore_power_profile
   timeout 6 steam -shutdown >/dev/null 2>&1 || true
   pkill -x steamwebhelper >/dev/null 2>&1 || true
@@ -148,13 +183,16 @@ run_console_session() {
   configure_console_display
   read -r width height refresh < <(console_resolution)
   cursor="$(hidden_cursor_file)"
+  disable_console_pointers
 
   {
     printf 'Starting SuperMachine Console Mode at %s\n' "$(date)"
     printf 'Resolution: %sx%s @ %s\n' "$width" "$height" "$refresh"
-    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 1 --cursor "$cursor" --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 0 --cursor "$cursor" --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
     printf 'Console Mode exited at %s\n' "$(date)"
   } >> "$log" 2>&1 || true
+
+  restore_console_pointers
 
   timeout 6 steam -shutdown >/dev/null 2>&1 || true
   pkill -x steamwebhelper >/dev/null 2>&1 || true
