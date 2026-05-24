@@ -109,6 +109,38 @@ PNG
   printf '%s\n' "$cursor"
 }
 
+hidden_x_cursor_files() {
+  local cursor="$HOME/.cache/supermachine-hidden-cursor.xbm"
+  local mask="$HOME/.cache/supermachine-hidden-cursor-mask.xbm"
+
+  if [ ! -s "$cursor" ]; then
+    mkdir -p "$(dirname "$cursor")"
+    {
+      printf '#define supermachine_hidden_cursor_width 1\n'
+      printf '#define supermachine_hidden_cursor_height 1\n'
+      printf 'static unsigned char supermachine_hidden_cursor_bits[] = { 0x00 };\n'
+    } > "$cursor"
+  fi
+
+  if [ ! -s "$mask" ]; then
+    {
+      printf '#define supermachine_hidden_cursor_mask_width 1\n'
+      printf '#define supermachine_hidden_cursor_mask_height 1\n'
+      printf 'static unsigned char supermachine_hidden_cursor_mask_bits[] = { 0x00 };\n'
+    } > "$mask"
+  fi
+
+  printf '%s %s\n' "$cursor" "$mask"
+}
+
+hide_x_root_cursor() {
+  local cursor mask
+
+  command -v xsetroot >/dev/null 2>&1 || return 0
+  read -r cursor mask < <(hidden_x_cursor_files)
+  xsetroot -cursor "$cursor" "$mask" >/dev/null 2>&1 || true
+}
+
 disable_console_pointers() {
   command -v xinput >/dev/null 2>&1 || return 0
 
@@ -180,15 +212,17 @@ run_console_session() {
   export PATH="$HOME/.local/bin:$PATH"
   export XDG_CURRENT_DESKTOP=gamescope
   export STEAMOS=1
+  export WLR_NO_HARDWARE_CURSORS=1
   configure_console_display
   read -r width height refresh < <(console_resolution)
   cursor="$(hidden_cursor_file)"
+  hide_x_root_cursor
   disable_console_pointers
 
   {
     printf 'Starting SuperMachine Console Mode at %s\n' "$(date)"
     printf 'Resolution: %sx%s @ %s\n' "$width" "$height" "$refresh"
-    gamescope -e -f -b --force-windows-fullscreen --hide-cursor-delay 0 --cursor "$cursor" --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+    gamescope -e -f -b --force-windows-fullscreen --force-grab-cursor --hide-cursor-delay 0 --cursor "$cursor" --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
     printf 'Console Mode exited at %s\n' "$(date)"
   } >> "$log" 2>&1 || true
 

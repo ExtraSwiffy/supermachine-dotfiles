@@ -83,4 +83,5 @@ xorg-xinit
 xorg-xinput
 xorg-xprop
 xorg-xrandr
+xorg-xsetroot
 zenity
