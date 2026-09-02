@@ -31,6 +31,8 @@ deploy() {
     cp "$config_home/eww/state/window-gap" "$state_home/supermachine/window-gap"
   fi
   cp -a "$repo_dir/systemd/user/." "$config_home/systemd/user/"
+  mkdir -p "$config_home/supermachine/themes"
+  cp -a "$repo_dir/themes-data/." "$config_home/supermachine/themes/"
 
   mkdir -p "$HOME/.screenlayout"
   cp "$repo_dir/.screenlayout/monitors.sh" "$HOME/.screenlayout/monitors.sh"

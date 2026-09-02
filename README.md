@@ -42,3 +42,12 @@ when configs are redeployed or updated.
 - Eww settings and customization tools
 - Console/game mode helpers
 - Multi-monitor wallpaper and placement support
+
+## Visual themes
+
+- Right-double-click an empty part of the desktop to open the theme carousel.
+- Left-double-click the desktop to choose a wallpaper from the active theme.
+- Use the side previews or arrow buttons to browse, then Apply to switch the
+  wallpaper, Eww accents, Openbox borders, and Polybar colors together.
+- `Default` includes the original wallpaper and the graphite SuperMachine
+  wordmark. `Snow Forest` includes two moonlit winter wallpapers.

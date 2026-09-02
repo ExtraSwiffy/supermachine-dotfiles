@@ -739,13 +739,24 @@
       </mousebind>
     </context>
     <context name="Root">
-      <!-- Menus -->
+      <!-- Visual desktop pickers. Shift+right-click keeps the classic root
+           menu available while right-double-click stays unambiguous. -->
+      <mousebind button="Right" action="DoubleClick">
+        <action name="Execute">
+          <command>bash -lc '~/.config/eww/scripts/theme-selector.sh theme open'</command>
+        </action>
+      </mousebind>
+      <mousebind button="Left" action="DoubleClick">
+        <action name="Execute">
+          <command>bash -lc '~/.config/eww/scripts/theme-selector.sh wallpaper open'</command>
+        </action>
+      </mousebind>
       <mousebind button="Middle" action="Press">
         <action name="ShowMenu">
           <menu>client-list-combined-menu</menu>
         </action>
       </mousebind>
-      <mousebind button="Right" action="Press">
+      <mousebind button="S-Right" action="Press">
         <action name="ShowMenu">
           <menu>root-menu</menu>
         </action>

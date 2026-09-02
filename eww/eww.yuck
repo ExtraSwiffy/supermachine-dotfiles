@@ -76,6 +76,83 @@
 (defvar KEY_CAPTURED_COMBO "None captured")
 (defpoll GLOW_SLOT :interval "30s" "cat ~/.config/eww/state/glow-slot 2>/dev/null || echo 1")
 
+; Visual desktop selectors. The short poll keeps carousel transitions immediate
+; without leaving a long-running helper process behind.
+(defpoll THEME_PICKER_NAME :interval "250ms" :initial "Default" "~/.config/eww/scripts/theme-selector.sh theme info name")
+(defpoll THEME_PICKER_TAGLINE :interval "250ms" :initial "Emerald focus. Graphite calm." "~/.config/eww/scripts/theme-selector.sh theme info tagline")
+(defpoll THEME_PICKER_PREVIEW :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/default/wallpapers/current-green.png" "~/.config/eww/scripts/theme-selector.sh theme info preview")
+(defpoll THEME_PICKER_PREVIOUS :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/snow-forest/wallpapers/snow-forest.png" "~/.config/eww/scripts/theme-selector.sh theme info previous-preview")
+(defpoll THEME_PICKER_NEXT :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/snow-forest/wallpapers/snow-forest.png" "~/.config/eww/scripts/theme-selector.sh theme info next-preview")
+(defpoll WALLPAPER_PICKER_NAME :interval "250ms" :initial "current green" "~/.config/eww/scripts/theme-selector.sh wallpaper info name")
+(defpoll WALLPAPER_PICKER_PREVIEW :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/default/wallpapers/current-green.png" "~/.config/eww/scripts/theme-selector.sh wallpaper info preview")
+
+(defwindow themechooser
+  :monitor 0
+  :stacking "overlay"
+  :exclusive false
+  :focusable true
+  :wm-ignore true
+  :geometry (geometry :width "820px" :height "510px" :anchor "center")
+  (box
+    :orientation "v"
+    :class "visual-picker-shell"
+    :spacing 16
+    :space-evenly false
+    :valign "fill"
+    (box :orientation "h" :class "visual-picker-heading"
+      (box :orientation "v" :hexpand true
+        (label :class "visual-picker-kicker" :halign "start" :text "SUPERMACHINE / THEMES")
+        (label :class "visual-picker-title" :halign "start" :text "Choose your atmosphere"))
+      (button :class "visual-picker-close" :onclick "eww close themechooser" "×"))
+    (box
+      :orientation "h"
+      :class "visual-picker-stage"
+      :spacing 10
+      :space-evenly false
+      :vexpand false
+      :halign "center"
+      :valign "center"
+      (button :class "visual-picker-side-card" :valign "center" :vexpand false :onclick "~/.config/eww/scripts/theme-selector.sh theme previous"
+        (image :path THEME_PICKER_PREVIOUS :image-width 125 :image-height 220))
+      (box :orientation "v" :class "visual-picker-main-card" :spacing 8 :space-evenly false :vexpand false
+        (image :class "visual-picker-hero" :path THEME_PICKER_PREVIEW :image-width 460 :image-height 258)
+        (label :class "visual-picker-name" :text THEME_PICKER_NAME)
+        (label :class "visual-picker-tagline" :text THEME_PICKER_TAGLINE))
+      (button :class "visual-picker-side-card" :valign "center" :vexpand false :onclick "~/.config/eww/scripts/theme-selector.sh theme next"
+        (image :path THEME_PICKER_NEXT :image-width 125 :image-height 220)))
+    (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
+      (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme previous" "‹")
+      (button :class "visual-picker-apply" :onclick "~/.config/eww/scripts/theme-selector.sh theme apply" "Apply theme")
+      (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme next" "›"))
+    (label :class "visual-picker-hint" :text "RIGHT-DOUBLE-CLICK DESKTOP  •  ← → EXPLORE  •  ENTER THE MOOD")))
+
+(defwindow wallpaperchooser
+  :monitor 0
+  :stacking "overlay"
+  :exclusive false
+  :focusable true
+  :wm-ignore true
+  :geometry (geometry :width "760px" :height "500px" :anchor "center")
+  (box
+    :orientation "v"
+    :class "visual-picker-shell wallpaper-picker-shell"
+    :spacing 16
+    :space-evenly false
+    :valign "fill"
+    (box :orientation "h" :class "visual-picker-heading"
+      (box :orientation "v" :hexpand true
+        (label :class "visual-picker-kicker" :halign "start" :text "ACTIVE THEME / WALLPAPERS")
+        (label :class "visual-picker-title" :halign "start" :text "Set the scene"))
+      (button :class "visual-picker-close" :onclick "eww close wallpaperchooser" "×"))
+    (box :orientation "v" :class "visual-picker-main-card wallpaper-main-card" :spacing 10 :space-evenly false :vexpand false
+      (image :class "visual-picker-hero" :path WALLPAPER_PICKER_PREVIEW :image-width 650 :image-height 365)
+      (label :class "visual-picker-name" :text WALLPAPER_PICKER_NAME))
+    (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
+      (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper previous" "‹")
+      (button :class "visual-picker-apply" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper apply" "Use wallpaper")
+      (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper next" "›"))
+    (label :class "visual-picker-hint" :text "LEFT-DOUBLE-CLICK DESKTOP  •  WALLPAPERS STAY INSIDE THEIR THEME")))
+
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
   :monitor 0
@@ -920,7 +997,7 @@
       :orientation "v"
       :class "settings-section"
       :spacing 10
-        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/theme-menu.sh" "Switch Openbox Theme")
+        (button :class "settings-wide-action" :onclick "~/.config/eww/scripts/theme-selector.sh theme open" "Visual Theme Picker")
         (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f lxappearance >/dev/null 2>&1'" "GTK, Icons, Cursor")
         (button :class "settings-wide-action" :onclick "bash -lc 'setsid -f obconf-qt >/dev/null 2>&1'" "Openbox Settings"))
 

@@ -1,0 +1,9 @@
+[Unit]
+Description=SuperMachine Eww visual picker service
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/eww --no-daemonize daemon
+Restart=on-failure
+RestartSec=2
