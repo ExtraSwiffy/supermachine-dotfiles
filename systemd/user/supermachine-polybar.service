@@ -1,6 +1,7 @@
 [Unit]
 Description=SuperMachine Polybar
 PartOf=graphical-session.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple

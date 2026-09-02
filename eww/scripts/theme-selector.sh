@@ -22,6 +22,18 @@ read_index() {
   printf '%s\n' "$((value % max))"
 }
 
+select_active_theme() {
+  local active index
+  active="$(cat "$theme_state" 2>/dev/null || echo default)"
+  for index in "${!themes[@]}"; do
+    if [ "${themes[index]}" = "$active" ]; then
+      printf '%s\n' "$index" > "$theme_index"
+      return 0
+    fi
+  done
+  printf '0\n' > "$theme_index"
+}
+
 ensure_eww() {
   local attempt
   if ! eww ping >/dev/null 2>&1; then
@@ -102,10 +114,10 @@ apply_theme() {
   cp "$scss" "$scss_work"
   set_scss_var "$scss_work" panel-accent "$THEME_ACCENT_RGBA"
   set_scss_var "$scss_work" window-border-accent "$THEME_ACCENT_RGBA"
-  set_scss_var "$scss_work" settings-glow-cyan "$THEME_ACCENT_RGBA"
-  set_scss_var "$scss_work" settings-glow-blue "$THEME_ACCENT_RGBA"
-  set_scss_var "$scss_work" settings-glow-purple "$THEME_ACCENT_RGBA"
-  set_scss_var "$scss_work" settings-glow-pink "$THEME_ACCENT_RGBA"
+  set_scss_var "$scss_work" settings-glow-cyan "${THEME_GLOW_CYAN:-$THEME_ACCENT_RGBA}"
+  set_scss_var "$scss_work" settings-glow-blue "${THEME_GLOW_BLUE:-$THEME_ACCENT_RGBA}"
+  set_scss_var "$scss_work" settings-glow-purple "${THEME_GLOW_PURPLE:-$THEME_ACCENT_RGBA}"
+  set_scss_var "$scss_work" settings-glow-pink "${THEME_GLOW_PINK:-$THEME_ACCENT_RGBA}"
   set_scss_var "$scss_work" settings-glow-edge "$THEME_ACCENT_EDGE"
   set_scss_var "$scss_work" panel-accent-muted "$THEME_ACCENT_MUTED"
   set_scss_var "$scss_work" panel-accent-soft "$THEME_ACCENT_SOFT"
@@ -114,6 +126,11 @@ apply_theme() {
   set_scss_var "$scss_work" panel-header "$THEME_HEADER_RGBA"
   set_scss_var "$scss_work" panel-subtext "$THEME_SUBTEXT_RGBA"
   set_scss_var "$scss_work" settings-panel-bg "$THEME_PANEL_RGBA"
+  set_scss_var "$scss_work" sidebar-bg "${THEME_SIDEBAR_RGBA:-$THEME_PANEL_RGBA}"
+  set_scss_var "$scss_work" settings-detail-bg "${THEME_DETAIL_RGBA:-$THEME_PANEL_RGBA}"
+  set_scss_var "$scss_work" settings-picker-bg "${THEME_PICKER_RGBA:-$THEME_PANEL_RGBA}"
+  set_scss_var "$scss_work" settings-section-bg "${THEME_SECTION_RGBA:-$THEME_ACCENT_MUTED}"
+  set_scss_var "$scss_work" welcome-bg "${THEME_WELCOME_RGBA:-$THEME_PANEL_RGBA}"
   mv "$scss_work" "$scss"
 
   sed -i \
@@ -149,6 +166,7 @@ wallpaper_info() {
 case "$mode:$action" in
   theme:open)
     ensure_eww
+    select_active_theme
     close_window wallpaperchooser || true
     close_window themechooser || true
     eww open themechooser

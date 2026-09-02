@@ -122,7 +122,7 @@
         (image :path THEME_PICKER_NEXT :image-width 125 :image-height 220)))
     (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme previous" "‹")
-      (button :class "visual-picker-apply" :onclick "~/.config/eww/scripts/theme-selector.sh theme apply" "Apply theme")
+      (button :class "visual-picker-apply" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/theme-selector.sh theme apply >/tmp/supermachine-theme-apply.log 2>&1'" "Apply theme")
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme next" "›"))
     (label :class "visual-picker-hint" :text "RIGHT-DOUBLE-CLICK DESKTOP  •  ← → EXPLORE  •  ENTER THE MOOD")))
 
@@ -149,7 +149,7 @@
       (label :class "visual-picker-name" :text WALLPAPER_PICKER_NAME))
     (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper previous" "‹")
-      (button :class "visual-picker-apply" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper apply" "Use wallpaper")
+      (button :class "visual-picker-apply" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/theme-selector.sh wallpaper apply >/tmp/supermachine-wallpaper-apply.log 2>&1'" "Use wallpaper")
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper next" "›"))
     (label :class "visual-picker-hint" :text "LEFT-DOUBLE-CLICK DESKTOP  •  WALLPAPERS STAY INSIDE THEIR THEME")))
 

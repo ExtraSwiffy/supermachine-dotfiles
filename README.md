@@ -51,3 +51,5 @@ when configs are redeployed or updated.
   wallpaper, Eww accents, Openbox borders, and Polybar colors together.
 - `Default` includes the original wallpaper and the graphite SuperMachine
   wordmark. `Snow Forest` includes two moonlit winter wallpapers.
+- `Ember Dusk`, `Neon Rain`, and `Golden Canopy` add coordinated volcanic,
+  cyber-city, and autumn-forest atmospheres.
