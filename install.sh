@@ -53,6 +53,7 @@ cp -r openbox ~/.config/
 cp -r rofi ~/.config/
 cp -r picom ~/.config/
 cp -r alacritty ~/.config/
+cp -r polybar ~/.config/
 cp -r themes/* ~/.themes/
 if [ -d local/bin ]; then
     cp -r local/bin/* ~/.local/bin/
@@ -76,6 +77,7 @@ echo "Making scripts executable..."
 
 chmod +x ~/.config/eww/scripts/*.sh
 chmod +x ~/.config/openbox/*.sh
+chmod +x ~/.config/polybar/*.sh
 if [ -d ~/.local/bin ]; then
     chmod +x ~/.local/bin/* 2>/dev/null || true
 fi

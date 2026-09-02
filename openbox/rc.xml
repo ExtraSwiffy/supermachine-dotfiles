@@ -346,7 +346,7 @@
     <!-- Swiffy custom keybinds -->
     <keybind key="W-Tab">
       <action name="Execute">
-        <command>~/.config/eww/scripts/toggle-settings.sh</command>
+        <command>pavucontrol</command>
       </action>
     </keybind>
     <keybind key="W-s">

@@ -47,9 +47,10 @@ if grep -Eq '^(settingsborder|systemsettings|bluetoothsettings|displaysettings|n
 else
   close_settings
   "$cfg/scripts/panel-layout.sh"
-  "$cfg/scripts/update-verse.sh"
   touch "$fullscreen_override"
   eww -c "$cfg" open sidebar >/dev/null 2>&1 || true
   eww -c "$cfg" open settingsborder
   eww -c "$cfg" open systemsettings
+  # Verse rotation is cosmetic; do not hold up the panel while Eww updates it.
+  "$cfg/scripts/update-verse.sh" >/dev/null 2>&1 &
 fi

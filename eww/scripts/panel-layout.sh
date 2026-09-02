@@ -92,6 +92,14 @@ case "$picker_depth" in
   *) picker_x=$((advanced_x + advanced_w + 48)) ;;
 esac
 
+# Avoid reparsing and potentially hot-reloading both large Eww config files on
+# every gear click when the display and layout settings have not changed.
+layout_stamp="${XDG_RUNTIME_DIR:-/tmp}/supermachine-panel-layout-${UID}.stamp"
+layout_signature="$screen_width:$screen_height:$sidebar_w:$glow:$picker_depth"
+if [ "$(cat "$layout_stamp" 2>/dev/null || true)" = "$layout_signature" ]; then
+  exit 0
+fi
+
 if [ $((picker_x + picker_w)) -gt "$screen_width" ]; then
   picker_x=$((screen_width - picker_w))
   [ "$picker_x" -lt "$advanced_x" ] && picker_x="$advanced_x"
@@ -189,7 +197,7 @@ awk -v scroll_h="$scroll_h" -v sidebar_w="$sidebar_w" '
   block == "sidebar-actions" && /^[[:space:]]*min-width:/ {
     sub(/min-width: [0-9]+px;/, "min-width: " (sidebar_w - 8) "px;")
   }
-  /^\.(settings-preset-scroll|settings-picker-scroll|settings-detail-scroll) / {
+  /^\.(settings-main-scroll|settings-preset-scroll|settings-picker-scroll|settings-detail-scroll)[, ]/ {
     in_scroll = 1
   }
   in_scroll && /^[[:space:]]*min-height:/ {
@@ -208,3 +216,5 @@ if cmp -s "$tmp" "$scss"; then
 else
   mv "$tmp" "$scss"
 fi
+
+printf '%s\n' "$layout_signature" > "$layout_stamp"

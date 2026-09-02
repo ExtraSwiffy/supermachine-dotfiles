@@ -1,15 +1,13 @@
-~/.screenlayout/monitors.sh &
+# Finish arranging every output before feh reads the desktop geometry.
+~/.screenlayout/monitors.sh
 
 xset s off &
 xset -dpms &
 xset s noblank &
 
-if [ -f "$HOME/.cache/eww-gamemode" ]; then
-  "$HOME/.config/eww/scripts/toggle-gamemode.sh" resume &
-  exit 0
-fi
+# Eww is kept installed for optional widgets, but no longer starts with Openbox.
 
-#~/.fehbg &
+~/.fehbg &
 alacritty &
 picom &
 nm-applet &
@@ -18,13 +16,7 @@ if [ -x /usr/lib/polkit-kde-authentication-agent-1 ]; then
   /usr/lib/polkit-kde-authentication-agent-1 &
 fi
 
-killall eww &
-eww daemon &
-
-sleep 1
-eww open sidebar &
-~/.config/eww/scripts/first-run.sh &
+"$HOME/.config/polybar/launch.sh" &
 
 sleep 1
 "$HOME/.config/openbox/smart-place.sh" &
-

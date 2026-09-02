@@ -27,7 +27,6 @@ lib32-gamemode
 lib32-libpulse
 lib32-mangohud
 lib32-mesa
-lib32-openal
 lib32-pipewire
 lib32-vkd3d
 lib32-vulkan-radeon
@@ -85,3 +84,4 @@ xorg-xprop
 xorg-xrandr
 xorg-xsetroot
 zenity
+polybar

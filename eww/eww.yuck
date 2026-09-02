@@ -79,7 +79,8 @@
 ; Permanent left sidebar with workspaces, launcher, clock, and settings button.
 (defwindow sidebar
   :monitor 0
-  :exclusive false
+  ; Publish an X11 strut so Openbox treats the rail as a real screen edge.
+  :exclusive true
   :stacking "fg"
   :focusable false
 
@@ -273,14 +274,18 @@
     :vexpand true
     :space-evenly false
 
-    ; Inner stack keeps controls near the top while the panel surface fills the screen.
-    (box
-      :orientation "v"
-      :class "settings-content"
-      :spacing 12
-      :valign "start"
-      :vexpand false
-      :space-evenly false
+    ; The main rail is taller than a 1080p screen, so keep it reachable by scrolling.
+    (scroll
+      :class "settings-scroll settings-main-scroll"
+      :vscroll true
+      :hscroll false
+      (box
+        :orientation "v"
+        :class "settings-content"
+        :spacing 12
+        :valign "start"
+        :vexpand false
+        :space-evenly false
 
     ; Header and close control for the full settings stack.
     (box
@@ -633,8 +638,8 @@
       (label :class "settings-release-copy" :halign "start" :text "Traditional floating workflow")
       (label :class "settings-release-copy" :halign "start" :text "Curated keyboard shortcuts")
       (label :class "settings-release-copy" :halign "start" :text "Right-click desktop configs")
-      (label :class "settings-release-copy" :halign "start" :text "Modify configs with Code")
-      (label :class "settings-release-copy" :halign "start" :text "Curated apps + custom configs")))
+        (label :class "settings-release-copy" :halign "start" :text "Modify configs with Code")
+        (label :class "settings-release-copy" :halign "start" :text "Curated apps + custom configs"))))
   )
 )
 

@@ -4,8 +4,8 @@ set -euo pipefail
 gap="${SUPERMACHINE_WINDOW_GAP:-5}"
 bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
-right_edge_bleed="${SUPERMACHINE_WINDOW_RIGHT_EDGE_BLEED:-1}"
-placement_inset="${SUPERMACHINE_WINDOW_PLACEMENT_INSET:-1}"
+right_edge_bleed="${SUPERMACHINE_WINDOW_RIGHT_EDGE_BLEED:-0}"
+placement_inset="${SUPERMACHINE_WINDOW_PLACEMENT_INSET:-0}"
 poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1.5}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
 state_dir="$HOME/.config/eww/state"
@@ -21,6 +21,11 @@ case "${1:-}" in
     flock -n 9 || exit 0
     ;;
 esac
+
+# One-shot layout commands and the background watcher may be triggered at the
+# same time. Serialize geometry correction so they cannot overcorrect using
+# each other's intermediate window positions.
+exec 8>/tmp/supermachine-window-geometry.lock
 
 current_desktop() {
   wmctrl -d | awk '$2 == "*" {print $1; exit}'
@@ -175,7 +180,17 @@ active_monitor_area() {
     mr=$((target_x + mw))
     mb=$((target_y + mh))
 
-    if [ "$mx" -lt "$ar" ] && [ "$mr" -gt "$ax" ] && [ "$my" -lt "$ab" ] && [ "$mb" -gt "$ay" ]; then
+    # EWMH work areas are global. Our bar is only on the primary monitor, so
+    # applying its top strut to the portrait output creates a false 32px gap.
+    # Only clip the primary output to the global work area.
+    if xrandr --query 2>/dev/null | awk -v x="$target_x" -v y="$target_y" '
+      / connected primary/ && match($0, /[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/) {
+        geometry = substr($0, RSTART, RLENGTH)
+        split(geometry, parts, /x|\+/)
+        exit !(parts[3] == x && parts[4] == y)
+      }
+      END {if (!NR) exit 1}
+    '; then
       [ "$mx" -lt "$ax" ] && mx="$ax"
       [ "$my" -lt "$ay" ] && my="$ay"
       [ "$mr" -gt "$ar" ] && mr="$ar"
@@ -232,6 +247,12 @@ monitor_areas() {
     awk -v wx="$wx" -v wy="$wy" -v ww="$ww" -v wh="$wh" '
       function max(a, b) { return a > b ? a : b }
       function min(a, b) { return a < b ? a : b }
+      / connected primary/ && match($0, /[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/) {
+        primary_geometry = substr($0, RSTART, RLENGTH)
+        split(primary_geometry, primary_parts, /x|\+/)
+        primary_x = primary_parts[3]
+        primary_y = primary_parts[4]
+      }
       / connected/ && match($0, /[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/) {
         geometry = substr($0, RSTART, RLENGTH)
         split(geometry, parts, /x|\+/)
@@ -240,10 +261,17 @@ monitor_areas() {
         mw = parts[1]
         mh = parts[2]
 
-        ix = max(wx, mx)
-        iy = max(wy, my)
-        ir = min(wx + ww, mx + mw)
-        ib = min(wy + wh, my + mh)
+        if (mx == primary_x && my == primary_y) {
+          ix = max(wx, mx)
+          iy = max(wy, my)
+          ir = min(wx + ww, mx + mw)
+          ib = min(wy + wh, my + mh)
+        } else {
+          ix = mx
+          iy = my
+          ir = mx + mw
+          ib = my + mh
+        }
 
         if (ir > ix && ib > iy) {
           print ix, iy, ir - ix, ib - iy
@@ -299,25 +327,20 @@ window_ids_in_area() {
   wmctrl -lxG |
     awk -v desktop="$desktop" '$2 == desktop {print $1, $3, $4, $5, $6, $7}' |
     while read -r id win_x win_y win_w win_h class; do
-      local win_r win_b overlap_x overlap_y overlap_r overlap_b
+      local center_x center_y
 
       if ! is_normal_window "$id" "$class"; then
         continue
       fi
 
-      win_r=$((win_x + win_w))
-      win_b=$((win_y + win_h))
-      overlap_x="$win_x"
-      overlap_y="$win_y"
-      overlap_r="$win_r"
-      overlap_b="$win_b"
+      # A window must belong to exactly one monitor. Overlap-based ownership
+      # lets a window crossing a bezel get tiled once by each monitor. Its
+      # center point is unambiguous and keeps all final geometry on one screen.
+      center_x=$((win_x + win_w / 2))
+      center_y=$((win_y + win_h / 2))
 
-      [ "$overlap_x" -lt "$area_x" ] && overlap_x="$area_x"
-      [ "$overlap_y" -lt "$area_y" ] && overlap_y="$area_y"
-      [ "$overlap_r" -gt "$area_r" ] && overlap_r="$area_r"
-      [ "$overlap_b" -gt "$area_b" ] && overlap_b="$area_b"
-
-      if [ "$overlap_r" -gt "$overlap_x" ] && [ "$overlap_b" -gt "$overlap_y" ]; then
+      if [ "$center_x" -ge "$area_x" ] && [ "$center_x" -lt "$area_r" ] &&
+         [ "$center_y" -ge "$area_y" ] && [ "$center_y" -lt "$area_b" ]; then
         printf '%s\n' "$id"
       fi
     done
@@ -349,7 +372,8 @@ abs() {
   fi
 }
 
-move_window() {
+move_window() (
+  flock -x 8
   local id="$1"
   local x="$2"
   local y="$3"
@@ -395,7 +419,7 @@ move_window() {
     req_w=$((req_w + dw))
     req_h=$((req_h + dh))
   done
-}
+)
 
 active_window() {
   xprop -root _NET_ACTIVE_WINDOW 2>/dev/null |
@@ -437,26 +461,9 @@ close_settings_windows() {
 }
 
 sync_sidebar_for_fullscreen() {
-  if game_mode_enabled; then
-    rm -f "$fullscreen_override"
-    return 0
-  fi
-
-  if is_active_fullscreen; then
-    if [ -f "$fullscreen_override" ] && settings_are_open; then
-      return 0
-    fi
-
-    rm -f "$fullscreen_override"
-    close_settings_windows
-    eww close sidebar >/dev/null 2>&1 || true
-    return 0
-  fi
-
+  # The sidebar is retired. Keep this hook so the tiling loop does not need
+  # restructuring, but never start or manage Eww from the window manager.
   rm -f "$fullscreen_override"
-  if ! sidebar_is_open; then
-    eww open sidebar >/dev/null 2>&1 || true
-  fi
 }
 
 tile_remaining_area() {
@@ -654,20 +661,28 @@ tile_windows() {
 }
 
 signature() {
-  local desktop
-  desktop="$(current_desktop)"
-  printf '%s:' "$desktop"
+  local desktop="$1"
   wmctrl -lxG |
     awk -v desktop="$desktop" '$2 == desktop {print $1, $3, $4, $5, $6, $7}' |
     while read -r id x y w h class; do
       if is_normal_window "$id" "$class"; then
-        state="$(xprop -id "$id" _NET_WM_STATE 2>/dev/null || true)"
-        flags=""
-        grep -q '_NET_WM_STATE_MAXIMIZED_HORZ' <<< "$state" && flags="${flags}H"
-        grep -q '_NET_WM_STATE_MAXIMIZED_VERT' <<< "$state" && flags="${flags}V"
-        printf '%s:%s,%s,%s,%s:%s\n' "$id" "$x" "$y" "$w" "$h" "$flags"
+        printf '%s:%s,%s,%s,%s\n' "$(normalize_id "$id")" "$x" "$y" "$w" "$h"
       fi
     done |
+    sort |
+    paste -sd ';' -
+}
+
+window_set_signature() {
+  local desktop="$1"
+  wmctrl -lxG |
+    awk -v desktop="$desktop" '$2 == desktop {print $1, $7}' |
+    while read -r id class; do
+      if is_normal_window "$id" "$class"; then
+        normalize_id "$id"
+      fi
+    done |
+    sort |
     paste -sd ';' -
 }
 
@@ -712,17 +727,58 @@ case "${1:-}" in
     ;;
 esac
 
-last_signature=""
+declare -A desktop_signatures=()
+declare -A desktop_window_sets=()
+declare -A pending_signatures=()
+declare -A pending_counts=()
 
 while true; do
   update_runtime_settings
   sync_sidebar_for_fullscreen
-  current_signature="$(signature)"
-  if smart_tiling_enabled && [ "$current_signature" != "$last_signature" ]; then
+  desktop="$(current_desktop)"
+  current_signature="$(signature "$desktop")"
+  current_window_set="$(window_set_signature "$desktop")"
+
+  if [ -z "${desktop_signatures[$desktop]+known}" ]; then
+    # A workspace switch should reveal windows at their saved geometry, not
+    # visibly retile them. Remember its existing layout on first sight.
+    desktop_signatures[$desktop]="$current_signature"
+    desktop_window_sets[$desktop]="$current_window_set"
+    pending_signatures[$desktop]=""
+    pending_counts[$desktop]=0
+  elif smart_tiling_enabled && [ "$current_window_set" != "${desktop_window_sets[$desktop]}" ]; then
+    # New and closed windows should remain snappy.
     tile_windows
-    last_signature="$(signature)"
+    desktop_signatures[$desktop]="$(signature "$desktop")"
+    desktop_window_sets[$desktop]="$(window_set_signature "$desktop")"
+    pending_signatures[$desktop]=""
+    pending_counts[$desktop]=0
+  elif smart_tiling_enabled && [ "$current_signature" != "${desktop_signatures[$desktop]}" ]; then
+    # Openbox owns the pointer during Alt-drag, so button state is not a
+    # reliable release signal. Wait for geometry to remain unchanged for
+    # three polls before attaching the window to its destination monitor.
+    if [ "$current_signature" = "${pending_signatures[$desktop]:-}" ]; then
+      pending_counts[$desktop]=$(( ${pending_counts[$desktop]:-0} + 1 ))
+    else
+      pending_signatures[$desktop]="$current_signature"
+      pending_counts[$desktop]=1
+    fi
+
+    if [ "${pending_counts[$desktop]}" -ge 3 ]; then
+      tile_windows
+      desktop_signatures[$desktop]="$(signature "$desktop")"
+      desktop_window_sets[$desktop]="$(window_set_signature "$desktop")"
+      pending_signatures[$desktop]=""
+      pending_counts[$desktop]=0
+    fi
   elif ! smart_tiling_enabled; then
-    last_signature="$current_signature"
+    desktop_signatures[$desktop]="$current_signature"
+    desktop_window_sets[$desktop]="$current_window_set"
+    pending_signatures[$desktop]=""
+    pending_counts[$desktop]=0
+  else
+    pending_signatures[$desktop]=""
+    pending_counts[$desktop]=0
   fi
   sleep "$poll_interval"
 done

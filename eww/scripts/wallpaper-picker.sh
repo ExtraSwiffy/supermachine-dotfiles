@@ -81,6 +81,8 @@ case "${wallpaper,,}" in
     ;;
 esac
 
-feh --bg-scale "$wallpaper"
+# Give feh one image per Xinerama screen so each monitor gets its own copy
+# instead of scaling a single image across the combined desktop.
+feh --bg-fill "$wallpaper" "$wallpaper"
 chmod +x "$HOME/.fehbg" 2>/dev/null || true
 notify-send "Wallpaper" "Wallpaper updated." 2>/dev/null || true
