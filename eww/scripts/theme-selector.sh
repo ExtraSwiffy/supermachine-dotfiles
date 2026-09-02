@@ -55,7 +55,7 @@ theme_info() {
   conf="$theme_root/$slug/theme.conf"
   # shellcheck disable=SC1090
   source "$conf"
-  preview="$theme_root/$slug/wallpapers/$THEME_WALLPAPER"
+  preview="$theme_root/$slug/${THEME_PREVIEW:-wallpapers/$THEME_WALLPAPER}"
   case "$field" in
     name) printf '%s\n' "$THEME_NAME" ;;
     tagline) printf '%s\n' "$THEME_TAGLINE" ;;
@@ -63,12 +63,12 @@ theme_info() {
     previous-preview)
       local previous=$(((index - 1 + ${#themes[@]}) % ${#themes[@]}))
       source "$theme_root/${themes[previous]}/theme.conf"
-      printf '%s\n' "$theme_root/${themes[previous]}/wallpapers/$THEME_WALLPAPER"
+      printf '%s\n' "$theme_root/${themes[previous]}/${THEME_PREVIEW:-wallpapers/$THEME_WALLPAPER}"
       ;;
     next-preview)
       local next=$(((index + 1) % ${#themes[@]}))
       source "$theme_root/${themes[next]}/theme.conf"
-      printf '%s\n' "$theme_root/${themes[next]}/wallpapers/$THEME_WALLPAPER"
+      printf '%s\n' "$theme_root/${themes[next]}/${THEME_PREVIEW:-wallpapers/$THEME_WALLPAPER}"
       ;;
   esac
 }
