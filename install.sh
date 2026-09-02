@@ -1,7 +1,27 @@
 #!/bin/bash
 set -euo pipefail
 
-cd "$(dirname "$0")"
+repo_url="https://github.com/ExtraSwiffy/supermachine-dotfiles.git"
+repo_dir="$HOME/supermachine-dotfiles"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+
+# A copy downloaded directly from GitHub can bootstrap the full repository on
+# a blank Arch installation, then hand control to the version inside the repo.
+if [ ! -f "$script_dir/pkglist.txt" ] || [ ! -f "$script_dir/setup" ]; then
+    echo "Bootstrapping SuperMachine from GitHub..."
+    sudo pacman -Sy --needed git
+    if [ -d "$repo_dir/.git" ]; then
+        git -C "$repo_dir" pull --ff-only
+    elif [ -e "$repo_dir" ]; then
+        echo "$repo_dir already exists but is not a Git repository."
+        exit 1
+    else
+        git clone "$repo_url" "$repo_dir"
+    fi
+    exec "$repo_dir/install.sh"
+fi
+
+cd "$script_dir"
 
 if [ "$EUID" -eq 0 ]; then
     echo "Do not run this script with sudo or as root."
@@ -41,6 +61,7 @@ mkdir -p ~/.themes
 mkdir -p ~/.config/gtk-3.0
 mkdir -p ~/.config/gtk-4.0
 mkdir -p ~/.local/bin
+mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
 
 echo "Copying wallpaper..."
 
@@ -48,12 +69,7 @@ cp -r wallpapers/* ~/Pictures/wallpapers/
 
 echo "Copying configs..."
 
-cp -r eww ~/.config/
-cp -r openbox ~/.config/
-cp -r rofi ~/.config/
-cp -r picom ~/.config/
-cp -r alacritty ~/.config/
-cp -r polybar ~/.config/
+./setup deploy
 cp -r themes/* ~/.themes/
 if [ -d local/bin ]; then
     cp -r local/bin/* ~/.local/bin/

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-state_dir="$HOME/.config/eww/state"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
 off_file="$state_dir/smart-tiling-off"
 
 mkdir -p "$state_dir"
@@ -15,4 +15,3 @@ else
   eww update SMART_TILING_STATE=off >/dev/null 2>&1 || true
   notify-send "Semi Tiling" "Disabled" 2>/dev/null || true
 fi
-

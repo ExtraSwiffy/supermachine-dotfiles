@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-state_dir="$HOME/.config/eww/state"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
 gap_file="$state_dir/window-gap"
 direction="${1:-up}"
 
 mkdir -p "$state_dir"
 
-gap="$(cat "$gap_file" 2>/dev/null || echo 5)"
+settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
+[ -r "$settings_file" ] && source "$settings_file"
+gap="$(cat "$gap_file" 2>/dev/null || echo "${SUPERMACHINE_WINDOW_GAP:-5}")"
 [[ "$gap" =~ ^[0-9]+$ ]] || gap=5
 
 case "$direction" in

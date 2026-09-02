@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
+[ -r "$settings_file" ] && source "$settings_file"
+
 gap="${SUPERMACHINE_WINDOW_GAP:-5}"
 bottom_gap="${SUPERMACHINE_WINDOW_BOTTOM_GAP:-12}"
 sidebar_width="${SUPERMACHINE_SIDEBAR_WIDTH:-90}"
@@ -8,9 +11,10 @@ right_edge_bleed="${SUPERMACHINE_WINDOW_RIGHT_EDGE_BLEED:-0}"
 placement_inset="${SUPERMACHINE_WINDOW_PLACEMENT_INSET:-0}"
 poll_interval="${SUPERMACHINE_SMART_PLACE_POLL:-1.5}"
 fullscreen_override="/tmp/supermachine-fullscreen-sidebar-override"
-state_dir="$HOME/.config/eww/state"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
+legacy_state_dir="$HOME/.config/eww/state"
 gap_file="$state_dir/window-gap"
-sidebar_width_file="$state_dir/sidebar-width"
+sidebar_width_file="$legacy_state_dir/sidebar-width"
 tiling_off_file="$state_dir/smart-tiling-off"
 game_state_file="$HOME/.cache/eww-gamemode"
 
@@ -34,7 +38,7 @@ current_desktop() {
 update_runtime_settings() {
   local saved_gap saved_sidebar_width
 
-  saved_gap="$(cat "$gap_file" 2>/dev/null || true)"
+  saved_gap="$(cat "$gap_file" 2>/dev/null || cat "$legacy_state_dir/window-gap" 2>/dev/null || true)"
   if [[ "$saved_gap" =~ ^[0-9]+$ ]] && [ "$saved_gap" -ge 0 ] && [ "$saved_gap" -le 40 ]; then
     gap="$saved_gap"
   fi

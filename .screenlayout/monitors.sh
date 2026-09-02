@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -u
 
-primary="HDMI-A-0"
-secondary="HDMI-A-1-1"
+settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
+[ -r "$settings_file" ] && source "$settings_file"
+
+primary="${SUPERMACHINE_PRIMARY_MONITOR:-HDMI-A-0}"
+secondary="${SUPERMACHINE_SECONDARY_MONITOR:-HDMI-A-1-1}"
+secondary_rotation="${SUPERMACHINE_SECONDARY_ROTATION:-left}"
+secondary_width="${SUPERMACHINE_SECONDARY_WIDTH:-1080}"
 
 is_connected() {
   xrandr --query 2>/dev/null |
@@ -14,8 +19,8 @@ is_connected() {
 # suffixed name, so handle this exact pair without affecting other layouts.
 if is_connected "$primary" && is_connected "$secondary"; then
   if xrandr \
-    --output "$secondary" --auto --rotate left --pos 0x0 \
-    --output "$primary" --primary --auto --rotate normal --pos 1080x0; then
+    --output "$secondary" --auto --rotate "$secondary_rotation" --pos 0x0 \
+    --output "$primary" --primary --auto --rotate normal --pos "${secondary_width}x0"; then
     exit 0
   fi
 

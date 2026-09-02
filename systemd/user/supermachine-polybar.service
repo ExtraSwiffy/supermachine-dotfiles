@@ -1,0 +1,12 @@
+[Unit]
+Description=SuperMachine Polybar
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/polybar --reload home
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=SuperMachine semi-tiling helper
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/openbox/smart-place.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

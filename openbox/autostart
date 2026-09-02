@@ -16,7 +16,7 @@ if [ -x /usr/lib/polkit-kde-authentication-agent-1 ]; then
   /usr/lib/polkit-kde-authentication-agent-1 &
 fi
 
-"$HOME/.config/polybar/launch.sh" &
-
-sleep 1
-"$HOME/.config/openbox/smart-place.sh" &
+# Import the X session into the user service manager, then let it supervise
+# the long-running desktop helpers.
+systemctl --user import-environment DISPLAY XAUTHORITY
+systemctl --user restart supermachine-polybar.service supermachine-tiler.service

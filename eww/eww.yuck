@@ -57,7 +57,7 @@
 (defpoll GLOW_THICKNESS :interval "30s" "awk -F': ' '/\\$settings-glow-thickness/ {gsub(/px;|;/,\"\",$2); print $2; exit}' ~/.config/eww/eww.scss 2>/dev/null || echo 5")
 (defpoll GLOW_PRESET :interval "30s" "cat ~/.config/eww/state/glow-preset 2>/dev/null || echo CUSTOM")
 (defpoll WINDOW_GAP :interval "30s" "cat ~/.config/eww/state/window-gap 2>/dev/null || echo 5")
-(defpoll SMART_TILING_STATE :interval "30s" "test -f ~/.config/eww/state/smart-tiling-off && echo off || echo on")
+(defpoll SMART_TILING_STATE :interval "30s" "test -f ~/.local/state/supermachine/smart-tiling-off && echo off || echo on")
 (defpoll WINDOW_BORDER_STATE :interval "30s" "test -f ~/.config/eww/state/window-border-off && echo off || echo on")
 (defpoll WINDOW_BORDER_WIDTH :interval "30s" "cat ~/.config/eww/state/window-border-width 2>/dev/null || echo 2")
 (defpoll WINDOW_RADIUS :interval "30s" "awk -F'= ' '/corner-radius/ {gsub(/;| /,\"\",$2); print $2; exit}' ~/.config/picom/picom.conf 2>/dev/null || echo 0")

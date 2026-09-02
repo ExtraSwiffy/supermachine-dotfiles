@@ -64,7 +64,7 @@ case "$mode" in
       status_file="$HOME/.config/eww/state/supermachine-update-status"
       cd "$repo"
       echo "Updating SuperMachine from $repo"
-      if git pull --ff-only && ./install.sh; then
+      if git pull --ff-only && ./setup deploy && ./setup restart; then
         echo "SuperMachine updated"
         printf "%s\n" "Update complete" > "$status_file"
       else
@@ -80,4 +80,3 @@ case "$mode" in
     exit 1
     ;;
 esac
-

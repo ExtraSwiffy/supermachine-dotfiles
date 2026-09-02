@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+deploy() {
+  mkdir -p "$config_home" "$config_home/systemd/user" "$state_home/supermachine"
+
+  for name in alacritty openbox picom polybar rofi; do
+    mkdir -p "$config_home/$name"
+    cp -a "$repo_dir/$name/." "$config_home/$name/"
+  done
+
+  # Eww keeps user-selected appearance values beside its config. Deploy the
+  # program files, but seed state only when a value does not already exist.
+  mkdir -p "$config_home/eww/scripts" "$config_home/eww/state"
+  cp "$repo_dir/eww/eww.scss" "$repo_dir/eww/eww.yuck" "$config_home/eww/"
+  cp -a "$repo_dir/eww/scripts/." "$config_home/eww/scripts/"
+  for state_file in "$repo_dir"/eww/state/*; do
+    [ -e "$state_file" ] || continue
+    [ -e "$config_home/eww/state/${state_file##*/}" ] || cp "$state_file" "$config_home/eww/state/"
+  done
+
+  mkdir -p "$config_home/supermachine"
+  if [ ! -f "$config_home/supermachine/settings.conf" ]; then
+    cp "$repo_dir/config/supermachine/settings.conf" "$config_home/supermachine/settings.conf"
+  fi
+  if [ -f "$config_home/eww/state/window-gap" ] && [ ! -f "$state_home/supermachine/window-gap" ]; then
+    cp "$config_home/eww/state/window-gap" "$state_home/supermachine/window-gap"
+  fi
+  cp -a "$repo_dir/systemd/user/." "$config_home/systemd/user/"
+
+  mkdir -p "$HOME/.screenlayout"
+  cp "$repo_dir/.screenlayout/monitors.sh" "$HOME/.screenlayout/monitors.sh"
+  cp "$repo_dir/.fehbg" "$HOME/.fehbg"
+
+  chmod +x "$config_home"/eww/scripts/*.sh "$config_home"/openbox/*.sh "$config_home"/polybar/*.sh
+  chmod +x "$HOME/.screenlayout/monitors.sh" "$HOME/.fehbg"
+  systemctl --user daemon-reload >/dev/null 2>&1 || true
+  echo "SuperMachine configs deployed."
+}
+
+restart_desktop() {
+  local tiler_pids
+  systemctl --user import-environment DISPLAY XAUTHORITY
+  systemctl --user stop supermachine-polybar.service supermachine-tiler.service >/dev/null 2>&1 || true
+  pkill -x polybar >/dev/null 2>&1 || true
+  tiler_pids="$(pgrep -f "^bash $config_home/openbox/smart-place.sh$" || true)"
+  [ -z "$tiler_pids" ] || kill $tiler_pids
+  while ! flock -n /tmp/supermachine-smart-place.lock true; do
+    sleep 0.1
+  done
+  systemctl --user start supermachine-polybar.service supermachine-tiler.service
+  openbox --reconfigure >/dev/null 2>&1 || true
+  echo "SuperMachine desktop helpers restarted."
+}
+
+check() {
+  local failed=0 command_name
+  for command_name in openbox polybar picom feh wmctrl xrandr; do
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+      echo "missing: $command_name"
+      failed=1
+    fi
+  done
+  bash -n "$repo_dir"/openbox/*.sh "$repo_dir"/eww/scripts/*.sh "$repo_dir"/polybar/*.sh
+  sh -n "$repo_dir/.fehbg"
+  if command -v xmllint >/dev/null 2>&1; then
+    xmllint --noout "$repo_dir/openbox/rc.xml" "$repo_dir/openbox/menu.xml"
+  fi
+  [ "$failed" -eq 0 ] || return 1
+  echo "SuperMachine checks passed."
+}
+
+case "${1:-help}" in
+  deploy) deploy ;;
+  restart) restart_desktop ;;
+  check) check ;;
+  update)
+    git -C "$repo_dir" pull --ff-only
+    deploy
+    restart_desktop
+    ;;
+  *)
+    echo "Usage: ./setup {deploy|restart|check|update}"
+    ;;
+esac

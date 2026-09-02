@@ -2,6 +2,7 @@
 set -euo pipefail
 
 STATE="$HOME/.cache/eww-gamemode"
+SUPERMACHINE_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
 PICOM_STATE="$HOME/.cache/eww-gamemode-picom-was-running"
 PICOM_CONFIG="$HOME/.config/picom/picom.conf"
 SMART_STATE="$HOME/.cache/eww-gamemode-smart-place-was-running"
@@ -58,20 +59,16 @@ close_regular_windows() {
 }
 
 stop_smart_place() {
-  local pids
-  pids="$(pgrep -f "^bash $HOME/.config/openbox/smart-place.sh$" || true)"
-  if [ -n "$pids" ]; then
+  if systemctl --user is-active --quiet supermachine-tiler.service; then
     touch "$SMART_STATE"
-    kill $pids >/dev/null 2>&1 || true
+    systemctl --user stop supermachine-tiler.service
   fi
 }
 
 start_smart_place() {
   rm -f "$SMART_STATE"
-  [ -f "$HOME/.config/eww/state/smart-tiling-off" ] && return 0
-  if ! pgrep -f "^bash $HOME/.config/openbox/smart-place.sh$" >/dev/null 2>&1; then
-    nohup "$HOME/.config/openbox/smart-place.sh" >/tmp/supermachine-smart-place.log 2>&1 &
-  fi
+  [ -f "$SUPERMACHINE_STATE/smart-tiling-off" ] && return 0
+  systemctl --user restart supermachine-tiler.service
 }
 
 stop_desktop_helpers() {

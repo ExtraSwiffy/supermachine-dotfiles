@@ -1,20 +1,44 @@
-SuperMachine Dotfiles
-Creator: ExtraSwiffy
+# SuperMachine Dotfiles
 
-Discription 
-  I started creating my own desktop experince something simple minimal and still modern look and feel this is kind of a mix of Hyprland and a normal
-floating windows desktop with simple keybinds this is heavily keyboard controled if thats what your into i decided to go with openbox to have a 
-bare metal startig point this is designed to make a fresh arch server build then clone my git files and reboot and thats it i plan to continue to 
-work on this make it better and smoother over time but still not bloating the system most of whats in here is whats needed 
+A simple, minimal Openbox desktop for a fresh Arch Linux installation. It
+combines keyboard-friendly semi-tiling with a normal floating desktop.
 
-Features 
-- Custom Rofi Conf
-- Custom eww sidebar
-- Custom settings pannel
-- Custom openbox conf
-- Keybinds for keyboard
+## Fresh Arch installation
 
-Included Applications 
-- Firefox
-- Visual Studio Code
-More COMING
+Download only the installer, make it executable, and run it as your normal
+user. It installs Git when needed, clones this repository, installs the
+packages and deploys the desktop:
+
+```bash
+wget https://raw.githubusercontent.com/ExtraSwiffy/supermachine-dotfiles/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+Do not run the installer itself with `sudo`; it asks for sudo only when a
+system package or service requires it. Reboot when installation finishes.
+
+## Everyday maintenance
+
+Run these inside `~/supermachine-dotfiles`:
+
+```bash
+./setup check    # validate dependencies and config syntax
+./setup deploy   # copy repository configs into the home directory
+./setup restart  # restart Polybar and the tiler
+./setup update   # pull, deploy, and restart
+```
+
+Machine-specific defaults live in
+`~/.config/supermachine/settings.conf`. Tiling runtime state lives under
+`~/.local/state/supermachine`. Existing Eww appearance choices are preserved
+when configs are redeployed or updated.
+
+## Features
+
+- Openbox floating desktop with optional semi-tiling
+- Polybar workspace and system status bar
+- Rofi launcher
+- Eww settings and customization tools
+- Console/game mode helpers
+- Multi-monitor wallpaper and placement support

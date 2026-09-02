@@ -1,4 +1,7 @@
 #!/bin/sh
+settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
+[ -r "$settings_file" ] && . "$settings_file"
+wallpaper="${SUPERMACHINE_WALLPAPER:-$HOME/Pictures/wallpapers/wallpaper-blur.png}"
 feh --no-fehbg --bg-fill \
-  "$HOME/Pictures/wallpapers/wallpaper-blur.png" \
-  "$HOME/Pictures/wallpapers/wallpaper-blur.png"
+  "$wallpaper" \
+  "$wallpaper"
