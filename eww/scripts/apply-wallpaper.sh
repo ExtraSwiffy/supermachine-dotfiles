@@ -28,18 +28,23 @@ if command -v magick >/dev/null 2>&1 && [ "${#monitor_rects[@]}" -gt 0 ]; then
     ((offset_y + height > canvas_height)) && canvas_height=$((offset_y + height))
   done
 
-  magick -size "${canvas_width}x${canvas_height}" xc:black "$composite_dir/root.png"
+  magick -size "${canvas_width}x${canvas_height}" xc:'#000000' \
+    -colorspace sRGB -type TrueColor "PNG24:$composite_dir/root.png"
   index=0
   for rect in "${monitor_rects[@]}"; do
     IFS='x+' read -r width height offset_x offset_y <<< "$rect"
-    magick "$wallpaper" -resize "${width}x${height}^" -gravity center \
-      -extent "${width}x${height}" "$composite_dir/monitor-${index}.png"
+    magick "$wallpaper" -colorspace sRGB -type TrueColor \
+      -resize "${width}x${height}^" -gravity center \
+      -extent "${width}x${height}" "PNG24:$composite_dir/monitor-${index}.png"
     magick "$composite_dir/root.png" "$composite_dir/monitor-${index}.png" \
-      -geometry "+${offset_x}+${offset_y}" -composite "$composite_dir/root-next.png"
+      -geometry "+${offset_x}+${offset_y}" -composite \
+      "PNG24:$composite_dir/root-next.png"
     mv "$composite_dir/root-next.png" "$composite_dir/root.png"
     index=$((index + 1))
   done
-  feh --no-xinerama --no-fehbg --bg-center "$composite_dir/root.png"
+  magick "$composite_dir/root.png" -colorspace sRGB -type TrueColor \
+    "PNG24:$composite_dir/root-color.png"
+  feh --no-xinerama --no-fehbg --bg-center "$composite_dir/root-color.png"
 else
   feh --bg-fill "$wallpaper" "$wallpaper"
 fi
