@@ -4,7 +4,45 @@ set -euo pipefail
 wallpaper="${1:-}"
 [ -f "$wallpaper" ] || exit 1
 
-feh --bg-fill "$wallpaper" "$wallpaper"
+# feh's Xinerama sizing does not account for a rotated output reliably. Build
+# one root image from the logical xrandr rectangles so every monitor receives
+# its own filled crop of the same wallpaper, including portrait displays.
+mapfile -t monitor_rects < <(
+  xrandr --query | awk '
+    / connected/ {
+      for (i = 1; i <= NF; i++)
+        if ($i ~ /^[0-9]+x[0-9]+\+[0-9]+\+[0-9]+$/) print $i
+    }
+  '
+)
+
+if command -v magick >/dev/null 2>&1 && [ "${#monitor_rects[@]}" -gt 0 ]; then
+  composite_dir="$(mktemp -d)"
+  trap 'rm -rf "$composite_dir"' EXIT
+  canvas_width=0
+  canvas_height=0
+
+  for rect in "${monitor_rects[@]}"; do
+    IFS='x+' read -r width height offset_x offset_y <<< "$rect"
+    ((offset_x + width > canvas_width)) && canvas_width=$((offset_x + width))
+    ((offset_y + height > canvas_height)) && canvas_height=$((offset_y + height))
+  done
+
+  magick -size "${canvas_width}x${canvas_height}" xc:black "$composite_dir/root.png"
+  index=0
+  for rect in "${monitor_rects[@]}"; do
+    IFS='x+' read -r width height offset_x offset_y <<< "$rect"
+    magick "$wallpaper" -resize "${width}x${height}^" -gravity center \
+      -extent "${width}x${height}" "$composite_dir/monitor-${index}.png"
+    magick "$composite_dir/root.png" "$composite_dir/monitor-${index}.png" \
+      -geometry "+${offset_x}+${offset_y}" -composite "$composite_dir/root-next.png"
+    mv "$composite_dir/root-next.png" "$composite_dir/root.png"
+    index=$((index + 1))
+  done
+  feh --no-xinerama --no-fehbg --bg-center "$composite_dir/root.png"
+else
+  feh --bg-fill "$wallpaper" "$wallpaper"
+fi
 
 settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
 if [ -f "$settings_file" ]; then

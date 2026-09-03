@@ -2,6 +2,10 @@
 settings_file="${XDG_CONFIG_HOME:-$HOME/.config}/supermachine/settings.conf"
 [ -r "$settings_file" ] && . "$settings_file"
 wallpaper="${SUPERMACHINE_WALLPAPER:-$HOME/Pictures/wallpapers/wallpaper-blur.png}"
-feh --no-fehbg --bg-fill \
-  "$wallpaper" \
-  "$wallpaper"
+apply_wallpaper="${XDG_CONFIG_HOME:-$HOME/.config}/eww/scripts/apply-wallpaper.sh"
+
+if [ -x "$apply_wallpaper" ]; then
+  exec "$apply_wallpaper" "$wallpaper"
+fi
+
+feh --no-fehbg --bg-fill "$wallpaper" "$wallpaper"

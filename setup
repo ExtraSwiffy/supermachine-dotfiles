@@ -61,7 +61,7 @@ restart_desktop() {
 
 check() {
   local failed=0 command_name
-  for command_name in openbox polybar picom feh wmctrl xrandr; do
+  for command_name in openbox polybar picom feh magick wmctrl xrandr; do
     if ! command -v "$command_name" >/dev/null 2>&1; then
       echo "missing: $command_name"
       failed=1

@@ -53,3 +53,5 @@ when configs are redeployed or updated.
   wordmark. `Snow Forest` includes two moonlit winter wallpapers.
 - `Ember Dusk`, `Neon Rain`, and `Golden Canopy` add coordinated volcanic,
   cyber-city, and autumn-forest atmospheres.
+- `Fable` adds three original, UI-free fairy-tale landscapes: a misty Albion
+  sunrise, an enchanted woodland, and a lantern-lit village at blue hour.
