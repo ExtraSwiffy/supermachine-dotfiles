@@ -142,8 +142,10 @@ apply_theme() {
   printf '%s\n' "$slug" > "$theme_state"
   "$config_home/eww/scripts/apply-wallpaper.sh" "$wallpaper"
   "$config_home/eww/scripts/sync-openbox-theme.sh" >/dev/null 2>&1 || true
-  eww reload >/dev/null 2>&1 || true
   systemctl --user restart supermachine-polybar.service >/dev/null 2>&1 || true
+  # SCSS changes make Eww hot-reload. Close once more after that reload so the
+  # chooser cannot be restored from its pre-reload window state.
+  close_window themechooser || true
   notify-send "Theme applied" "$THEME_NAME" 2>/dev/null || true
 }
 
@@ -177,6 +179,7 @@ case "$mode:$action" in
     printf '%s\n' "$index" > "$theme_index"
     ;;
   theme:info) theme_info ;;
+  theme:close) close_window themechooser ;;
   theme:apply) apply_theme ;;
   wallpaper:open)
     ensure_eww
@@ -193,9 +196,13 @@ case "$mode:$action" in
     printf '%s\n' "$index" > "$wallpaper_index"
     ;;
   wallpaper:info) wallpaper_info ;;
+  wallpaper:close) close_window wallpaperchooser ;;
   wallpaper:apply)
     selected="$($0 wallpaper info preview)"
+    # Hide the chooser before ImageMagick builds the multi-monitor wallpaper;
+    # the desktop should respond to the click immediately.
+    close_window wallpaperchooser || true
     "$config_home/eww/scripts/apply-wallpaper.sh" "$selected"
-    close_window wallpaperchooser
+    notify-send "Wallpaper applied" "$(basename "${selected%.png}" | tr '-' ' ')" 2>/dev/null || true
     ;;
 esac

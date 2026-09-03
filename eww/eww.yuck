@@ -103,7 +103,7 @@
       (box :orientation "v" :hexpand true
         (label :class "visual-picker-kicker" :halign "start" :text "SUPERMACHINE / THEMES")
         (label :class "visual-picker-title" :halign "start" :text "Choose your atmosphere"))
-      (button :class "visual-picker-close" :onclick "eww close themechooser" "×"))
+      (button :class "visual-picker-close" :onclick "~/.config/eww/scripts/theme-selector.sh theme close" "×"))
     (box
       :orientation "h"
       :class "visual-picker-stage"
@@ -143,7 +143,7 @@
       (box :orientation "v" :hexpand true
         (label :class "visual-picker-kicker" :halign "start" :text "ACTIVE THEME / WALLPAPERS")
         (label :class "visual-picker-title" :halign "start" :text "Set the scene"))
-      (button :class "visual-picker-close" :onclick "eww close wallpaperchooser" "×"))
+      (button :class "visual-picker-close" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper close" "×"))
     (box :orientation "v" :class "visual-picker-main-card wallpaper-main-card" :spacing 10 :space-evenly false :vexpand false
       (image :class "visual-picker-hero" :path WALLPAPER_PICKER_PREVIEW :image-width 650 :image-height 365)
       (label :class "visual-picker-name" :text WALLPAPER_PICKER_NAME))
