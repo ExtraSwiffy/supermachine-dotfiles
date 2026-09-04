@@ -17,6 +17,7 @@ flameshot
 gamemode
 gamescope
 git
+gtk4
 goverlay
 htop
 iw
@@ -56,6 +57,7 @@ pipewire-pulse
 playerctl
 polkit-kde-agent
 power-profiles-daemon
+python-gobject
 protontricks
 remmina
 rofi

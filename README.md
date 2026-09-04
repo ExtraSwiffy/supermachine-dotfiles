@@ -39,7 +39,8 @@ when configs are redeployed or updated.
 - Openbox floating desktop with optional semi-tiling
 - Polybar workspace and system status bar
 - Rofi launcher
-- Eww settings and customization tools
+- Native, frameless GTK 4 settings and customization application
+- Editable GtkBuilder `app.ui` layout with live theme-color synchronization
 - Console/game mode helpers
 - Multi-monitor wallpaper and placement support
 
@@ -48,7 +49,8 @@ when configs are redeployed or updated.
 - Right-double-click an empty part of the desktop to open the theme carousel.
 - Left-double-click the desktop to choose a wallpaper from the active theme.
 - Use the side previews or arrow buttons to browse, then Apply to switch the
-  wallpaper, Eww accents, Openbox borders, and Polybar colors together.
+  wallpaper, Eww accents, Openbox borders, Polybar colors, and the open GTK
+  settings application together.
 - `Default` includes the original wallpaper and the graphite SuperMachine
   wordmark. `Snow Forest` includes two moonlit winter wallpapers.
 - `Ember Dusk`, `Neon Rain`, and `Golden Canopy` add coordinated volcanic,

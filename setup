@@ -8,7 +8,7 @@ state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 deploy() {
   mkdir -p "$config_home" "$config_home/systemd/user" "$state_home/supermachine"
 
-  for name in alacritty openbox picom polybar rofi; do
+  for name in alacritty openbox picom polybar rofi supermachine-settings; do
     mkdir -p "$config_home/$name"
     cp -a "$repo_dir/$name/." "$config_home/$name/"
   done
@@ -38,7 +38,7 @@ deploy() {
   cp "$repo_dir/.screenlayout/monitors.sh" "$HOME/.screenlayout/monitors.sh"
   cp "$repo_dir/.fehbg" "$HOME/.fehbg"
 
-  chmod +x "$config_home"/eww/scripts/*.sh "$config_home"/openbox/*.sh "$config_home"/polybar/*.sh
+  chmod +x "$config_home"/eww/scripts/*.sh "$config_home"/openbox/*.sh "$config_home"/polybar/*.sh "$config_home"/supermachine-settings/*.sh "$config_home"/supermachine-settings/*.py
   chmod +x "$HOME/.screenlayout/monitors.sh" "$HOME/.fehbg"
   systemctl --user daemon-reload >/dev/null 2>&1 || true
   echo "SuperMachine configs deployed."
@@ -61,16 +61,19 @@ restart_desktop() {
 
 check() {
   local failed=0 command_name
-  for command_name in openbox polybar picom feh magick wmctrl xrandr; do
+  for command_name in openbox polybar picom feh magick wmctrl xrandr python3; do
     if ! command -v "$command_name" >/dev/null 2>&1; then
       echo "missing: $command_name"
       failed=1
     fi
   done
   bash -n "$repo_dir"/openbox/*.sh "$repo_dir"/eww/scripts/*.sh "$repo_dir"/polybar/*.sh
+  bash -n "$repo_dir"/supermachine-settings/*.sh
+  python3 -c 'import ast, pathlib, sys; path=pathlib.Path(sys.argv[1]); ast.parse(path.read_text(), filename=str(path))' "$repo_dir/supermachine-settings/app.py"
   sh -n "$repo_dir/.fehbg"
   if command -v xmllint >/dev/null 2>&1; then
     xmllint --noout "$repo_dir/openbox/rc.xml" "$repo_dir/openbox/menu.xml"
+    xmllint --noout "$repo_dir/supermachine-settings/app.ui"
   fi
   [ "$failed" -eq 0 ] || return 1
   echo "SuperMachine checks passed."

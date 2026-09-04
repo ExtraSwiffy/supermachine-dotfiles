@@ -1,0 +1,28 @@
+/* These tokens are filled from the active theme's theme.conf by app.py.
+ * Keep the names intact when editing the rest of this stylesheet. */
+@define-color accent __ACCENT__;
+@define-color gold __GOLD__;
+@define-color header __HEADER__;
+@define-color subtext __SUBTEXT__;
+@define-color panel __PANEL__;
+@define-color detail __DETAIL__;
+@define-color section __SECTION__;
+
+* { font-family: "JetBrainsMono Nerd Font"; }
+window { background: transparent; color: @header; }
+.app-shell { background: alpha(@panel, .985); border: 2px solid alpha(@accent, .48); border-radius: 30px 9px 30px 9px; }
+.navigation { padding: 24px 18px 18px; background: alpha(@detail, .94); border-radius: 28px 0 0 7px; }
+.kicker, .section-title { color: @accent; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+.brand-title { color: @header; font-size: 21px; font-weight: 800; margin: 2px 0 10px; }
+.gold-rule { background: alpha(@gold, .3); margin: 0 0 8px; }
+.nav-button { padding: 13px 14px; border-radius: 16px 5px 16px 5px; color: @subtext; background: transparent; }
+.nav-button:hover, .nav-button.active { color: @header; background: alpha(@accent, .13); box-shadow: inset 3px 0 @accent; }
+.close-button { color: @subtext; background: transparent; border-radius: 14px 5px 14px 5px; padding: 10px 12px; margin-bottom: 6px; }
+.close-button:hover { color: @header; background: alpha(@gold, .14); }
+.identity-card, .section-card { background: @section; border: 1px solid alpha(@accent, .16); border-radius: 20px 6px 20px 6px; padding: 16px; }
+.card-title { color: @accent; font-weight: 700; }.muted, .page-subtitle { color: @subtext; }.content-page { padding: 30px 34px; }
+.page-title { color: @header; font-size: 27px; font-weight: 900; }.page-subtitle { margin-bottom: 4px; }
+.action-button, .tile-button { color: @header; background: alpha(@accent, .07); border: 1px solid alpha(@accent, .15); border-radius: 15px 5px 15px 5px; padding: 12px 15px; }
+.action-button:hover, .tile-button:hover { background: alpha(@accent, .18); border-color: @accent; }.featured { color: #071008; background: @accent; font-weight: 800; }.featured:hover { background: @header; }
+.tile-button { min-height: 72px; min-width: 250px; font-weight: 700; }.step-button { min-width: 38px; min-height: 34px; border-radius: 12px; color: @accent; background: alpha(@accent, .1); }.step-button:hover { background: alpha(@accent, .22); }.step-value { color: @header; font-weight: 700; }.system-info { color: @subtext; line-height: 1.5; }
+scale trough { background: alpha(@subtext, .2); border-radius: 99px; min-height: 6px; } scale highlight { background: @accent; border-radius: 99px; } scale slider { background: @header; border-radius: 99px; min-width: 17px; min-height: 17px; }

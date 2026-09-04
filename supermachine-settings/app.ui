@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <!-- This file is intentionally plain GtkBuilder XML: pages, labels and
+       controls can be rearranged without touching the Python controller. -->
+  <object class="GtkApplicationWindow" id="main_window">
+    <property name="title">SuperMachine Settings</property>
+    <property name="default-width">980</property>
+    <property name="default-height">680</property>
+    <property name="resizable">true</property>
+    <property name="decorated">false</property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="css-classes">app-shell</property>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="width-request">248</property>
+            <property name="spacing">8</property>
+            <property name="css-classes">navigation</property>
+            <child><object class="GtkLabel"><property name="label">SUPERMACHINE / SETTINGS</property><property name="xalign">0</property><property name="css-classes">kicker</property></object></child>
+            <child><object class="GtkLabel"><property name="label">Shape your machine</property><property name="xalign">0</property><property name="wrap">true</property><property name="css-classes">brand-title</property></object></child>
+            <child><object class="GtkSeparator"><property name="css-classes">gold-rule</property></object></child>
+            <child><object class="GtkButton" id="nav_appearance"><property name="label">󰏘  Appearance</property><property name="css-classes">nav-button active</property></object></child>
+            <child><object class="GtkButton" id="nav_devices"><property name="label">󰍹  Devices &amp; sound</property><property name="css-classes">nav-button</property></object></child>
+            <child><object class="GtkButton" id="nav_system"><property name="label">󰒓  System</property><property name="css-classes">nav-button</property></object></child>
+            <child><object class="GtkButton" id="nav_about"><property name="label">󰍛  About</property><property name="css-classes">nav-button</property></object></child>
+            <child><object class="GtkBox"><property name="vexpand">true</property></object></child>
+            <child><object class="GtkButton" id="close_app"><property name="label">×  Close settings</property><property name="css-classes">close-button</property></object></child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property><property name="spacing">4</property><property name="css-classes">identity-card</property>
+                <child><object class="GtkLabel"><property name="label">SUPERMachine Openbox</property><property name="xalign">0</property><property name="css-classes">card-title</property></object></child>
+                <child><object class="GtkLabel" id="sidebar_status"><property name="label">Loading system state…</property><property name="xalign">0</property><property name="wrap">true</property><property name="css-classes">muted</property></object></child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child><object class="GtkSeparator"><property name="orientation">vertical</property></object></child>
+        <child>
+          <object class="GtkStack" id="page_stack">
+            <property name="hexpand">true</property><property name="vexpand">true</property>
+            <child>
+              <object class="GtkStackPage"><property name="name">appearance</property><property name="child">
+                <object class="GtkScrolledWindow"><property name="child">
+                  <object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">16</property><property name="css-classes">content-page</property>
+                    <child><object class="GtkLabel"><property name="label">Appearance</property><property name="xalign">0</property><property name="css-classes">page-title</property></object></child>
+                    <child><object class="GtkLabel" id="appearance_summary"><property name="label">Themes, atmosphere and window behavior</property><property name="xalign">0</property><property name="wrap">true</property><property name="css-classes">page-subtitle</property></object></child>
+                    <child><object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">10</property><property name="css-classes">section-card</property>
+                      <child><object class="GtkLabel"><property name="label">ATMOSPHERE</property><property name="xalign">0</property><property name="css-classes">section-title</property></object></child>
+                      <child><object class="GtkButton" id="theme_picker"><property name="label">󰏘  Open visual theme picker</property><property name="css-classes">action-button featured</property></object></child>
+                      <child><object class="GtkButton" id="wallpaper_picker"><property name="label">󰸉  Choose wallpaper</property><property name="css-classes">action-button</property></object></child>
+                      <child><object class="GtkButton" id="gtk_appearance"><property name="label">󰍜  GTK, icons and cursor</property><property name="css-classes">action-button</property></object></child>
+                      <child><object class="GtkButton" id="openbox_settings"><property name="label">󰖯  Openbox configuration</property><property name="css-classes">action-button</property></object></child>
+                    </object></child>
+                    <child><object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">10</property><property name="css-classes">section-card</property>
+                      <child><object class="GtkLabel"><property name="label">WINDOW LAYOUT</property><property name="xalign">0</property><property name="css-classes">section-title</property></object></child>
+                      <child><object class="GtkButton" id="smart_tiling"><property name="label">Toggle semi-tiling</property><property name="css-classes">action-button</property></object></child>
+                      <child><object class="GtkBox"><property name="spacing">8</property><child><object class="GtkLabel"><property name="label">Window gap</property><property name="hexpand">true</property><property name="xalign">0</property></object></child><child><object class="GtkButton" id="gap_down"><property name="label">−</property><property name="css-classes">step-button</property></object></child><child><object class="GtkLabel" id="gap_value"><property name="label">5 px</property><property name="width-chars">7</property><property name="css-classes">step-value</property></object></child><child><object class="GtkButton" id="gap_up"><property name="label">+</property><property name="css-classes">step-button</property></object></child></object></child>
+                      <child><object class="GtkBox"><property name="spacing">8</property><child><object class="GtkLabel"><property name="label">Border width</property><property name="hexpand">true</property><property name="xalign">0</property></object></child><child><object class="GtkButton" id="border_down"><property name="label">−</property><property name="css-classes">step-button</property></object></child><child><object class="GtkLabel" id="border_value"><property name="label">2 px</property><property name="width-chars">7</property><property name="css-classes">step-value</property></object></child><child><object class="GtkButton" id="border_up"><property name="label">+</property><property name="css-classes">step-button</property></object></child></object></child>
+                      <child><object class="GtkBox"><property name="spacing">8</property><child><object class="GtkLabel"><property name="label">Corner radius</property><property name="hexpand">true</property><property name="xalign">0</property></object></child><child><object class="GtkButton" id="radius_down"><property name="label">−</property><property name="css-classes">step-button</property></object></child><child><object class="GtkLabel" id="radius_value"><property name="label">0 r</property><property name="width-chars">7</property><property name="css-classes">step-value</property></object></child><child><object class="GtkButton" id="radius_up"><property name="label">+</property><property name="css-classes">step-button</property></object></child></object></child>
+                    </object></child>
+                  </object>
+                </property></object>
+              </property></object>
+            </child>
+            <child>
+              <object class="GtkStackPage"><property name="name">devices</property><property name="child">
+                <object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">16</property><property name="css-classes">content-page</property>
+                  <child><object class="GtkLabel"><property name="label">Devices &amp; sound</property><property name="xalign">0</property><property name="css-classes">page-title</property></object></child>
+                  <child><object class="GtkLabel"><property name="label">Network, Bluetooth, displays and audio</property><property name="xalign">0</property><property name="css-classes">page-subtitle</property></object></child>
+                  <child><object class="GtkFlowBox"><property name="max-children-per-line">2</property><property name="min-children-per-line">2</property><property name="column-spacing">12</property><property name="row-spacing">12</property><property name="selection-mode">none</property>
+                    <child><object class="GtkButton" id="network"><property name="label">󰖩  Network connections</property><property name="css-classes">tile-button</property></object></child>
+                    <child><object class="GtkButton" id="bluetooth"><property name="label">󰂯  Bluetooth devices</property><property name="css-classes">tile-button</property></object></child>
+                    <child><object class="GtkButton" id="audio"><property name="label">󰕾  Audio mixer</property><property name="css-classes">tile-button</property></object></child>
+                    <child><object class="GtkButton" id="displays"><property name="label">󰍹  Display layout</property><property name="css-classes">tile-button</property></object></child>
+                  </object></child>
+                  <child><object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">10</property><property name="css-classes">section-card</property>
+                    <child><object class="GtkLabel"><property name="label">QUICK AUDIO</property><property name="xalign">0</property><property name="css-classes">section-title</property></object></child>
+                    <child><object class="GtkScale" id="volume"><property name="orientation">horizontal</property><property name="adjustment"><object class="GtkAdjustment"><property name="lower">0</property><property name="upper">100</property><property name="step-increment">1</property></object></property><property name="draw-value">true</property><property name="value-pos">right</property></object></child>
+                    <child><object class="GtkButton" id="mute"><property name="label">Toggle mute</property><property name="css-classes">action-button</property></object></child>
+                  </object></child>
+                </object>
+              </property></object>
+            </child>
+            <child>
+              <object class="GtkStackPage"><property name="name">system</property><property name="child">
+                <object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">16</property><property name="css-classes">content-page</property>
+                  <child><object class="GtkLabel"><property name="label">System</property><property name="xalign">0</property><property name="css-classes">page-title</property></object></child>
+                  <child><object class="GtkLabel"><property name="label">Desktop behavior, performance and maintenance</property><property name="xalign">0</property><property name="css-classes">page-subtitle</property></object></child>
+                  <child><object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">10</property><property name="css-classes">section-card</property>
+                    <child><object class="GtkLabel"><property name="label">DESKTOP MODES</property><property name="xalign">0</property><property name="css-classes">section-title</property></object></child>
+                    <child><object class="GtkButton" id="game_mode"><property name="label">󰊴  Toggle game mode</property><property name="css-classes">action-button featured</property></object></child>
+                    <child><object class="GtkButton" id="night_mode"><property name="label">󰖔  Toggle night mode</property><property name="css-classes">action-button</property></object></child>
+                    <child><object class="GtkButton" id="console_mode"><property name="label">󰐥  Enter Steam console mode</property><property name="css-classes">action-button</property></object></child>
+                  </object></child>
+                  <child><object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">10</property><property name="css-classes">section-card</property>
+                    <child><object class="GtkLabel"><property name="label">MAINTENANCE</property><property name="xalign">0</property><property name="css-classes">section-title</property></object></child>
+                    <child><object class="GtkButton" id="check_updates"><property name="label">Check for SuperMachine updates</property><property name="css-classes">action-button</property></object></child>
+                    <child><object class="GtkButton" id="reload_openbox"><property name="label">Reload Openbox configuration</property><property name="css-classes">action-button</property></object></child>
+                    <child><object class="GtkButton" id="edit_settings"><property name="label">󰨞  Edit this settings application</property><property name="css-classes">action-button</property></object></child>
+                  </object></child>
+                </object>
+              </property></object>
+            </child>
+            <child>
+              <object class="GtkStackPage"><property name="name">about</property><property name="child">
+                <object class="GtkBox"><property name="orientation">vertical</property><property name="spacing">16</property><property name="css-classes">content-page</property>
+                  <child><object class="GtkLabel"><property name="label">About this machine</property><property name="xalign">0</property><property name="wrap">true</property><property name="css-classes">page-title</property></object></child>
+                  <child><object class="GtkLabel" id="system_info"><property name="label">Loading…</property><property name="xalign">0</property><property name="yalign">0</property><property name="selectable">true</property><property name="wrap">true</property><property name="css-classes">system-info section-card</property></object></child>
+                </object>
+              </property></object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+</interface>

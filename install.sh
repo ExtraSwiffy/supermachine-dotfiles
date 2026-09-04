@@ -94,6 +94,7 @@ echo "Making scripts executable..."
 chmod +x ~/.config/eww/scripts/*.sh
 chmod +x ~/.config/openbox/*.sh
 chmod +x ~/.config/polybar/*.sh
+chmod +x ~/.config/supermachine-settings/*.sh ~/.config/supermachine-settings/*.py
 if [ -d ~/.local/bin ]; then
     chmod +x ~/.local/bin/* 2>/dev/null || true
 fi

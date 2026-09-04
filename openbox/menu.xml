@@ -181,7 +181,7 @@
 
   <item label="Open SuperMachine Settings">
     <action name="Execute">
-      <command>~/.config/eww/scripts/toggle-settings.sh</command>
+      <command>~/.config/supermachine-settings/launch.sh</command>
     </action>
   </item>
 
@@ -227,21 +227,9 @@
     <action name="Reconfigure" />
   </item>
 
-  <item label="Reload Eww">
+  <item label="Open SuperMachine Settings">
     <action name="Execute">
-      <command>eww reload</command>
-    </action>
-  </item>
-
-  <item label="Open Sidebar">
-    <action name="Execute">
-      <command>eww open sidebar</command>
-    </action>
-  </item>
-
-  <item label="Open Control Center">
-    <action name="Execute">
-      <command>eww open controlcenter</command>
+      <command>~/.config/supermachine-settings/launch.sh</command>
     </action>
   </item>
 

@@ -194,7 +194,7 @@
       (box :orientation "v" :hexpand true
         (label :class "visual-picker-kicker" :halign "start" :text "SUPERMACHINE / THEMES")
         (label :class "visual-picker-title" :halign "start" :text "Choose your atmosphere"))
-      (button :class "visual-picker-close" :onclick "eww close themechooser" "×"))
+      (button :class "visual-picker-close" :onclick "setsid -f bash -lc 'sleep 0.2; eww close themechooser'" "×"))
     (box
       :orientation "h"
       :class "visual-picker-stage"
@@ -213,7 +213,7 @@
         (image :path THEME_PICKER_NEXT :image-width 125 :image-height 220)))
     (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme previous" "‹")
-      (button :class "visual-picker-apply" :onclick "bash -lc 'eww close themechooser >/dev/null 2>&1 || true; setsid -f ~/.config/eww/scripts/theme-selector.sh theme apply >/tmp/supermachine-theme-apply.log 2>&1'" "Apply theme")
+      (button :class "visual-picker-apply" :onclick "setsid -f bash -lc 'sleep 0.2; exec ~/.config/eww/scripts/theme-selector.sh theme apply' >/tmp/supermachine-theme-apply.log 2>&1" "Apply theme")
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme next" "›"))
     (label :class "visual-picker-hint" :text "RIGHT-DOUBLE-CLICK DESKTOP  •  ← → EXPLORE  •  ENTER THE MOOD")))
 
@@ -234,13 +234,13 @@
       (box :orientation "v" :hexpand true
         (label :class "visual-picker-kicker" :halign "start" :text "ACTIVE THEME / WALLPAPERS")
         (label :class "visual-picker-title" :halign "start" :text "Set the scene"))
-      (button :class "visual-picker-close" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper close" "×"))
+      (button :class "visual-picker-close" :onclick "setsid -f bash -lc 'sleep 0.2; eww close wallpaperchooser'" "×"))
     (box :orientation "v" :class "visual-picker-main-card wallpaper-main-card" :spacing 10 :space-evenly false :vexpand false
       (image :class "visual-picker-hero" :path WALLPAPER_PICKER_PREVIEW :image-width 650 :image-height 365)
       (label :class "visual-picker-name" :text WALLPAPER_PICKER_NAME))
     (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper previous" "‹")
-      (button :class "visual-picker-apply" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/theme-selector.sh wallpaper apply >/tmp/supermachine-wallpaper-apply.log 2>&1'" "Use wallpaper")
+      (button :class "visual-picker-apply" :onclick "setsid -f bash -lc 'sleep 0.2; exec ~/.config/eww/scripts/theme-selector.sh wallpaper apply' >/tmp/supermachine-wallpaper-apply.log 2>&1" "Use wallpaper")
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh wallpaper next" "›"))
     (label :class "visual-picker-hint" :text "LEFT-DOUBLE-CLICK DESKTOP  •  WALLPAPERS STAY INSIDE THEIR THEME")))
 
