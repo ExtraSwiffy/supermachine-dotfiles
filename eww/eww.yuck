@@ -85,6 +85,97 @@
 (defpoll THEME_PICKER_NEXT :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/snow-forest/wallpapers/snow-forest.png" "~/.config/eww/scripts/theme-selector.sh theme info next-preview")
 (defpoll WALLPAPER_PICKER_NAME :interval "250ms" :initial "current green" "~/.config/eww/scripts/theme-selector.sh wallpaper info name")
 (defpoll WALLPAPER_PICKER_PREVIEW :interval "250ms" :initial "/home/swiffy/.config/supermachine/themes/default/wallpapers/current-green.png" "~/.config/eww/scripts/theme-selector.sh wallpaper info preview")
+(defpoll FABLE_COUNTDOWN_DAYS :interval "30m" :initial "168" "~/.config/eww/scripts/fable-countdown.sh days")
+(defpoll FABLE_COUNTDOWN_LABEL :interval "30m" :initial "UNTIL EARLY ACCESS" "~/.config/eww/scripts/fable-countdown.sh label")
+(defvar CODEX_USAGE_STATE "Loading")
+(defvar CODEX_USAGE_DETAIL "Contacting Codex…")
+(defvar CODEX_USAGE_PLAN "Account")
+(defvar CODEX_USAGE_USED 0)
+(defvar CODEX_USAGE_REMAINING 100)
+(defvar CODEX_USAGE_WINDOW "Usage window")
+(defvar CODEX_USAGE_RESET "Loading…")
+(defvar CODEX_USAGE_CREDITS "—")
+(defvar CODEX_USAGE_RESETS "0")
+(defvar WORKSPACE_OSD_NUMBER 1)
+(defvar WORKSPACE_OSD_DISPLAY "01")
+(defvar WORKSPACE_OSD_DIRECTION "◆")
+
+; A modern replacement for Openbox's built-in workspace popup.
+(defwindow workspaceosd
+  :monitor 0
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :wm-ignore true
+  :geometry (geometry :x "0px" :y "70px" :width "470px" :height "126px" :anchor "top center")
+  (box :orientation "v" :class "workspace-osd" :spacing 9 :space-evenly false :hexpand true :vexpand true
+    (box :orientation "h" :class "workspace-osd-main" :spacing 14
+      (label :class "workspace-osd-number" :text WORKSPACE_OSD_DISPLAY)
+      (box :orientation "v" :class "workspace-osd-copy" :valign "center" :hexpand true :space-evenly false
+        (label :class "workspace-osd-kicker" :halign "start" :text "SUPERMACHINE")
+        (label :class "workspace-osd-title" :halign "start" :text {"WORKSPACE " + WORKSPACE_OSD_NUMBER + " OF 4"}))
+      (label :class "workspace-osd-direction" :text WORKSPACE_OSD_DIRECTION))
+    (box :orientation "h" :class "workspace-osd-rail" :spacing 7 :homogeneous true
+      (box :class {WORKSPACE_OSD_NUMBER == 1 ? "workspace-osd-step-active" : "workspace-osd-step"})
+      (box :class {WORKSPACE_OSD_NUMBER == 2 ? "workspace-osd-step-active" : "workspace-osd-step"})
+      (box :class {WORKSPACE_OSD_NUMBER == 3 ? "workspace-osd-step-active" : "workspace-osd-step"})
+      (box :class {WORKSPACE_OSD_NUMBER == 4 ? "workspace-osd-step-active" : "workspace-osd-step"}))))
+
+; Theme-exclusive countdown for the 2027 Fable reboot early-access launch.
+(defwindow fablecountdown
+  :monitor 0
+  :stacking "bg"
+  :windowtype "desktop"
+  :exclusive false
+  :focusable false
+  :wm-ignore false
+  :geometry (geometry :x "24px" :y "56px" :width "520px" :height "218px" :anchor "top left")
+  (box :orientation "v" :class "fable-countdown" :spacing 0 :space-evenly false
+    (box :orientation "h" :class "fable-countdown-heading"
+      (label :class "fable-countdown-mark" :text "✦")
+      (label :class "fable-countdown-kicker" :halign "center" :hexpand true :text "FABLE")
+      (label :class "fable-countdown-mark" :text "✦"))
+    (box :orientation "h" :class "fable-countdown-main" :spacing 14 :halign "center"
+      (label :class "fable-countdown-days" :text FABLE_COUNTDOWN_DAYS)
+      (box :orientation "v" :class "fable-countdown-copy" :valign "center" :spacing 2
+        (label :class "fable-countdown-label" :halign "start" :text FABLE_COUNTDOWN_LABEL)
+        (label :class "fable-countdown-date" :halign "start" :text "FEB 18 · 2027")
+        (label :class "fable-countdown-note" :halign "start" :text "Albion awaits you.")))
+    (box :orientation "h" :class "fable-countdown-footer"
+      (label :class "fable-countdown-rule" :text "◆")
+      (label :class "fable-countdown-footer-text" :hexpand true :text "ENDING NOT GUARANTEED")
+      (label :class "fable-countdown-rule" :text "◆"))))
+
+(defwindow codexusage
+  :monitor 0
+  :stacking "overlay"
+  :exclusive false
+  :focusable true
+  :wm-ignore true
+  :geometry (geometry :x "-12px" :y "38px" :width "360px" :height "286px" :anchor "top right")
+  (box :orientation "v" :class "codex-usage" :spacing 14 :space-evenly false
+    (box :orientation "h" :class "codex-usage-heading"
+      (label :class "codex-usage-icon" :text "󰚩")
+      (box :orientation "v" :hexpand true
+        (label :class "codex-usage-title" :halign "start" :text "CODEX USAGE")
+        (label :class "codex-usage-plan" :halign "start" :text CODEX_USAGE_PLAN))
+      (button :class "codex-usage-close" :onclick "eww close codexusage" "×"))
+    (box :orientation "v" :class "codex-usage-card" :spacing 8
+      (box :orientation "h"
+        (label :class "codex-usage-window" :halign "start" :hexpand true :text CODEX_USAGE_WINDOW)
+        (label :class "codex-usage-percent" :text {CODEX_USAGE_REMAINING + "% left"}))
+      (progress :class "codex-usage-progress" :value CODEX_USAGE_USED :orientation "h")
+      (label :class "codex-usage-reset" :halign "start" :text {"Resets " + CODEX_USAGE_RESET}))
+    (box :orientation "h" :class "codex-usage-stats" :spacing 10 :homogeneous true
+      (box :orientation "v" :class "codex-usage-stat"
+        (label :class "codex-usage-stat-value" :text CODEX_USAGE_CREDITS)
+        (label :class "codex-usage-stat-label" :text "CREDITS"))
+      (box :orientation "v" :class "codex-usage-stat"
+        (label :class "codex-usage-stat-value" :text CODEX_USAGE_RESETS)
+        (label :class "codex-usage-stat-label" :text "FULL RESETS")))
+    (box :orientation "h"
+      (label :class "codex-usage-status" :halign "start" :hexpand true :text {CODEX_USAGE_STATE + " · " + CODEX_USAGE_DETAIL})
+      (button :class "codex-usage-refresh" :onclick "~/.config/eww/scripts/codex-usage.sh refresh" "↻ Refresh"))))
 
 (defwindow themechooser
   :monitor 0
@@ -103,7 +194,7 @@
       (box :orientation "v" :hexpand true
         (label :class "visual-picker-kicker" :halign "start" :text "SUPERMACHINE / THEMES")
         (label :class "visual-picker-title" :halign "start" :text "Choose your atmosphere"))
-      (button :class "visual-picker-close" :onclick "~/.config/eww/scripts/theme-selector.sh theme close" "×"))
+      (button :class "visual-picker-close" :onclick "eww close themechooser" "×"))
     (box
       :orientation "h"
       :class "visual-picker-stage"
@@ -122,7 +213,7 @@
         (image :path THEME_PICKER_NEXT :image-width 125 :image-height 220)))
     (box :orientation "h" :halign "center" :valign "center" :vexpand false :spacing 16
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme previous" "‹")
-      (button :class "visual-picker-apply" :onclick "bash -lc 'setsid -f ~/.config/eww/scripts/theme-selector.sh theme apply >/tmp/supermachine-theme-apply.log 2>&1'" "Apply theme")
+      (button :class "visual-picker-apply" :onclick "bash -lc 'eww close themechooser >/dev/null 2>&1 || true; setsid -f ~/.config/eww/scripts/theme-selector.sh theme apply >/tmp/supermachine-theme-apply.log 2>&1'" "Apply theme")
       (button :class "visual-picker-arrow" :onclick "~/.config/eww/scripts/theme-selector.sh theme next" "›"))
     (label :class "visual-picker-hint" :text "RIGHT-DOUBLE-CLICK DESKTOP  •  ← → EXPLORE  •  ENTER THE MOOD")))
 

@@ -128,7 +128,8 @@
     <name>desktop 2</name>
     -->
     </names>
-    <popupTime>875</popupTime>
+    <!-- The workspace-osd helper provides the themed indicator. -->
+    <popupTime>0</popupTime>
     <!-- The number of milliseconds to show the popup for when switching
        desktops.  Set this to 0 to disable the popup. -->
   </desktops>
@@ -739,8 +740,8 @@
       </mousebind>
     </context>
     <context name="Root">
-      <!-- Visual desktop pickers. Shift+right-click keeps the classic root
-           menu available while right-double-click stays unambiguous. -->
+      <!-- Visual desktop pickers. Middle-click opens the classic root menu
+           while right-double-click stays unambiguous. -->
       <mousebind button="Right" action="DoubleClick">
         <action name="Execute">
           <command>bash -lc '~/.config/eww/scripts/theme-selector.sh theme open'</command>
@@ -753,7 +754,7 @@
       </mousebind>
       <mousebind button="Middle" action="Press">
         <action name="ShowMenu">
-          <menu>client-list-combined-menu</menu>
+          <menu>root-menu</menu>
         </action>
       </mousebind>
       <mousebind button="S-Right" action="Press">

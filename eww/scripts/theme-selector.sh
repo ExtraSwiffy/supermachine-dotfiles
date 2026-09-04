@@ -10,8 +10,9 @@ state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/supermachine"
 theme_state="$state_dir/active-theme"
 theme_index="$state_dir/theme-picker-index"
 wallpaper_index="$state_dir/wallpaper-picker-index"
+wallpaper_preview_dir="${XDG_CACHE_HOME:-$HOME/.cache}/supermachine/wallpaper-previews"
 
-mkdir -p "$state_dir"
+mkdir -p "$state_dir" "$wallpaper_preview_dir"
 mapfile -t themes < <(find "$theme_root" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
 [ "${#themes[@]}" -gt 0 ] || exit 1
 
@@ -34,6 +35,25 @@ select_active_theme() {
   printf '0\n' > "$theme_index"
 }
 
+select_active_wallpaper() {
+  local slug settings_file active active_real candidate_real index
+  slug="$(cat "$theme_state" 2>/dev/null || echo default)"
+  [ -d "$theme_root/$slug" ] || slug=default
+  settings_file="$config_home/supermachine/settings.conf"
+  active="$(sed -n 's/^SUPERMACHINE_WALLPAPER="\([^"]*\)"$/\1/p' "$settings_file" 2>/dev/null | head -n 1)"
+  active_real="$(readlink -f "$active" 2>/dev/null || true)"
+  mapfile -t wallpapers < <(find "$theme_root/$slug/wallpapers" -maxdepth 1 -type f -iname '*.png' | sort)
+
+  for index in "${!wallpapers[@]}"; do
+    candidate_real="$(readlink -f "${wallpapers[index]}" 2>/dev/null || true)"
+    if [ -n "$active_real" ] && [ "$candidate_real" = "$active_real" ]; then
+      printf '%s\n' "$index" > "$wallpaper_index"
+      return 0
+    fi
+  done
+  printf '0\n' > "$wallpaper_index"
+}
+
 ensure_eww() {
   local attempt
   if ! eww ping >/dev/null 2>&1; then
@@ -51,6 +71,10 @@ ensure_eww() {
 close_window() {
   local window="$1" attempt
   eww close "$window" >/dev/null 2>&1 || true
+  # An SCSS hot-reload can orphan the client that originally opened a picker:
+  # the daemon then reports no active window even though its surface remains.
+  # End only that exact picker client so the stale surface cannot survive.
+  pkill -f "^eww open ${window}$" >/dev/null 2>&1 || true
   for attempt in {1..20}; do
     if ! eww active-windows 2>/dev/null | grep -q "^${window}:"; then
       return 0
@@ -58,6 +82,20 @@ close_window() {
     sleep 0.05
   done
   return 1
+}
+
+rounded_wallpaper_preview() {
+  local slug="$1" source="$2" base output tmp
+  base="${source##*/}"
+  output="$wallpaper_preview_dir/${slug}-${base%.png}.png"
+  if [ ! -f "$output" ] || [ "$source" -nt "$output" ]; then
+    tmp="$(mktemp "$wallpaper_preview_dir/.rounded.XXXXXX.png")"
+    magick "$source" -auto-orient -resize '650x365^' -gravity center -extent 650x365 \
+      \( -size 650x365 xc:none -fill white -draw 'roundrectangle 0,0 649,364 24,24' \) \
+      -alpha off -compose CopyOpacity -composite -strip "$tmp"
+    mv "$tmp" "$output"
+  fi
+  printf '%s\n' "$output"
 }
 
 theme_info() {
@@ -98,6 +136,14 @@ set_scss_var() {
 
 apply_theme() {
   local index slug conf scss scss_work polybar wallpaper
+  # Eww may briefly replay a button command while hot-reloading SCSS. Allow
+  # only one theme application to mutate the stylesheet at a time.
+  exec 9>"$state_dir/theme-apply.lock"
+  if ! flock -n 9; then
+    eww close themechooser >/dev/null 2>&1 || true
+    return 0
+  fi
+
   index="$(read_index "$theme_index" "${#themes[@]}")"
   slug="${themes[index]}"
   conf="$theme_root/$slug/theme.conf"
@@ -108,7 +154,7 @@ apply_theme() {
 
   # Close first: changing SCSS while this window is open makes Eww hot-reload
   # and resurrect the chooser before the old apply sequence can close it.
-  close_window themechooser
+  close_window themechooser || true
 
   scss_work="$(mktemp)"
   cp "$scss" "$scss_work"
@@ -146,6 +192,11 @@ apply_theme() {
   # SCSS changes make Eww hot-reload. Close once more after that reload so the
   # chooser cannot be restored from its pre-reload window state.
   close_window themechooser || true
+  # Do not let persistent Eww clients (notably the Fable countdown opener)
+  # inherit this descriptor and hold the apply lock after this script exits.
+  flock -u 9
+  exec 9>&-
+  "$config_home/eww/scripts/fable-countdown.sh" sync || true
   notify-send "Theme applied" "$THEME_NAME" 2>/dev/null || true
 }
 
@@ -161,7 +212,8 @@ wallpaper_info() {
       name="${name%.png}"
       printf '%s\n' "${name//-/ }"
       ;;
-    preview) printf '%s\n' "${wallpapers[index]}" ;;
+    preview) rounded_wallpaper_preview "$slug" "${wallpapers[index]}" ;;
+    source) printf '%s\n' "${wallpapers[index]}" ;;
   esac
 }
 
@@ -183,7 +235,7 @@ case "$mode:$action" in
   theme:apply) apply_theme ;;
   wallpaper:open)
     ensure_eww
-    printf '0\n' > "$wallpaper_index"
+    select_active_wallpaper
     close_window themechooser || true
     close_window wallpaperchooser || true
     eww open wallpaperchooser
@@ -198,7 +250,7 @@ case "$mode:$action" in
   wallpaper:info) wallpaper_info ;;
   wallpaper:close) close_window wallpaperchooser ;;
   wallpaper:apply)
-    selected="$($0 wallpaper info preview)"
+    selected="$($0 wallpaper info source)"
     # Hide the chooser before ImageMagick builds the multi-monitor wallpaper;
     # the desktop should respond to the click immediately.
     close_window wallpaperchooser || true

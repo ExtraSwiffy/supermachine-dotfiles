@@ -71,6 +71,9 @@ else
   set_theme_value "window.active.border.color" "$border"
 fi
 set_theme_value "window.active.title.separator.color" "$accent"
+set_theme_value "window.inactive.border.color" "#16191D"
+set_theme_value "window.inactive.title.separator.color" "#16191D"
+set_theme_value "window.inactive.client.color" "#16191D"
 set_theme_value "window.active.button.*.image.color" "$accent"
 set_theme_value "window.active.button.hover.image.color" "#FFFFFF"
 set_theme_value "window.active.button.pressed.bg.color" "$accent"

@@ -47,14 +47,14 @@ deploy() {
 restart_desktop() {
   local tiler_pids
   systemctl --user import-environment DISPLAY XAUTHORITY
-  systemctl --user stop supermachine-polybar.service supermachine-tiler.service >/dev/null 2>&1 || true
+  systemctl --user stop supermachine-polybar.service supermachine-tiler.service supermachine-workspace-osd.service supermachine-fable-visibility.service >/dev/null 2>&1 || true
   pkill -x polybar >/dev/null 2>&1 || true
   tiler_pids="$(pgrep -f "^bash $config_home/openbox/smart-place.sh$" || true)"
   [ -z "$tiler_pids" ] || kill $tiler_pids
   while ! flock -n /tmp/supermachine-smart-place.lock true; do
     sleep 0.1
   done
-  systemctl --user start supermachine-polybar.service supermachine-tiler.service
+  systemctl --user start supermachine-polybar.service supermachine-tiler.service supermachine-workspace-osd.service supermachine-fable-visibility.service
   openbox --reconfigure >/dev/null 2>&1 || true
   echo "SuperMachine desktop helpers restarted."
 }

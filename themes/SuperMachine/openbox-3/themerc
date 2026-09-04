@@ -10,6 +10,9 @@ padding.height: 0
 padding.width: 0
 window.active.border.color: #8AADF4
 window.active.title.separator.color: #8AADF4
+window.inactive.border.color: #16191D
+window.inactive.title.separator.color: #16191D
+window.inactive.client.color: #16191D
 window.active.button.*.image.color: #8AADF4
 window.active.button.hover.image.color: #FFFFFF
 window.active.button.pressed.bg.color: #8AADF4

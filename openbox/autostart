@@ -19,4 +19,5 @@ fi
 # Import the X session into the user service manager, then let it supervise
 # the long-running desktop helpers.
 systemctl --user import-environment DISPLAY XAUTHORITY
-systemctl --user restart supermachine-polybar.service supermachine-tiler.service
+systemctl --user restart supermachine-polybar.service supermachine-tiler.service supermachine-workspace-osd.service supermachine-fable-visibility.service
+~/.config/eww/scripts/fable-countdown.sh sync &

@@ -1,0 +1,12 @@
+[Unit]
+Description=SuperMachine workspace change indicator
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/eww/scripts/workspace-osd.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
