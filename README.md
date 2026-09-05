@@ -1,5 +1,41 @@
 # SuperMachine Dotfiles
 
+> SuperMachine 2.0 is being developed in [`hyprland-super`](hyprland-super/).
+> The existing Openbox/Eww generation remains available on this branch while
+> the new Hyprland and Quickshell desktop is developed and tested.
+
+## Hyprland development generation
+
+The new desktop currently includes only a portable Hyprland Lua configuration
+and an original Quickshell shell skeleton with a screen frame, left rail, and
+expanding top-edge menu. Application choices such as the terminal, launcher,
+file manager, notifications, wallpaper, and lock screen are intentionally not
+part of the core yet.
+
+Its standalone two-stage installation guide is in
+[`hyprland-super/README.md`](hyprland-super/README.md).
+
+Install it from a local clone with:
+
+```bash
+cd hyprland-super
+./superbase.sh
+```
+
+For development without installing packages or replacing the running shell:
+
+```bash
+cd hyprland-super
+./check.sh
+./deploy.sh
+qs -p ./config/quickshell/supermachine
+```
+
+The deploy script preserves an existing `~/.config/hypr/monitors.lua`, keeping
+machine-specific display geometry out of the portable dotfiles. During the
+migration, it is safest to test the custom shell from a TTY or after stopping
+Caelestia so the two shells do not overlap.
+
 A simple, minimal Openbox desktop for a fresh Arch Linux installation. It
 combines keyboard-friendly semi-tiling with a normal floating desktop.
 
