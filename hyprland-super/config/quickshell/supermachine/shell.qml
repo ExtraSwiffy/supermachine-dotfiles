@@ -122,6 +122,14 @@ ShellRoot {
             ShellSettings.setLeavesEnabled(value);
         }
 
+        function setSnow(value: bool) {
+            ShellSettings.setSnowEnabled(value);
+        }
+
+        function setBats(value: bool) {
+            ShellSettings.setBatsEnabled(value);
+        }
+
         function setRainSpeed(value: real) {
             ShellSettings.setRainSpeed(value);
         }
@@ -130,8 +138,16 @@ ShellRoot {
             ShellSettings.setLeafSpeed(value);
         }
 
+        function setSnowSpeed(value: real) {
+            ShellSettings.setSnowSpeed(value);
+        }
+
+        function setBatSpeed(value: real) {
+            ShellSettings.setBatSpeed(value);
+        }
+
         function status(): string {
-            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}`;
+            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:snow=${ShellSettings.snowEnabled}@${ShellSettings.snowSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}:bats=${ShellSettings.batsEnabled}@${ShellSettings.batSpeed}`;
         }
     }
 

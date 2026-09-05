@@ -12,7 +12,7 @@ PanelWindow {
     readonly property bool centerOpen: ControlCenterState.open && ControlCenterState.screenName === monitor?.name
     readonly property var sections: [
         { key: "appearance", icon: "✦", name: "Appearance", detail: "Badge & shell" },
-        { key: "effects", icon: "☂", name: "Effects", detail: "Rain & falling leaves" },
+        { key: "effects", icon: "☂", name: "Effects", detail: "Weather & atmosphere" },
         { key: "network", icon: "⌁", name: "Network", detail: "Wi-Fi & connections" },
         { key: "power", icon: "ϟ", name: "Power", detail: "Profiles & battery" },
         { key: "system", icon: "◉", name: "System", detail: "Hardware & software" }
@@ -218,7 +218,9 @@ PanelWindow {
                         Repeater {
                             model: ControlCenterState.section === "effects" ? [
                                 { key: "rain", title: "Rain drops", detail: "Fine glassy rain with varied speed", enabled: ShellSettings.rainEnabled },
-                                { key: "leaves", title: "Falling leaves", detail: "Slow drifting and rotating leaves", enabled: ShellSettings.leavesEnabled }
+                                { key: "snow", title: "Snow", detail: "Soft white flakes with gentle drift", enabled: ShellSettings.snowEnabled },
+                                { key: "leaves", title: "Falling leaves", detail: "Slow drifting and rotating leaves", enabled: ShellSettings.leavesEnabled },
+                                { key: "bats", title: "Bat flight", detail: "A sparse Halloween flight across the sky", enabled: ShellSettings.batsEnabled }
                             ] : []
                             delegate: Rectangle {
                                 id: effectCard
@@ -243,9 +245,16 @@ PanelWindow {
                                     }
                                     MouseArea {
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                        onClicked: effectCard.modelData.key === "rain"
-                                            ? ShellSettings.setRainEnabled(!ShellSettings.rainEnabled)
-                                            : ShellSettings.setLeavesEnabled(!ShellSettings.leavesEnabled)
+                                        onClicked: {
+                                            if (effectCard.modelData.key === "rain")
+                                                ShellSettings.setRainEnabled(!ShellSettings.rainEnabled);
+                                            else if (effectCard.modelData.key === "snow")
+                                                ShellSettings.setSnowEnabled(!ShellSettings.snowEnabled);
+                                            else if (effectCard.modelData.key === "leaves")
+                                                ShellSettings.setLeavesEnabled(!ShellSettings.leavesEnabled);
+                                            else
+                                                ShellSettings.setBatsEnabled(!ShellSettings.batsEnabled);
+                                        }
                                     }
                                 }
                             }
@@ -280,7 +289,9 @@ PanelWindow {
                             Repeater {
                                 model: [
                                     { key: "rain", name: "Rain drop speed", value: ShellSettings.rainSpeed },
-                                    { key: "leaves", name: "Leaf fall speed", value: ShellSettings.leafSpeed }
+                                    { key: "snow", name: "Snow fall speed", value: ShellSettings.snowSpeed },
+                                    { key: "leaves", name: "Leaf fall speed", value: ShellSettings.leafSpeed },
+                                    { key: "bats", name: "Bat flight speed", value: ShellSettings.batSpeed }
                                 ]
                                 delegate: Column {
                                     id: speedControl
@@ -318,8 +329,12 @@ PanelWindow {
                                                 const value = Math.round((0.5 + 1.5 * position / width) * 10) / 10;
                                                 if (speedControl.modelData.key === "rain")
                                                     ShellSettings.setRainSpeed(value);
-                                                else
+                                                else if (speedControl.modelData.key === "snow")
+                                                    ShellSettings.setSnowSpeed(value);
+                                                else if (speedControl.modelData.key === "leaves")
                                                     ShellSettings.setLeafSpeed(value);
+                                                else
+                                                    ShellSettings.setBatSpeed(value);
                                             }
                                             onPressed: mouse => applyAt(mouse.x)
                                             onPositionChanged: mouse => { if (pressed) applyAt(mouse.x); }

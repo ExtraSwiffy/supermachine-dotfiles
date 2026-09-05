@@ -31,7 +31,17 @@ QtObject {
         { name: "Crystal Cavern", source: Qt.resolvedUrl("assets/wallpapers/crystal-cavern.webp") },
         { name: "Golden Savanna", source: Qt.resolvedUrl("assets/wallpapers/golden-savanna.webp") },
         { name: "Storm Cliffs", source: Qt.resolvedUrl("assets/wallpapers/storm-cliffs.webp") },
-        { name: "Pastel Mushrooms", source: Qt.resolvedUrl("assets/wallpapers/pastel-mushrooms.webp") }
+        { name: "Pastel Mushrooms", source: Qt.resolvedUrl("assets/wallpapers/pastel-mushrooms.webp") },
+        { name: "Snowy Cabin River", source: Qt.resolvedUrl("assets/wallpapers/snowy-cabin-river.webp") },
+        { name: "Winter Covered Bridge", source: Qt.resolvedUrl("assets/wallpapers/winter-covered-bridge.webp") },
+        { name: "Frozen Aurora Lake", source: Qt.resolvedUrl("assets/wallpapers/frozen-aurora-lake.webp") },
+        { name: "Christmas Village", source: Qt.resolvedUrl("assets/wallpapers/christmas-village.webp") },
+        { name: "Christmas Forest Cabin", source: Qt.resolvedUrl("assets/wallpapers/christmas-forest-cabin.webp") },
+        { name: "Camp Lake Jason", source: Qt.resolvedUrl("assets/wallpapers/camp-lake-jason.webp") },
+        { name: "Halloween Street Michael", source: Qt.resolvedUrl("assets/wallpapers/halloween-street-michael.webp") },
+        { name: "Boiler Dream Freddy", source: Qt.resolvedUrl("assets/wallpapers/boiler-dream-freddy.webp") },
+        { name: "Enchanted Pumpkin Forest", source: Qt.resolvedUrl("assets/wallpapers/enchanted-pumpkin-forest.webp") },
+        { name: "Moonlit Bat Cemetery", source: Qt.resolvedUrl("assets/wallpapers/moonlit-bat-cemetery.webp") }
     ]
 
     readonly property url selectedSource: wallpapers.length > selectedIndex ? wallpapers[selectedIndex].source : ""

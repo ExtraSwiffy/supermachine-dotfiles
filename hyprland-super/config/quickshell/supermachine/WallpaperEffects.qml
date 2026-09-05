@@ -48,6 +48,45 @@ PanelWindow {
 
     Item {
         anchors.fill: parent
+        visible: ShellSettings.snowEnabled
+
+        Repeater {
+            model: 64
+            Item {
+                id: flake
+                required property int index
+                property real baseX: root.spread(index, 21, root.width)
+                x: baseX
+                y: -40 - root.spread(index, 25, root.height)
+                width: 5 + index % 5 * 1.5
+                height: width
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: width / 2
+                    color: "#ffffff"
+                    opacity: 0.48 + (flake.index % 4) * 0.12
+                }
+
+                NumberAnimation on y {
+                    running: ShellSettings.snowEnabled
+                    loops: Animation.Infinite
+                    from: -60 - root.spread(index, 19, root.height)
+                    to: root.height + 60
+                    duration: (5200 + (index % 8) * 430) / ShellSettings.snowSpeed
+                }
+                SequentialAnimation on x {
+                    running: ShellSettings.snowEnabled
+                    loops: Animation.Infinite
+                    NumberAnimation { from: flake.baseX - 18; to: flake.baseX + 18; duration: (1900 + flake.index % 6 * 150) / ShellSettings.snowSpeed; easing.type: Easing.InOutSine }
+                    NumberAnimation { from: flake.baseX + 18; to: flake.baseX - 18; duration: (1900 + flake.index % 6 * 150) / ShellSettings.snowSpeed; easing.type: Easing.InOutSine }
+                }
+            }
+        }
+    }
+
+    Item {
+        anchors.fill: parent
         visible: ShellSettings.leavesEnabled
 
         Repeater {
@@ -90,6 +129,45 @@ PanelWindow {
                     from: 0
                     to: leaf.index % 2 ? 360 : -360
                     duration: (4200 + leaf.index % 6 * 360) / ShellSettings.leafSpeed
+                }
+            }
+        }
+    }
+
+    Item {
+        anchors.fill: parent
+        visible: ShellSettings.batsEnabled
+
+        Repeater {
+            model: 11
+            Item {
+                id: bat
+                required property int index
+                property real baseY: 70 + root.spread(index, 37, Math.max(1, root.height * 0.62))
+                x: -90 - root.spread(index, 31, root.width)
+                y: baseY
+                width: 34
+                height: 24
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "🦇"
+                    font.pixelSize: 25
+                    opacity: 0.68 + (bat.index % 3) * 0.1
+                }
+
+                NumberAnimation on x {
+                    running: ShellSettings.batsEnabled
+                    loops: Animation.Infinite
+                    from: -90 - root.spread(index, 31, root.width)
+                    to: root.width + 90
+                    duration: (9000 + (index % 6) * 850) / ShellSettings.batSpeed
+                }
+                SequentialAnimation on y {
+                    running: ShellSettings.batsEnabled
+                    loops: Animation.Infinite
+                    NumberAnimation { from: bat.baseY - 14; to: bat.baseY + 14; duration: (1050 + bat.index % 4 * 130) / ShellSettings.batSpeed; easing.type: Easing.InOutSine }
+                    NumberAnimation { from: bat.baseY + 14; to: bat.baseY - 14; duration: (1050 + bat.index % 4 * 130) / ShellSettings.batSpeed; easing.type: Easing.InOutSine }
                 }
             }
         }

@@ -13,9 +13,13 @@ QtObject {
     property string colorMode: "dark"
     property bool rainEnabled: true
     property bool leavesEnabled: true
+    property bool snowEnabled: false
+    property bool batsEnabled: false
     property string leafColor: "#83ad62"
     property real rainSpeed: 1.0
     property real leafSpeed: 1.0
+    property real snowSpeed: 1.0
+    property real batSpeed: 1.0
 
     readonly property var badgePresets: [
         { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
@@ -67,6 +71,10 @@ QtObject {
             leafColor = saved.leafColor ?? leafColor;
             rainSpeed = saved.rainSpeed ?? rainSpeed;
             leafSpeed = saved.leafSpeed ?? leafSpeed;
+            snowEnabled = saved.snowEnabled ?? snowEnabled;
+            batsEnabled = saved.batsEnabled ?? batsEnabled;
+            snowSpeed = saved.snowSpeed ?? snowSpeed;
+            batSpeed = saved.batSpeed ?? batSpeed;
         } catch (error) {
             console.warn(`Could not load SuperMachine settings: ${error}`);
         }
@@ -83,7 +91,11 @@ QtObject {
             leavesEnabled,
             leafColor,
             rainSpeed,
-            leafSpeed
+            leafSpeed,
+            snowEnabled,
+            batsEnabled,
+            snowSpeed,
+            batSpeed
         }, null, 2));
     }
 
@@ -134,6 +146,16 @@ QtObject {
         save();
     }
 
+    function setSnowEnabled(value) {
+        snowEnabled = value;
+        save();
+    }
+
+    function setBatsEnabled(value) {
+        batsEnabled = value;
+        save();
+    }
+
     function setLeafColor(value) {
         leafColor = value;
         save();
@@ -146,6 +168,16 @@ QtObject {
 
     function setLeafSpeed(value) {
         leafSpeed = Math.max(0.5, Math.min(2.0, value));
+        save();
+    }
+
+    function setSnowSpeed(value) {
+        snowSpeed = Math.max(0.5, Math.min(2.0, value));
+        save();
+    }
+
+    function setBatSpeed(value) {
+        batSpeed = Math.max(0.5, Math.min(2.0, value));
         save();
     }
 
