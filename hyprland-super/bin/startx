@@ -24,6 +24,7 @@ while :; do
 
     Hyprland --config "${HOME}/.config/hypr/hyprland.lua" >> "$hypr_log" 2>&1
     exit_code=$?
+    systemctl --user stop supermachine-shell.service >/dev/null 2>&1 || true
     printf '[%s] Hyprland exited with code %s\n' "$(date --iso-8601=seconds)" "$exit_code" >> "$hypr_log"
     [ -e "$console_state" ] || break
 done

@@ -28,8 +28,19 @@ enter_mode() {
     printf '%s\n' console > "$state_file"
     printf '\n[%s] Console Mode requested from Hyprland\n' "$(date --iso-8601=seconds)" >> "$log_file"
     notify "Switching to the Steam console session."
+    # Run outside Quickshell's service cgroup so stopping the shell cannot kill
+    # this handoff before Hyprland has accepted its exit request.
+    systemd-run --user --collect --quiet /bin/sh -c 'sleep 2; systemctl --user stop supermachine-shell.service' >> "$log_file" 2>&1 || true
     sleep 0.5
-    hyprctl dispatch exit >/dev/null 2>&1 || true
+    if hyprctl eval 'hl.dispatch(hl.dsp.exit())' >> "$log_file" 2>&1; then
+        printf '[%s] Hyprland accepted the session-exit request\n' "$(date --iso-8601=seconds)" >> "$log_file"
+    else
+        exit_code=$?
+        printf '[%s] ERROR: Hyprland rejected the session-exit request (code %s)\n' "$(date --iso-8601=seconds)" "$exit_code" >> "$log_file"
+        rm -f "$state_file"
+        notify "Console Mode could not close Hyprland. The saved mode was rolled back; check the console log."
+        exit "$exit_code"
+    fi
 }
 
 return_mode() {
