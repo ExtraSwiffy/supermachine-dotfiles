@@ -59,17 +59,19 @@ PanelWindow {
                 strokeColor: "transparent"
                 startX: 0; startY: 0
                 PathLine { x: deckShape.width; y: 0 }
+                PathLine { x: deckShape.width; y: Theme.frameWidth }
                 PathCubic {
-                    x: deckShape.width - 27; y: 27
-                    control1X: deckShape.width - 15; control1Y: 0
-                    control2X: deckShape.width - 27; control2Y: 12
+                    x: deckShape.width - 27; y: Theme.frameWidth + 27
+                    control1X: deckShape.width - 15; control1Y: Theme.frameWidth
+                    control2X: deckShape.width - 27; control2Y: Theme.frameWidth + 12
                 }
-                PathLine { x: deckShape.width - 27; y: deckShape.height - 27 }
+                PathLine { x: deckShape.width - 27; y: deckShape.height - Theme.frameWidth - 27 }
                 PathCubic {
-                    x: deckShape.width; y: deckShape.height
-                    control1X: deckShape.width - 27; control1Y: deckShape.height - 12
-                    control2X: deckShape.width - 15; control2Y: deckShape.height
+                    x: deckShape.width; y: deckShape.height - Theme.frameWidth
+                    control1X: deckShape.width - 27; control1Y: deckShape.height - Theme.frameWidth - 12
+                    control2X: deckShape.width - 15; control2Y: deckShape.height - Theme.frameWidth
                 }
+                PathLine { x: deckShape.width; y: deckShape.height }
                 PathLine { x: 0; y: deckShape.height }
                 PathLine { x: 0; y: 0 }
             }
@@ -104,7 +106,7 @@ PanelWindow {
                     readonly property bool selected: index === BadgeDeckState.selectedIndex
                     width: root.cardSize
                     height: root.cardSize
-                    x: (cardStage.width - width) / 2
+                    x: (cardStage.width - width) / 2 - 8
                     y: (cardStage.height - height) / 2 + distance * root.cardStep
                     scale: selected ? 1 : Math.max(0.82, 0.94 - Math.abs(distance) * 0.018)
                     opacity: selected ? 1 : Math.max(0.54, 0.9 - Math.abs(distance) * 0.055)
@@ -162,14 +164,6 @@ PanelWindow {
                     }
                 }
             }
-        }
-
-        Text {
-            anchors { horizontalCenter: cardStage.horizontalCenter; bottom: parent.bottom; bottomMargin: 18 }
-            text: "↑  ↓  SELECT   •   ESC CLOSE"
-            color: Theme.mutedInk
-            font.pixelSize: 8
-            font.letterSpacing: 0.8
         }
 
         Keys.onEscapePressed: BadgeDeckState.close()
