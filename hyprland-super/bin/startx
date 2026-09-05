@@ -1,0 +1,8 @@
+#!/bin/sh
+# SuperMachine keeps the familiar startx command while launching native Wayland.
+if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${DISPLAY:-}" ]; then
+    printf '%s\n' "startx: a graphical session is already active." >&2
+    exit 1
+fi
+
+exec Hyprland --config "${HOME}/.config/hypr/hyprland.lua"

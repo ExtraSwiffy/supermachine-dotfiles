@@ -4,7 +4,8 @@ import QtQuick
 QtObject {
     property bool open: false
     property string screenName: ""
-    property int selectedIndex: 0
+    // Redwood Creek is the curated out-of-box default.
+    property int selectedIndex: 4
 
     readonly property var wallpapers: [
         { name: "Alpine Morning", source: Qt.resolvedUrl("assets/wallpapers/alpine-morning.webp") },

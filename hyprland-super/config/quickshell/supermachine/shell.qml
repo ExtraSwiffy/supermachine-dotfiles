@@ -9,6 +9,7 @@ ShellRoot {
         function toggle() {
             WallpaperState.close();
             ControlCenterState.close();
+            BadgeDeckState.close();
             LauncherState.toggle(Hyprland.focusedMonitor?.name ?? "");
         }
 
@@ -27,6 +28,7 @@ ShellRoot {
         function toggle() {
             LauncherState.close();
             ControlCenterState.close();
+            BadgeDeckState.close();
             WallpaperState.toggle(Hyprland.focusedMonitor?.name ?? "");
         }
 
@@ -53,6 +55,7 @@ ShellRoot {
         function toggle() {
             LauncherState.close();
             WallpaperState.close();
+            BadgeDeckState.close();
             ControlCenterState.toggle(Hyprland.focusedMonitor?.name ?? "");
         }
 
@@ -70,6 +73,25 @@ ShellRoot {
 
         function status(): string {
             return `${ControlCenterState.open}:${ControlCenterState.section}`;
+        }
+    }
+
+    IpcHandler {
+        target: "badges"
+
+        function toggle() {
+            LauncherState.close();
+            WallpaperState.close();
+            ControlCenterState.close();
+            BadgeDeckState.toggle(Hyprland.focusedMonitor?.name ?? "");
+        }
+
+        function close() {
+            BadgeDeckState.close();
+        }
+
+        function status(): string {
+            return `${BadgeDeckState.open}:${ShellSettings.badgeSource}`;
         }
     }
 
@@ -100,8 +122,16 @@ ShellRoot {
             ShellSettings.setLeavesEnabled(value);
         }
 
+        function setRainSpeed(value: real) {
+            ShellSettings.setRainSpeed(value);
+        }
+
+        function setLeafSpeed(value: real) {
+            ShellSettings.setLeafSpeed(value);
+        }
+
         function status(): string {
-            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}:leaves=${ShellSettings.leavesEnabled}:${ShellSettings.leafColor}`;
+            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}`;
         }
     }
 

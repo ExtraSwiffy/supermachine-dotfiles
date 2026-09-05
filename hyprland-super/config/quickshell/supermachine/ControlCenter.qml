@@ -272,205 +272,61 @@ PanelWindow {
                             }
                         }
 
-                        Rectangle {
+                        Column {
+                            visible: ControlCenterState.section === "effects"
                             width: parent.width - 28
-                            height: 132
-                            radius: 18
-                            color: Theme.searchBackground
-                            visible: ControlCenterState.section === "appearance"
-
-                            Row {
-                                anchors.fill: parent
-                                anchors.margins: 16
-                                spacing: 18
-
-                                Rectangle {
-                                    width: 88
-                                    height: 88
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    radius: 24
-                                    color: Theme.surface
-
-                                    AnimatedImage {
-                                        anchors.centerIn: parent
-                                        width: ShellSettings.badgeSize + 18
-                                        height: width
-                                        visible: ShellSettings.badgeMode === "image" && ShellSettings.badgeSource.length > 0
-                                        source: ShellSettings.badgeSource
-                                        fillMode: Image.PreserveAspectFit
-                                        asynchronous: true
-                                        playing: visible
-                                        paused: false
-                                        cache: false
-                                    }
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        visible: ShellSettings.badgeMode !== "image" || !ShellSettings.badgeSource.length
-                                        text: ShellSettings.badgeText
-                                        font.pixelSize: ShellSettings.badgeSize + 8
-                                    }
-                                }
-
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 5
-                                    Text { text: "Launcher badge"; color: Theme.ink; font.pixelSize: 16; font.weight: Font.DemiBold }
-                                    Text { text: "Shown at the top of the sidebar"; color: Theme.mutedInk; font.pixelSize: 11 }
-                                    Text {
-                                        text: ShellSettings.badgeMode === "image" ? "IMAGE / ANIMATED GIF" : "EMOJI"
-                                        color: Theme.ink
-                                        font.pixelSize: 9
-                                        font.letterSpacing: 1.2
-                                    }
-                                }
-                            }
-                        }
-
-                        Row {
-                            visible: ControlCenterState.section === "appearance"
-                            spacing: 10
+                            spacing: 14
 
                             Repeater {
-                                model: [{ key: "emoji", name: "Emoji" }, { key: "image", name: "Image / GIF" }]
-                                delegate: Rectangle {
-                                    id: modeButton
+                                model: [
+                                    { key: "rain", name: "Rain drop speed", value: ShellSettings.rainSpeed },
+                                    { key: "leaves", name: "Leaf fall speed", value: ShellSettings.leafSpeed }
+                                ]
+                                delegate: Column {
+                                    id: speedControl
                                     required property var modelData
-                                    width: 126
-                                    height: 38
-                                    radius: 12
-                                    color: ShellSettings.badgeMode === modelData.key ? Theme.ink : Theme.searchBackground
-                                    Text { anchors.centerIn: parent; text: modeButton.modelData.name; color: ShellSettings.badgeMode === modeButton.modelData.key ? Theme.surface : Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setBadgeMode(modeButton.modelData.key) }
-                                }
-                            }
-                        }
-
-                        Column {
-                            visible: ControlCenterState.section === "appearance"
-                            width: parent.width - 28
-                            spacing: 8
-
-                            Text { text: "SuperMachine badge collection"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-
-                            Flow {
-                                width: parent.width
-                                spacing: 8
-
-                                Repeater {
-                                    model: ShellSettings.badgePresets
-
-                                    delegate: Rectangle {
-                                        id: presetCard
-                                        required property var modelData
-                                        width: 92
-                                        height: 90
-                                        radius: 15
+                                    width: settingsColumn.width - 28
+                                    spacing: 7
+                                    Text {
+                                        text: `${speedControl.modelData.name}  ${speedControl.modelData.value.toFixed(1)}×`
+                                        color: Theme.ink
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                    }
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 36
+                                        radius: 12
                                         color: Theme.searchBackground
-                                        border.width: ShellSettings.badgeSource === modelData.source.toString() ? 2 : 0
-                                        border.color: Theme.ink
-
-                                        AnimatedImage {
-                                            anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
-                                            width: 54
-                                            height: 54
-                                            source: presetCard.modelData.source
-                                            fillMode: Image.PreserveAspectFit
-                                            asynchronous: true
-                                            playing: visible
-                                            paused: false
-                                            cache: false
+                                        Rectangle {
+                                            x: 9
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.width - 18
+                                            height: 4
+                                            radius: 2
+                                            color: Theme.dark ? "#445052" : "#cbd1d2"
+                                            Rectangle {
+                                                width: (speedControl.modelData.value - 0.5) / 1.5 * parent.width
+                                                height: parent.height
+                                                radius: 2
+                                                color: Theme.ink
+                                            }
                                         }
-
-                                        Text {
-                                            anchors { bottom: parent.bottom; bottomMargin: 7; horizontalCenter: parent.horizontalCenter }
-                                            text: presetCard.modelData.animated ? `${presetCard.modelData.name}  •` : presetCard.modelData.name
-                                            color: Theme.ink
-                                            font.pixelSize: 9
-                                            font.weight: Font.Medium
-                                        }
-
                                         MouseArea {
                                             anchors.fill: parent
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: ShellSettings.setBadgePreset(presetCard.modelData.source)
+                                            function applyAt(position) {
+                                                const value = Math.round((0.5 + 1.5 * position / width) * 10) / 10;
+                                                if (speedControl.modelData.key === "rain")
+                                                    ShellSettings.setRainSpeed(value);
+                                                else
+                                                    ShellSettings.setLeafSpeed(value);
+                                            }
+                                            onPressed: mouse => applyAt(mouse.x)
+                                            onPositionChanged: mouse => { if (pressed) applyAt(mouse.x); }
                                         }
                                     }
                                 }
                             }
-                        }
-
-                        Column {
-                            visible: ControlCenterState.section === "appearance"
-                            width: parent.width - 28
-                            spacing: 8
-
-                            Text { text: "Quick emoji"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-
-                            Row {
-                                spacing: 7
-                                Repeater {
-                                    model: ShellSettings.emojiPresets
-                                    delegate: Rectangle {
-                                        id: emojiCard
-                                        required property string modelData
-                                        width: 42
-                                        height: 42
-                                        radius: 12
-                                        color: ShellSettings.badgeMode === "emoji" && ShellSettings.badgeText === modelData ? Theme.ink : Theme.searchBackground
-                                        Text { anchors.centerIn: parent; text: emojiCard.modelData; font.pixelSize: 21 }
-                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setEmojiPreset(emojiCard.modelData) }
-                                    }
-                                }
-                            }
-                        }
-
-                        Column {
-                            visible: ControlCenterState.section === "appearance" && ShellSettings.badgeMode === "emoji"
-                            width: parent.width - 28
-                            spacing: 7
-                            Text { text: "Emoji or sticker character"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-                            Rectangle {
-                                width: parent.width
-                                height: 46
-                                radius: 13
-                                color: Theme.searchBackground
-                                TextInput {
-                                    id: emojiInput
-                                    anchors.fill: parent
-                                    anchors.margins: 12
-                                    text: ShellSettings.badgeText
-                                    color: Theme.ink
-                                    font.pixelSize: 19
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    onEditingFinished: ShellSettings.setBadgeText(text)
-                                }
-                            }
-                        }
-
-                        Column {
-                            visible: ControlCenterState.section === "appearance" && ShellSettings.badgeMode === "image"
-                            width: parent.width - 28
-                            spacing: 7
-                            Text { text: "Local image or animated GIF path"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-                            Rectangle {
-                                width: parent.width
-                                height: 46
-                                radius: 13
-                                color: Theme.searchBackground
-                                TextInput {
-                                    id: sourceInput
-                                    anchors.fill: parent
-                                    anchors.margins: 12
-                                    text: ShellSettings.badgeSource
-                                    color: Theme.ink
-                                    font.pixelSize: 12
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    clip: true
-                                    onEditingFinished: ShellSettings.setBadgeSource(text)
-                                }
-                            }
-                            Text { text: "Example: ~/Pictures/my-badge.gif"; color: Theme.mutedInk; font.pixelSize: 10 }
                         }
 
                         Column {
@@ -503,16 +359,6 @@ PanelWindow {
                                     onPositionChanged: mouse => { if (pressed) ShellSettings.setBadgeSize(20 + Math.round(22 * mouse.x / width)); }
                                 }
                             }
-                        }
-
-                        Rectangle {
-                            visible: ControlCenterState.section === "appearance"
-                            width: 122
-                            height: 38
-                            radius: 12
-                            color: Theme.searchBackground
-                            Text { anchors.centerIn: parent; text: "Reset badge"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.resetBadge() }
                         }
 
                         Rectangle {

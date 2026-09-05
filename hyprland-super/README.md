@@ -1,9 +1,19 @@
 # SuperMachine 2.0
 
 A minimal, from-scratch Hyprland and Quickshell desktop. Hyprland owns the
-session and window management; Quickshell currently provides only a rounded
-screen frame and a left time-and-date rail. Application choices will be added
-only when the shell needs them.
+session and window management; Quickshell provides the rounded screen frame,
+left rail, launcher, wallpaper deck, badge deck, and control center.
+
+## Shell shortcuts
+
+- `Super+Space` — application launcher
+- `Super+W` — wallpaper deck
+- `Super+B` — badge deck
+- `Super+Tab` — settings deck
+
+The first-stage deployment adds a guarded TTY1 login hook that starts Hyprland
+through `startx`. Creating `~/.config/supermachine/console-mode` skips graphical
+startup; that flag is reserved for the future Console Mode switch.
 
 ## Stage one: fresh Arch TTY
 

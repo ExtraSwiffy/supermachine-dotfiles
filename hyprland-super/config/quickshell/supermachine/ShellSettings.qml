@@ -6,14 +6,16 @@ import Quickshell.Io
 QtObject {
     id: root
 
-    property string badgeMode: "emoji"
+    property string badgeMode: "image"
     property string badgeText: "🚀"
-    property string badgeSource: ""
-    property int badgeSize: 30
-    property string colorMode: "light"
-    property bool rainEnabled: false
-    property bool leavesEnabled: false
-    property string leafColor: "#e58a45"
+    property string badgeSource: Qt.resolvedUrl("assets/badges/whitetail-deer.webp").toString()
+    property int badgeSize: 42
+    property string colorMode: "dark"
+    property bool rainEnabled: true
+    property bool leavesEnabled: true
+    property string leafColor: "#83ad62"
+    property real rainSpeed: 1.0
+    property real leafSpeed: 1.0
 
     readonly property var badgePresets: [
         { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
@@ -63,6 +65,8 @@ QtObject {
             rainEnabled = saved.rainEnabled ?? rainEnabled;
             leavesEnabled = saved.leavesEnabled ?? leavesEnabled;
             leafColor = saved.leafColor ?? leafColor;
+            rainSpeed = saved.rainSpeed ?? rainSpeed;
+            leafSpeed = saved.leafSpeed ?? leafSpeed;
         } catch (error) {
             console.warn(`Could not load SuperMachine settings: ${error}`);
         }
@@ -77,7 +81,9 @@ QtObject {
             colorMode,
             rainEnabled,
             leavesEnabled,
-            leafColor
+            leafColor,
+            rainSpeed,
+            leafSpeed
         }, null, 2));
     }
 
@@ -133,13 +139,27 @@ QtObject {
         save();
     }
 
-    function resetBadge() {
-        badgeMode = "emoji";
-        badgeText = "🚀";
-        badgeSource = "";
-        badgeSize = 30;
+    function setRainSpeed(value) {
+        rainSpeed = Math.max(0.5, Math.min(2.0, value));
         save();
     }
 
-    Component.onCompleted: load()
+    function setLeafSpeed(value) {
+        leafSpeed = Math.max(0.5, Math.min(2.0, value));
+        save();
+    }
+
+    function resetBadge() {
+        badgeMode = "image";
+        badgeText = "🚀";
+        badgeSource = Qt.resolvedUrl("assets/badges/whitetail-deer.webp").toString();
+        badgeSize = 42;
+        save();
+    }
+
+    Component.onCompleted: {
+        load();
+        // Also writes newly introduced defaults during settings migrations.
+        save();
+    }
 }

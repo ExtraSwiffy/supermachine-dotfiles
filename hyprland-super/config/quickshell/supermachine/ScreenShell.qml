@@ -123,6 +123,10 @@ Scope {
         targetScreen: root.modelData
     }
 
+    BadgeDeck {
+        targetScreen: root.modelData
+    }
+
     PanelWindow {
         screen: root.modelData
         color: "transparent"
@@ -164,6 +168,7 @@ Scope {
                 onClicked: {
                     WallpaperState.close();
                     ControlCenterState.close();
+                    BadgeDeckState.close();
                     LauncherState.toggle(root.modelData.name);
                 }
             }

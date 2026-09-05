@@ -40,7 +40,7 @@ PanelWindow {
                     loops: Animation.Infinite
                     from: -80 - root.spread(index, 2, root.height)
                     to: root.height + 100
-                    duration: 1350 + (index % 7) * 125
+                    duration: (1350 + (index % 7) * 125) / ShellSettings.rainSpeed
                 }
             }
         }
@@ -76,20 +76,20 @@ PanelWindow {
                     loops: Animation.Infinite
                     from: -80 - root.spread(index, 3, root.height)
                     to: root.height + 80
-                    duration: 6500 + (index % 8) * 520
+                    duration: (6500 + (index % 8) * 520) / ShellSettings.leafSpeed
                 }
                 SequentialAnimation on x {
                     running: ShellSettings.leavesEnabled
                     loops: Animation.Infinite
-                    NumberAnimation { from: leaf.baseX - 24; to: leaf.baseX + 24; duration: 1700 + leaf.index % 5 * 170; easing.type: Easing.InOutSine }
-                    NumberAnimation { from: leaf.baseX + 24; to: leaf.baseX - 24; duration: 1700 + leaf.index % 5 * 170; easing.type: Easing.InOutSine }
+                    NumberAnimation { from: leaf.baseX - 24; to: leaf.baseX + 24; duration: (1700 + leaf.index % 5 * 170) / ShellSettings.leafSpeed; easing.type: Easing.InOutSine }
+                    NumberAnimation { from: leaf.baseX + 24; to: leaf.baseX - 24; duration: (1700 + leaf.index % 5 * 170) / ShellSettings.leafSpeed; easing.type: Easing.InOutSine }
                 }
                 RotationAnimation on rotation {
                     running: ShellSettings.leavesEnabled
                     loops: Animation.Infinite
                     from: 0
                     to: leaf.index % 2 ? 360 : -360
-                    duration: 4200 + leaf.index % 6 * 360
+                    duration: (4200 + leaf.index % 6 * 360) / ShellSettings.leafSpeed
                 }
             }
         }

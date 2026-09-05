@@ -121,7 +121,7 @@ PanelWindow {
                     width: root.cardWidth
                     height: root.cardHeight
                     x: (cardStage.width - width) / 2 + distance * root.deckStep
-                    y: (cardStage.height - height) / 2 + Math.abs(distance) * 10
+                    y: (cardStage.height - height) / 2 + Math.abs(distance) * 4
                     scale: selected ? 1 : Math.max(0.82, 0.92 - Math.abs(distance) * 0.025)
                     opacity: selected ? 1 : Math.max(0.58, 0.88 - Math.abs(distance) * 0.08)
                     z: selected ? 100 : 50 - Math.abs(distance)
