@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+log_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/supermachine/logs"
+shell_log="${log_dir}/quickshell.log"
+mkdir -p "$log_dir"
+
+if [[ -f "$shell_log" ]] && (( $(wc -c < "$shell_log") > 2097152 )); then
+    mv "$shell_log" "${shell_log}.previous"
+fi
+
+printf '\n[%s] Starting SuperMachine Quickshell\n' "$(date --iso-8601=seconds)" >> "$shell_log"
+qs -c supermachine >> "$shell_log" 2>&1
+exit_code=$?
+printf '[%s] Quickshell exited with code %s\n' "$(date --iso-8601=seconds)" "$exit_code" >> "$shell_log"
+exit "$exit_code"

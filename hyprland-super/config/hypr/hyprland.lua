@@ -64,8 +64,7 @@ hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "smooth"
 hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "smooth", style = "slide" })
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd("qs -c supermachine -d")
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP && systemctl --user restart supermachine-shell.service")
 end)
 
 hl.bind(main_mod .. " + Return", hl.dsp.exec_cmd(terminal))

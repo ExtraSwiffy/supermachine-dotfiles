@@ -531,6 +531,27 @@ PanelWindow {
                             }
                         }
 
+                        Row {
+                            visible: ControlCenterState.section === "system"
+                            width: parent.width - 28; spacing: 10
+                            Repeater {
+                                model: [
+                                    { name: "View live shell log", action: "logs" },
+                                    { name: "Build diagnostic report", action: "report" }
+                                ]
+                                delegate: Rectangle {
+                                    id: diagnosticButton
+                                    required property var modelData
+                                    width: (settingsColumn.width - 38) / 2; height: 46; radius: 14; color: Theme.ink
+                                    Text { anchors.centerIn: parent; text: diagnosticButton.modelData.name; color: Theme.surface; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    MouseArea {
+                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        onClicked: diagnosticButton.modelData.action === "logs" ? ShellSettings.viewLogs() : ShellSettings.createDiagnosticReport()
+                                    }
+                                }
+                            }
+                        }
+
                         Rectangle {
                             visible: ControlCenterState.section === "network"
                             width: parent.width - 28

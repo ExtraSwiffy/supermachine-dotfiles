@@ -229,6 +229,15 @@ QtObject {
         Quickshell.execDetached([`${Quickshell.env("HOME")}/.local/bin/supermachine-console-mode`, "enter"]);
     }
 
+    function viewLogs() {
+        const log = `${Quickshell.env("HOME")}/.local/state/supermachine/logs/quickshell.log`;
+        Quickshell.execDetached(["foot", "-e", "tail", "-n", "250", "-F", log]);
+    }
+
+    function createDiagnosticReport() {
+        Quickshell.execDetached([`${Quickshell.env("HOME")}/.local/bin/supermachine-diagnostics`, "--open"]);
+    }
+
     function resetBadge() {
         badgeMode = "image";
         badgeText = "🚀";

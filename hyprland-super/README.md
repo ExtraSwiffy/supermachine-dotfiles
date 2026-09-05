@@ -53,3 +53,13 @@ qs -p ./config/quickshell/supermachine
 
 Use `./deploy.sh --shell-only` when previewing Quickshell without replacing the
 active Hyprland configuration.
+
+## Logs and diagnostics
+
+Persistent, size-limited session logs are stored in
+`~/.local/state/supermachine/logs/`. Quickshell runs as a user service and
+automatically restarts after unexpected failures. In `Super+Tab` → System,
+**View live shell log** follows the current shell log and **Build diagnostic
+report** creates a timestamped report under
+`~/.local/state/supermachine/reports/` with recent session, journal, graphics,
+and crash information.

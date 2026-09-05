@@ -15,6 +15,12 @@ install -m 0755 "${project_dir}/bin/supermachine-console-mode" "${HOME}/.local/b
 install -m 0755 "${project_dir}/bin/supermachine-system-info" "${HOME}/.local/bin/supermachine-system-info"
 install -m 0755 "${project_dir}/bin/steamos-session-select" "${HOME}/.local/bin/steamos-session-select"
 install -m 0755 "${project_dir}/bin/steamos-session-select" "${HOME}/.local/bin/return-to-gaming-mode"
+install -m 0755 "${project_dir}/bin/supermachine-shell" "${HOME}/.local/bin/supermachine-shell"
+install -m 0755 "${project_dir}/bin/supermachine-diagnostics" "${HOME}/.local/bin/supermachine-diagnostics"
+mkdir -p "${config_home}/systemd/user"
+install -m 0644 "${project_dir}/systemd/supermachine-shell.service" "${config_home}/systemd/user/supermachine-shell.service"
+systemctl --user daemon-reload >/dev/null 2>&1 || true
+systemctl --user enable supermachine-shell.service >/dev/null 2>&1 || true
 touch "${profile_file}"
 if grep -q 'SUPERMACHINE AUTO START' "${profile_file}"; then
     sed -i 's/ && ! -e "$HOME\/.config\/supermachine\/console-mode"//' "${profile_file}"
