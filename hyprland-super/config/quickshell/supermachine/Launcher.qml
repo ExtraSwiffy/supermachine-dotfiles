@@ -33,21 +33,26 @@ PanelWindow {
     screen: targetScreen
     color: "transparent"
     implicitWidth: Theme.launcherWidth
-    implicitHeight: launcherOpen ? Theme.launcherHeight : 1
+    implicitHeight: Theme.launcherHeight
     anchors { bottom: true }
     WlrLayershell.namespace: "supermachine-launcher"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
     WlrLayershell.keyboardFocus: launcherOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    mask: launcherOpen ? null : closedMask
 
-    Behavior on implicitHeight {
-        NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
+    Region {
+        id: closedMask
     }
 
     Item {
-        anchors.fill: parent
-        opacity: root.launcherOpen ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 180 } }
+        width: parent.width
+        height: parent.height
+        y: root.launcherOpen ? 0 : root.height
+
+        Behavior on y {
+            NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
+        }
 
         Shape {
             anchors.fill: parent
