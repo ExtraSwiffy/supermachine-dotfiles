@@ -206,6 +206,63 @@ PanelWindow {
                             }
                         }
 
+                        Repeater {
+                            model: ControlCenterState.section === "appearance" ? [
+                                { key: "frame", name: "Screen border thickness", value: ShellSettings.frameWidth, minimum: 5, maximum: 18, suffix: "px" },
+                                { key: "gap", name: "Application gap", value: ShellSettings.windowGap, minimum: 4, maximum: 30, suffix: "px" }
+                            ] : []
+                            delegate: Column {
+                                id: layoutControl
+                                required property var modelData
+                                width: settingsColumn.width - 28
+                                spacing: 7
+                                Text { text: `${layoutControl.modelData.name}  ${layoutControl.modelData.value}${layoutControl.modelData.suffix}`; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                                Rectangle {
+                                    width: parent.width; height: 36; radius: 12; color: Theme.searchBackground
+                                    Rectangle {
+                                        x: 9; anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - 18; height: 4; radius: 2
+                                        color: Theme.dark ? "#445052" : "#cbd1d2"
+                                        Rectangle {
+                                            width: (layoutControl.modelData.value - layoutControl.modelData.minimum) / (layoutControl.modelData.maximum - layoutControl.modelData.minimum) * parent.width
+                                            height: parent.height; radius: 2; color: Theme.ink
+                                        }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        function applyAt(position) {
+                                            const item = layoutControl.modelData;
+                                            const value = item.minimum + Math.round((item.maximum - item.minimum) * position / width);
+                                            if (item.key === "frame") ShellSettings.setFrameWidth(value);
+                                            else ShellSettings.setWindowGap(value);
+                                        }
+                                        onPressed: mouse => applyAt(mouse.x)
+                                        onPositionChanged: mouse => { if (pressed) applyAt(mouse.x); }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28; spacing: 9
+                            Text { text: "Application outline color"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                            Row {
+                                spacing: 10
+                                Repeater {
+                                    model: ["#86d9d9", "#8ab4f8", "#b69df8", "#f19bb4", "#efb66f", "#9bc987", "#f2f4f3"]
+                                    delegate: Rectangle {
+                                        id: borderColorButton
+                                        required property string modelData
+                                        width: 46; height: 46; radius: 15; color: modelData
+                                        border.width: ShellSettings.windowBorderColor === modelData ? 3 : 0
+                                        border.color: Theme.ink
+                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setWindowBorderColor(borderColorButton.modelData) }
+                                    }
+                                }
+                            }
+                        }
+
                         Text {
                             width: parent.width - 28
                             visible: ControlCenterState.section === "effects"
@@ -376,8 +433,106 @@ PanelWindow {
                             }
                         }
 
+                        Text {
+                            visible: ControlCenterState.section === "power"
+                            width: parent.width - 28
+                            text: "Choose how aggressively the system uses power. The selected profile persists across restarts."
+                            color: Theme.mutedInk; font.pixelSize: 12; wrapMode: Text.WordWrap
+                        }
+
+                        Row {
+                            visible: ControlCenterState.section === "power"
+                            width: parent.width - 28
+                            spacing: 10
+                            Repeater {
+                                model: [
+                                    { key: "power-saver", icon: "♧", name: "Low", detail: "Quiet & efficient" },
+                                    { key: "balanced", icon: "◐", name: "Balanced", detail: "Everyday use" },
+                                    { key: "performance", icon: "ϟ", name: "High", detail: "Maximum speed" }
+                                ]
+                                delegate: Rectangle {
+                                    id: profileCard
+                                    required property var modelData
+                                    width: (settingsColumn.width - 48) / 3; height: 112; radius: 18
+                                    color: ShellSettings.powerProfile === modelData.key ? Theme.ink : Theme.searchBackground
+                                    Column {
+                                        anchors.centerIn: parent; spacing: 5
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: profileCard.modelData.icon; color: ShellSettings.powerProfile === profileCard.modelData.key ? Theme.surface : Theme.ink; font.pixelSize: 25 }
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: profileCard.modelData.name; color: ShellSettings.powerProfile === profileCard.modelData.key ? Theme.surface : Theme.ink; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: profileCard.modelData.detail; color: ShellSettings.powerProfile === profileCard.modelData.key ? Theme.surface : Theme.mutedInk; opacity: 0.78; font.pixelSize: 9 }
+                                    }
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setPowerProfile(profileCard.modelData.key) }
+                                }
+                            }
+                        }
+
                         Rectangle {
-                            visible: ControlCenterState.section !== "appearance" && ControlCenterState.section !== "effects"
+                            visible: ControlCenterState.section === "power"
+                            width: parent.width - 28; height: 112; radius: 18; color: Theme.searchBackground
+                            Column {
+                                anchors { left: parent.left; leftMargin: 18; verticalCenter: parent.verticalCenter }
+                                spacing: 5
+                                Text { text: "Steam Console Mode"; color: Theme.ink; font.pixelSize: 15; font.weight: Font.DemiBold }
+                                Text { text: "Close Hyprland and launch Steam Gamepad UI in Gamescope."; color: Theme.mutedInk; font.pixelSize: 11 }
+                                Text { text: "This choice remains active after a shutdown until Desktop Mode is selected in Steam."; color: Theme.mutedInk; font.pixelSize: 10 }
+                            }
+                            Rectangle {
+                                anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }
+                                width: 142; height: 42; radius: 14; color: Theme.ink
+                                Text { anchors.centerIn: parent; text: "Enter console mode"; color: Theme.surface; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.enterConsoleMode() }
+                            }
+                        }
+
+                        Grid {
+                            visible: ControlCenterState.section === "system"
+                            width: parent.width - 28
+                            columns: 3; spacing: 10
+                            Repeater {
+                                model: [
+                                    { name: "CPU activity", value: `${SystemInfo.cpuPercent}%` },
+                                    { name: "Memory", value: `${SystemInfo.memoryPercent}%` },
+                                    { name: "Disk", value: `${SystemInfo.diskPercent}%` }
+                                ]
+                                delegate: Rectangle {
+                                    id: activityCard
+                                    required property var modelData
+                                    width: (settingsColumn.width - 48) / 3; height: 102; radius: 18; color: Theme.searchBackground
+                                    Column { anchors.centerIn: parent; spacing: 5
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: activityCard.modelData.value; color: Theme.ink; font.pixelSize: 24; font.weight: Font.Bold }
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: activityCard.modelData.name; color: Theme.mutedInk; font.pixelSize: 10 }
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: ControlCenterState.section === "system"
+                            width: parent.width - 28; height: 230; radius: 18; color: Theme.searchBackground
+                            Column {
+                                anchors.fill: parent; anchors.margins: 18; spacing: 13
+                                Repeater {
+                                    model: [
+                                        { name: "Processor", value: SystemInfo.cpuName },
+                                        { name: "Graphics", value: SystemInfo.gpuName },
+                                        { name: "Memory used", value: SystemInfo.memoryUsage },
+                                        { name: "Root storage", value: SystemInfo.diskUsage },
+                                        { name: "Uptime", value: SystemInfo.uptime },
+                                        { name: "Kernel", value: SystemInfo.kernel }
+                                    ]
+                                    delegate: Row {
+                                        id: infoRow
+                                        required property var modelData
+                                        width: parent.width
+                                        Text { width: 110; text: infoRow.modelData.name; color: Theme.mutedInk; font.pixelSize: 11 }
+                                        Text { width: infoRow.width - 110; text: infoRow.modelData.value; color: Theme.ink; font.pixelSize: 11; elide: Text.ElideRight }
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: ControlCenterState.section === "network"
                             width: parent.width - 28
                             height: 150
                             radius: 18

@@ -29,7 +29,13 @@ if [[ ! -f "${script_dir}/pkg.list" || ! -f "${script_dir}/deploy.sh" ]]; then
 fi
 
 echo "Installing the minimal Hyprland base from pkg.list..."
+if ! grep -Eq '^\[multilib\]' /etc/pacman.conf; then
+    echo "Enabling Arch multilib for Steam..."
+    sudo sed -i '/^#\[multilib\]/{s/^#//; n; s/^#//;}' /etc/pacman.conf
+    sudo pacman -Sy
+fi
 sudo pacman -Syu --needed - < "${script_dir}/pkg.list"
+sudo systemctl enable --now power-profiles-daemon.service
 "${script_dir}/deploy.sh"
 
 echo

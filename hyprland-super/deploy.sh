@@ -10,16 +10,21 @@ cp -a "${project_dir}/config/quickshell/supermachine/." "${config_home}/quickshe
 
 mkdir -p "${config_home}/supermachine"
 mkdir -p "${HOME}/.local/bin"
-if [[ ! -e "${HOME}/.local/bin/startx" ]]; then
-    install -m 0755 "${project_dir}/bin/startx" "${HOME}/.local/bin/startx"
-fi
+install -m 0755 "${project_dir}/bin/startx" "${HOME}/.local/bin/startx"
+install -m 0755 "${project_dir}/bin/supermachine-console-mode" "${HOME}/.local/bin/supermachine-console-mode"
+install -m 0755 "${project_dir}/bin/supermachine-system-info" "${HOME}/.local/bin/supermachine-system-info"
+install -m 0755 "${project_dir}/bin/steamos-session-select" "${HOME}/.local/bin/steamos-session-select"
+install -m 0755 "${project_dir}/bin/steamos-session-select" "${HOME}/.local/bin/return-to-gaming-mode"
 touch "${profile_file}"
+if grep -q 'SUPERMACHINE AUTO START' "${profile_file}"; then
+    sed -i 's/ && ! -e "$HOME\/.config\/supermachine\/console-mode"//' "${profile_file}"
+fi
 if ! grep -q 'SUPERMACHINE AUTO START' "${profile_file}"; then
     printf '%s\n' \
         '' \
         '# SUPERMACHINE AUTO START' \
-        '# A future Console Mode toggle can create this flag to stay in the TTY.' \
-        'if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" && "$(tty)" == "/dev/tty1" && ! -e "$HOME/.config/supermachine/console-mode" ]]; then' \
+        '# Start the persistent SuperMachine desktop or console session on TTY1.' \
+        'if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" && "$(tty)" == "/dev/tty1" ]]; then' \
         '    exec "$HOME/.local/bin/startx"' \
         'fi' >> "${profile_file}"
 fi

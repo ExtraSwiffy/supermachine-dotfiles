@@ -20,6 +20,10 @@ QtObject {
     property real leafSpeed: 1.0
     property real snowSpeed: 1.0
     property real batSpeed: 1.0
+    property int frameWidth: 9
+    property int windowGap: 12
+    property string windowBorderColor: "#86d9d9"
+    property string powerProfile: "performance"
 
     readonly property var badgePresets: [
         { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
@@ -75,6 +79,10 @@ QtObject {
             batsEnabled = saved.batsEnabled ?? batsEnabled;
             snowSpeed = saved.snowSpeed ?? snowSpeed;
             batSpeed = saved.batSpeed ?? batSpeed;
+            frameWidth = saved.frameWidth ?? frameWidth;
+            windowGap = saved.windowGap ?? windowGap;
+            windowBorderColor = saved.windowBorderColor ?? windowBorderColor;
+            powerProfile = saved.powerProfile ?? powerProfile;
         } catch (error) {
             console.warn(`Could not load SuperMachine settings: ${error}`);
         }
@@ -95,7 +103,11 @@ QtObject {
             snowEnabled,
             batsEnabled,
             snowSpeed,
-            batSpeed
+            batSpeed,
+            frameWidth,
+            windowGap,
+            windowBorderColor,
+            powerProfile
         }, null, 2));
     }
 
@@ -181,6 +193,42 @@ QtObject {
         save();
     }
 
+    function applyWindowSettings() {
+        const color = `rgba(${windowBorderColor.slice(1)}ff)`;
+        const code = `hl.config({ general = { gaps_in = ${windowGap}, gaps_out = ${windowGap}, col = { active_border = "${color}" } } })`;
+        Quickshell.execDetached(["hyprctl", "eval", code]);
+    }
+
+    function setFrameWidth(value) {
+        frameWidth = Math.max(5, Math.min(18, Math.round(value)));
+        save();
+    }
+
+    function setWindowGap(value) {
+        windowGap = Math.max(4, Math.min(30, Math.round(value)));
+        applyWindowSettings();
+        save();
+    }
+
+    function setWindowBorderColor(value) {
+        windowBorderColor = value;
+        applyWindowSettings();
+        save();
+    }
+
+    function setPowerProfile(value) {
+        if (["power-saver", "balanced", "performance"].indexOf(value) === -1)
+            return;
+        powerProfile = value;
+        Quickshell.execDetached(["powerprofilesctl", "set", value]);
+        save();
+    }
+
+    function enterConsoleMode() {
+        save();
+        Quickshell.execDetached([`${Quickshell.env("HOME")}/.local/bin/supermachine-console-mode`, "enter"]);
+    }
+
     function resetBadge() {
         badgeMode = "image";
         badgeText = "🚀";
@@ -191,6 +239,8 @@ QtObject {
 
     Component.onCompleted: {
         load();
+        applyWindowSettings();
+        Quickshell.execDetached(["powerprofilesctl", "set", powerProfile]);
         // Also writes newly introduced defaults during settings migrations.
         save();
     }

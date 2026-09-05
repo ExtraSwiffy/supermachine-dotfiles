@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/supermachine"
+state_file="${state_dir}/console-mode"
+display_file="${state_dir}/console-display"
+log_file="${XDG_CACHE_HOME:-${HOME}/.cache}/supermachine-console-mode.log"
+
+notify() {
+    notify-send "SuperMachine Console Mode" "$1" >/dev/null 2>&1 || true
+}
+
+enter_mode() {
+    if ! command -v gamescope >/dev/null || ! command -v steam >/dev/null; then
+        notify "Gamescope or Steam is not installed."
+        exit 1
+    fi
+    mkdir -p "$state_dir"
+    if command -v hyprctl >/dev/null && command -v jq >/dev/null; then
+        hyprctl monitors -j | jq -r 'first(.[] | select(.focused == true)) | "\(.width) \(.height) \(.refreshRate | floor)"' > "$display_file" 2>/dev/null || true
+    fi
+    printf '%s\n' console > "$state_file"
+    notify "Switching to the Steam console session."
+    sleep 0.5
+    hyprctl dispatch exit >/dev/null 2>&1 || true
+}
+
+return_mode() {
+    rm -f "$state_file"
+    timeout 6 steam -shutdown >/dev/null 2>&1 || true
+    pkill -x steamwebhelper >/dev/null 2>&1 || true
+    pkill -x steam >/dev/null 2>&1 || true
+    pkill -x gamescope >/dev/null 2>&1 || true
+}
+
+run_session() {
+    local width=1920 height=1080 refresh=60
+    if [ -s "$display_file" ]; then
+        read -r width height refresh < "$display_file" || true
+    fi
+    export PATH="${HOME}/.local/bin:${PATH}"
+    export XDG_CURRENT_DESKTOP=gamescope
+    export STEAMOS=1
+    export WLR_NO_HARDWARE_CURSORS=1
+    powerprofilesctl set performance >/dev/null 2>&1 || true
+    {
+        printf 'Starting console session at %s (%sx%s@%s)\n' "$(date)" "$width" "$height" "$refresh"
+        gamescope -e -f -b --force-windows-fullscreen --force-grab-cursor --hide-cursor-delay 0 --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+    } >> "$log_file" 2>&1 || true
+}
+
+case "${1:-status}" in
+    enter) enter_mode ;;
+    return|desktop) return_mode ;;
+    session) run_session ;;
+    status) [ -e "$state_file" ] && printf 'console\n' || printf 'desktop\n' ;;
+    *) printf 'Usage: %s [enter|return|session|status]\n' "$0" >&2; exit 2 ;;
+esac

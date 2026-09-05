@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cpu="$(LC_ALL=C top -bn1 | awk '/Cpu\(s\)/ {printf "%.0f", 100-$8; exit}')"
+memory="$(free | awk '/Mem:/ {printf "%.0f", $3/$2*100}')"
+memory_used="$(free -h | awk '/Mem:/ {print $3 " / " $2}')"
+disk="$(df -h / | awk 'NR==2 {print $3 " / " $2}')"
+disk_percent="$(df / | awk 'NR==2 {gsub(/%/,"",$5); print $5}')"
+uptime_text="$(uptime -p | sed 's/^up //')"
+cpu_name="$(sed -n 's/^model name[[:space:]]*: //p' /proc/cpuinfo | head -1)"
+gpu_name="$(lspci 2>/dev/null | sed -nE 's/.*(VGA compatible controller|3D controller): //p' | head -1)"
+profile="$(powerprofilesctl get 2>/dev/null || printf unavailable)"
+kernel="$(uname -r)"
+console="desktop"
+[ -e "${XDG_CONFIG_HOME:-${HOME}/.config}/supermachine/console-mode" ] && console="console"
+printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$cpu" "$memory" "$memory_used" "$disk" "$disk_percent" "$uptime_text" "$cpu_name" "${gpu_name:-Unknown GPU}" "$profile" "$kernel" "$console"

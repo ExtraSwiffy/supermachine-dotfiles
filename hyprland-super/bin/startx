@@ -5,4 +5,15 @@ if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${DISPLAY:-}" ]; then
     exit 1
 fi
 
-exec Hyprland --config "${HOME}/.config/hypr/hyprland.lua"
+console_state="${HOME}/.config/supermachine/console-mode"
+console_runner="${HOME}/.local/bin/supermachine-console-mode"
+
+while :; do
+    if [ -e "$console_state" ] && [ -x "$console_runner" ]; then
+        "$console_runner" session
+        continue
+    fi
+
+    Hyprland --config "${HOME}/.config/hypr/hyprland.lua"
+    [ -e "$console_state" ] || break
+done

@@ -154,8 +154,24 @@ ShellRoot {
             ShellSettings.setBatSpeed(value);
         }
 
+        function setFrameWidth(value: int) {
+            ShellSettings.setFrameWidth(value);
+        }
+
+        function setWindowGap(value: int) {
+            ShellSettings.setWindowGap(value);
+        }
+
+        function setWindowBorderColor(value: string) {
+            ShellSettings.setWindowBorderColor(value);
+        }
+
+        function setPowerProfile(value: string) {
+            ShellSettings.setPowerProfile(value);
+        }
+
         function status(): string {
-            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:snow=${ShellSettings.snowEnabled}@${ShellSettings.snowSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}:bats=${ShellSettings.batsEnabled}@${ShellSettings.batSpeed}`;
+            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:frame=${ShellSettings.frameWidth}:gap=${ShellSettings.windowGap}:border=${ShellSettings.windowBorderColor}:power=${ShellSettings.powerProfile}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:snow=${ShellSettings.snowEnabled}@${ShellSettings.snowSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}:bats=${ShellSettings.batsEnabled}@${ShellSettings.batSpeed}`;
         }
     }
 

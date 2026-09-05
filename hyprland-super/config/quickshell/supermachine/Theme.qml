@@ -16,7 +16,7 @@ QtObject {
     readonly property string badgeText: ShellSettings.badgeText
     readonly property string badgeSource: ShellSettings.badgeMode === "image" ? ShellSettings.badgeSource : ""
 
-    readonly property int frameWidth: 9
+    readonly property int frameWidth: ShellSettings.frameWidth
     readonly property int sidebarWidth: 76
     readonly property int innerRadius: 18
     readonly property int windowRadius: 14

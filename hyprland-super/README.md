@@ -11,9 +11,10 @@ left rail, launcher, wallpaper deck, badge deck, and control center.
 - `Super+B` — badge deck
 - `Super+Tab` — settings deck
 
-The first-stage deployment adds a guarded TTY1 login hook that starts Hyprland
-through `startx`. Creating `~/.config/supermachine/console-mode` skips graphical
-startup; that flag is reserved for the future Console Mode switch.
+The first-stage deployment adds a guarded TTY1 login hook that starts the
+persistent session selected in the control center. Desktop Mode launches
+Hyprland; Console Mode launches Steam's Gamepad UI through Gamescope. Steam's
+Desktop Mode action clears the saved Console Mode flag and returns to Hyprland.
 
 ## Stage one: fresh Arch TTY
 

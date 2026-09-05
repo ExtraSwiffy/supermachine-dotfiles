@@ -7,7 +7,10 @@ bash -n "${project_dir}/superbase.sh" \
     "${project_dir}/superbase-advance.sh" \
     "${project_dir}/deploy.sh" \
     "${project_dir}/check.sh" \
-    "${project_dir}/bin/startx"
+    "${project_dir}/bin/startx" \
+    "${project_dir}/bin/supermachine-console-mode" \
+    "${project_dir}/bin/supermachine-system-info" \
+    "${project_dir}/bin/steamos-session-select"
 
 if command -v Hyprland >/dev/null 2>&1; then
     Hyprland --verify-config -c "${project_dir}/config/hypr/hyprland.lua"
