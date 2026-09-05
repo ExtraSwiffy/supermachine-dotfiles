@@ -58,10 +58,18 @@ PanelWindow {
                 fillColor: Theme.surface
                 strokeColor: "transparent"
                 startX: 0; startY: 0
-                PathLine { x: deckShape.width - 27; y: 0 }
-                PathQuad { x: deckShape.width; y: 27; controlX: deckShape.width; controlY: 0 }
-                PathLine { x: deckShape.width; y: deckShape.height - 27 }
-                PathQuad { x: deckShape.width - 27; y: deckShape.height; controlX: deckShape.width; controlY: deckShape.height }
+                PathLine { x: deckShape.width; y: 0 }
+                PathCubic {
+                    x: deckShape.width - 27; y: 27
+                    control1X: deckShape.width - 15; control1Y: 0
+                    control2X: deckShape.width - 27; control2Y: 12
+                }
+                PathLine { x: deckShape.width - 27; y: deckShape.height - 27 }
+                PathCubic {
+                    x: deckShape.width; y: deckShape.height
+                    control1X: deckShape.width - 27; control1Y: deckShape.height - 12
+                    control2X: deckShape.width - 15; control2Y: deckShape.height
+                }
                 PathLine { x: 0; y: deckShape.height }
                 PathLine { x: 0; y: 0 }
             }
@@ -96,7 +104,7 @@ PanelWindow {
                     readonly property bool selected: index === BadgeDeckState.selectedIndex
                     width: root.cardSize
                     height: root.cardSize
-                    x: (cardStage.width - width) / 2 + Math.abs(distance) * 2
+                    x: (cardStage.width - width) / 2
                     y: (cardStage.height - height) / 2 + distance * root.cardStep
                     scale: selected ? 1 : Math.max(0.82, 0.94 - Math.abs(distance) * 0.018)
                     opacity: selected ? 1 : Math.max(0.54, 0.9 - Math.abs(distance) * 0.055)
