@@ -20,6 +20,8 @@ install -m 0755 "${project_dir}/bin/steamos-session-select" "${HOME}/.local/bin/
 install -m 0755 "${project_dir}/bin/supermachine-shell" "${HOME}/.local/bin/supermachine-shell"
 install -m 0755 "${project_dir}/bin/supermachine-diagnostics" "${HOME}/.local/bin/supermachine-diagnostics"
 install -m 0755 "${project_dir}/bin/supermachine-terminal" "${HOME}/.local/bin/supermachine-terminal"
+install -m 0755 "${project_dir}/bin/supermachine-install-age" "${HOME}/.local/bin/supermachine-install-age"
+install -m 0755 "${project_dir}/bin/supermachine-config-files" "${HOME}/.local/bin/supermachine-config-files"
 install -m 0644 "${project_dir}/config/supermachine/terminal.bashrc" "${config_home}/supermachine/terminal.bashrc"
 mkdir -p "${config_home}/systemd/user"
 install -m 0644 "${project_dir}/systemd/supermachine-shell.service" "${config_home}/systemd/user/supermachine-shell.service"

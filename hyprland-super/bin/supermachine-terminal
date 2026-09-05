@@ -8,6 +8,10 @@ printf '%s\n' \
     '  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'
 printf '\033[38;2;174;185;184m  Hyprland  --  Quickshell  --  Ready\033[0m\n\n'
 
+if command -v supermachine-install-age >/dev/null 2>&1; then
+    printf '\033[38;2;174;185;184m  Arch installed: %s\033[0m\n\n' "$(supermachine-install-age)"
+fi
+
 if command -v fastfetch >/dev/null 2>&1; then
     fastfetch --logo none --key-padding-left 2
     printf '\n'

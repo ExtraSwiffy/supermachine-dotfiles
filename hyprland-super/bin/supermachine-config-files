@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+repo_dir="${HOME}/supermachine-dotfiles/hyprland-super"
+
+emit() {
+    local label="$1"
+    local path="$2"
+    [[ -f "${path}" ]] && printf '%s\t%s\n' "${label}" "${path}"
+}
+
+# Keep this deliberately curated: this is a quick navigation menu, not a file browser.
+emit "Hyprland · Main" "${config_home}/hypr/hyprland.lua"
+emit "Hyprland · Monitors" "${config_home}/hypr/monitors.lua"
+emit "Quickshell · Shell" "${config_home}/quickshell/supermachine/shell.qml"
+emit "Quickshell · Screen frame" "${config_home}/quickshell/supermachine/ScreenShell.qml"
+emit "Quickshell · Theme" "${config_home}/quickshell/supermachine/Theme.qml"
+emit "Quickshell · Settings" "${config_home}/quickshell/supermachine/ShellSettings.qml"
+emit "Quickshell · Quick menu" "${config_home}/quickshell/supermachine/QuickMenu.qml"
+emit "Quickshell · Control center" "${config_home}/quickshell/supermachine/ControlCenter.qml"
+emit "Quickshell · Wallpaper deck" "${config_home}/quickshell/supermachine/WallpaperDeck.qml"
+emit "Quickshell · Badge deck" "${config_home}/quickshell/supermachine/BadgeDeck.qml"
+emit "Foot · Terminal" "${config_home}/foot/foot.ini"
+emit "Terminal · Prompt" "${config_home}/supermachine/terminal.bashrc"
+emit "Installer · Pacman packages" "${repo_dir}/pkg.list"
+emit "Installer · AUR packages" "${repo_dir}/yay.list"
+emit "Installer · Base setup" "${repo_dir}/superbase.sh"
+emit "Installer · Hyprland setup" "${repo_dir}/superbase-advance.sh"
+emit "Installer · Deploy" "${repo_dir}/deploy.sh"

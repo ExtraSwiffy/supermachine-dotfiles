@@ -12,3 +12,5 @@ ControlCenter 1.0 ControlCenter.qml
 singleton BadgeDeckState 1.0 BadgeDeckState.qml
 BadgeDeck 1.0 BadgeDeck.qml
 singleton SystemInfo 1.0 SystemInfo.qml
+singleton QuickMenuState 1.0 QuickMenuState.qml
+QuickMenu 1.0 QuickMenu.qml

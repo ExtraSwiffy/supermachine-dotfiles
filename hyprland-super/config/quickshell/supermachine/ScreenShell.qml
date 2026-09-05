@@ -127,6 +127,10 @@ Scope {
         targetScreen: root.modelData
     }
 
+    QuickMenu {
+        targetScreen: root.modelData
+    }
+
     PanelWindow {
         screen: root.modelData
         color: "transparent"

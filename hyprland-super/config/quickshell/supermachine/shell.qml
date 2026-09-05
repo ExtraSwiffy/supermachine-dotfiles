@@ -4,6 +4,18 @@ import Quickshell.Io
 
 ShellRoot {
     IpcHandler {
+        target: "quickmenu"
+
+        function close() {
+            QuickMenuState.close();
+        }
+
+        function status(): string {
+            return `${QuickMenuState.open}:${QuickMenuState.configOpen}`;
+        }
+    }
+
+    IpcHandler {
         target: "launcher"
 
         function toggle() {

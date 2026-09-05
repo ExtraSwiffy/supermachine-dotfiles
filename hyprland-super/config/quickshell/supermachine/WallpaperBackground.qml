@@ -11,7 +11,6 @@ PanelWindow {
     WlrLayershell.namespace: "supermachine-wallpaper"
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
-    mask: Region {}
 
     Image {
         anchors.fill: parent
@@ -22,6 +21,18 @@ PanelWindow {
 
         Behavior on opacity {
             NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: mouse => {
+            LauncherState.close();
+            WallpaperState.close();
+            ControlCenterState.close();
+            BadgeDeckState.close();
+            QuickMenuState.show(targetScreen.name, mouse.x, mouse.y);
         }
     }
 }
