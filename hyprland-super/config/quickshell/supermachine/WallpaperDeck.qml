@@ -99,7 +99,7 @@ PanelWindow {
             anchors.fill: parent
             z: 1
             acceptedButtons: Qt.NoButton
-            onWheel: wheel.angleDelta.y < 0 ? WallpaperState.step(1) : WallpaperState.step(-1)
+            onWheel: wheel => wheel.angleDelta.y < 0 ? WallpaperState.step(1) : WallpaperState.step(-1)
         }
 
         Item {
@@ -141,7 +141,7 @@ PanelWindow {
 
                         Image {
                             anchors.fill: parent
-                            source: card.modelData.source
+                            source: WallpaperState.thumbnailFor(card.modelData.source)
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
                             cache: true
