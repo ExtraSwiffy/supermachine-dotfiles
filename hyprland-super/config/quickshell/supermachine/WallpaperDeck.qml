@@ -65,19 +65,20 @@ PanelWindow {
                     path: {
                         const w = root.width;
                         const h = root.height;
-                        const r = Theme.innerRadius;
+                        const j = Theme.wallpaperJoinRadius;
 
-                        return `M ${r} 0 H ${w - r} `
-                            + `Q ${w} 0 ${w} ${r} `
-                            + `V ${h} H 0 V ${r} `
-                            + `Q 0 0 ${r} 0 Z`;
+                        return `M 0 0 `
+                            + `C ${j} 0 ${j} ${j} ${j * 2} ${j} `
+                            + `H ${w - j * 2} `
+                            + `C ${w - j} ${j} ${w - j} 0 ${w} 0 `
+                            + `V ${h} H 0 Z`;
                     }
                 }
             }
         }
 
         Text {
-            anchors { top: parent.top; topMargin: 18; horizontalCenter: parent.horizontalCenter }
+            anchors { top: parent.top; topMargin: Theme.wallpaperJoinRadius + 10; horizontalCenter: parent.horizontalCenter }
             text: WallpaperState.selectedName
             color: Theme.ink
             font.pixelSize: 17
@@ -85,7 +86,7 @@ PanelWindow {
         }
 
         Text {
-            anchors { top: parent.top; topMargin: 43; horizontalCenter: parent.horizontalCenter }
+            anchors { top: parent.top; topMargin: Theme.wallpaperJoinRadius + 35; horizontalCenter: parent.horizontalCenter }
             text: "CLICK A CARD TO PREVIEW  •  SCROLL TO GLIDE  •  ESC TO CLOSE"
             color: Theme.mutedInk
             font.pixelSize: 9
@@ -103,7 +104,7 @@ PanelWindow {
             id: cardStage
             z: 2
             anchors { left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom }
-            anchors { leftMargin: 36; rightMargin: 36; topMargin: 70; bottomMargin: Theme.frameWidth + 18 }
+            anchors { leftMargin: 36; rightMargin: 36; topMargin: Theme.wallpaperJoinRadius + 62; bottomMargin: Theme.frameWidth + 12 }
 
             Repeater {
                 model: WallpaperState.wallpapers
