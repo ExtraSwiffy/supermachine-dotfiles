@@ -23,10 +23,14 @@ QtObject {
         { name: "Fox", source: Qt.resolvedUrl("assets/badges/fox.webp"), animated: false },
         { name: "Frog", source: Qt.resolvedUrl("assets/badges/frog.webp"), animated: false },
         { name: "Coffee", source: Qt.resolvedUrl("assets/badges/coffee.webp"), animated: false },
+        { name: "Windmill", source: Qt.resolvedUrl("assets/badges/ranch-windmill.webp"), animated: false },
+        { name: "Red barn", source: Qt.resolvedUrl("assets/badges/red-barn.webp"), animated: false },
+        { name: "Whitetail", source: Qt.resolvedUrl("assets/badges/whitetail-deer.webp"), animated: false },
         { name: "Rocket loop", source: Qt.resolvedUrl("assets/badges/rocket-flight.gif"), animated: true },
         { name: "Moon drift", source: Qt.resolvedUrl("assets/badges/moon-drift.gif"), animated: true },
         { name: "Crystal pulse", source: Qt.resolvedUrl("assets/badges/crystal-pulse.gif"), animated: true },
-        { name: "Coffee steam", source: Qt.resolvedUrl("assets/badges/coffee-steam.gif"), animated: true }
+        { name: "Coffee steam", source: Qt.resolvedUrl("assets/badges/coffee-steam.gif"), animated: true },
+        { name: "Windmill spin", source: Qt.resolvedUrl("assets/badges/windmill-spin.gif"), animated: true }
     ]
 
     readonly property var emojiPresets: ["🚀", "⚡", "🌙", "🛸", "🐸", "🦊", "💎", "🌈"]
