@@ -19,7 +19,8 @@ QtObject {
     readonly property int sidebarWidth: 76
     readonly property int innerRadius: 18
     readonly property int windowRadius: 14
-    readonly property int launcherWidth: 620
+    readonly property int launcherWidth: 668
     readonly property int launcherHeight: 500
+    readonly property int launcherJoinRadius: 24
     readonly property int launcherResultCount: 7
 }

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -48,21 +49,38 @@ PanelWindow {
         opacity: root.launcherOpen ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
 
-        Rectangle {
+        Shape {
             anchors.fill: parent
-            color: Theme.surface
-            radius: Theme.innerRadius
+            preferredRendererType: Shape.CurveRenderer
+
+            ShapePath {
+                fillColor: Theme.surface
+                strokeColor: "transparent"
+
+                PathSvg {
+                    path: {
+                        const w = root.width;
+                        const h = root.height;
+                        const j = Theme.launcherJoinRadius;
+                        const r = Theme.innerRadius;
+
+                        return `M ${j + r} 0 H ${w - j - r} `
+                            + `Q ${w - j} 0 ${w - j} ${r} `
+                            + `V ${h - j} Q ${w - j} ${h} ${w} ${h} `
+                            + `H 0 Q ${j} ${h} ${j} ${h - j} `
+                            + `V ${r} Q ${j} 0 ${j + r} 0 Z`;
+                    }
+                }
+            }
         }
 
         Rectangle {
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: Theme.innerRadius
-            color: Theme.surface
-        }
-
-        Rectangle {
             anchors.fill: parent
-            anchors { leftMargin: Theme.frameWidth; rightMargin: Theme.frameWidth; topMargin: Theme.frameWidth }
+            anchors {
+                leftMargin: Theme.launcherJoinRadius + Theme.frameWidth
+                rightMargin: Theme.launcherJoinRadius + Theme.frameWidth
+                topMargin: Theme.frameWidth
+            }
             color: Theme.launcherBackground
             radius: Theme.windowRadius
 
