@@ -72,7 +72,7 @@ hl.bind(main_mod .. " + Space", hl.dsp.exec_cmd("qs -c supermachine ipc call lau
 hl.bind(main_mod .. " + W", hl.dsp.exec_cmd("qs -c supermachine ipc call wallpapers toggle"))
 hl.bind(main_mod .. " + Tab", hl.dsp.exec_cmd("qs -c supermachine ipc call controlcenter toggle"))
 hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("qs -c supermachine ipc call badges toggle"))
-hl.bind(main_mod .. " + Q", hl.dsp.window.close())
+hl.bind(main_mod .. " + C", hl.dsp.window.close())
 hl.bind(main_mod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(main_mod .. " + SHIFT + R", hl.dsp.exec_cmd("qs -c supermachine kill; qs -c supermachine -d"))
