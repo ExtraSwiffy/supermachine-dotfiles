@@ -3,7 +3,6 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import Quickshell.Widgets
 
 PanelWindow {
     id: root
@@ -11,7 +10,19 @@ PanelWindow {
 
     readonly property var monitor: Hyprland.monitorFor(targetScreen)
     readonly property bool deckOpen: BadgeDeckState.open && BadgeDeckState.screenName === monitor?.name
-    readonly property int deckWidth: 118
+    readonly property int deckWidth: 126
+    readonly property int cardSize: 88
+    readonly property int cardStep: 43
+
+    function signedDistance(index) {
+        const count = ShellSettings.badgePresets.length;
+        let distance = index - BadgeDeckState.selectedIndex;
+        if (distance > count / 2)
+            distance -= count;
+        if (distance < -count / 2)
+            distance += count;
+        return distance;
+    }
 
     screen: targetScreen
     color: "transparent"
@@ -27,78 +38,85 @@ PanelWindow {
 
     FocusScope {
         id: movingSurface
-        x: root.deckOpen ? 0 : -root.deckWidth - 8
+        x: root.deckOpen ? 0 : -root.width - 4
         width: root.width
         height: root.height
         focus: root.deckOpen
+        opacity: root.deckOpen ? 1 : 0
 
-        Behavior on x { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
+        Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: root.deckOpen ? 120 : 220 } }
 
         Shape {
             id: deckShape
             x: Theme.sidebarWidth - Theme.frameWidth
-            y: 92
             width: root.deckWidth + Theme.frameWidth
-            height: parent.height - 112
+            height: parent.height
             preferredRendererType: Shape.CurveRenderer
+
             ShapePath {
                 fillColor: Theme.surface
                 strokeColor: "transparent"
                 startX: 0; startY: 0
-                PathLine { x: deckShape.width - 24; y: 0 }
-                PathQuad { x: deckShape.width; y: 24; controlX: deckShape.width; controlY: 0 }
-                PathLine { x: deckShape.width; y: deckShape.height - 24 }
-                PathQuad { x: deckShape.width - 24; y: deckShape.height; controlX: deckShape.width; controlY: deckShape.height }
+                PathLine { x: deckShape.width - 27; y: 0 }
+                PathQuad { x: deckShape.width; y: 27; controlX: deckShape.width; controlY: 0 }
+                PathLine { x: deckShape.width; y: deckShape.height - 27 }
+                PathQuad { x: deckShape.width - 27; y: deckShape.height; controlX: deckShape.width; controlY: deckShape.height }
                 PathLine { x: 0; y: deckShape.height }
                 PathLine { x: 0; y: 0 }
             }
         }
 
         Text {
-            x: Theme.sidebarWidth + 15
-            y: 108
-            text: "BADGES"
+            x: Theme.sidebarWidth + 17
+            y: 20
+            text: "BADGE DECK"
             color: Theme.mutedInk
             font.pixelSize: 9
             font.weight: Font.Bold
-            font.letterSpacing: 1.4
+            font.letterSpacing: 1.35
         }
 
-        Flickable {
-            id: badgeScroll
+        Item {
+            id: cardStage
             x: Theme.sidebarWidth + 8
-            y: 132
+            y: 48
             width: root.deckWidth - 16
-            height: parent.height - 164
-            contentWidth: width
-            contentHeight: 82 + Math.max(0, ShellSettings.badgePresets.length - 1) * 58
-            boundsBehavior: Flickable.StopAtBounds
+            height: parent.height - 96
             clip: true
 
             Repeater {
                 model: ShellSettings.badgePresets
+
                 delegate: Item {
                     id: badgeCard
                     required property var modelData
                     required property int index
-                    readonly property bool selected: ShellSettings.badgeMode === "image"
-                        && ShellSettings.badgeSource === modelData.source.toString()
-                    width: 82
-                    height: 82
-                    x: (badgeScroll.width - width) / 2 + (index % 2 ? 3 : -3)
-                    y: index * 58
-                    z: selected ? 100 : 50 + index
+                    readonly property real distance: root.signedDistance(index)
+                    readonly property bool selected: index === BadgeDeckState.selectedIndex
+                    width: root.cardSize
+                    height: root.cardSize
+                    x: (cardStage.width - width) / 2 + Math.abs(distance) * 2
+                    y: (cardStage.height - height) / 2 + distance * root.cardStep
+                    scale: selected ? 1 : Math.max(0.82, 0.94 - Math.abs(distance) * 0.018)
+                    opacity: selected ? 1 : Math.max(0.54, 0.9 - Math.abs(distance) * 0.055)
+                    z: selected ? 100 : 60 - Math.abs(distance)
+
+                    Behavior on x { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+                    Behavior on y { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+                    Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 18
+                        radius: 19
                         color: Theme.searchBackground
                         border.width: badgeCard.selected ? 3 : 1
-                        border.color: badgeCard.selected ? Theme.ink : (Theme.dark ? "#405052" : "#d5dbdc")
+                        border.color: badgeCard.selected ? "#ffffff" : (Theme.dark ? "#405052" : "#d5dbdc")
 
                         AnimatedImage {
                             anchors { top: parent.top; topMargin: 7; horizontalCenter: parent.horizontalCenter }
-                            width: 52; height: 52
+                            width: 57; height: 57
                             source: badgeCard.modelData.source
                             fillMode: Image.PreserveAspectFit
                             asynchronous: true
@@ -109,24 +127,27 @@ PanelWindow {
 
                         Rectangle {
                             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                            height: 23
-                            color: badgeCard.selected ? Theme.ink : Theme.surface
-                            radius: 11
+                            height: 24
+                            radius: 12
+                            color: Theme.surface
                             Text {
                                 anchors.centerIn: parent
+                                width: parent.width - 8
                                 text: badgeCard.modelData.name
-                                color: badgeCard.selected ? Theme.surface : Theme.ink
+                                color: Theme.ink
                                 font.pixelSize: 8
                                 font.weight: Font.Medium
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
                             }
                         }
 
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: ShellSettings.setBadgePreset(badgeCard.modelData.source)
+                            onClicked: BadgeDeckState.select(badgeCard.index)
                             onDoubleClicked: {
-                                ShellSettings.setBadgePreset(badgeCard.modelData.source);
+                                BadgeDeckState.select(badgeCard.index);
                                 BadgeDeckState.close();
                             }
                         }
@@ -135,7 +156,19 @@ PanelWindow {
             }
         }
 
+        Text {
+            anchors { horizontalCenter: cardStage.horizontalCenter; bottom: parent.bottom; bottomMargin: 18 }
+            text: "↑  ↓  SELECT   •   ESC CLOSE"
+            color: Theme.mutedInk
+            font.pixelSize: 8
+            font.letterSpacing: 0.8
+        }
+
         Keys.onEscapePressed: BadgeDeckState.close()
+        Keys.onUpPressed: BadgeDeckState.step(-1)
+        Keys.onDownPressed: BadgeDeckState.step(1)
+        Keys.onReturnPressed: BadgeDeckState.close()
+        Keys.onEnterPressed: BadgeDeckState.close()
     }
 
     onDeckOpenChanged: {
