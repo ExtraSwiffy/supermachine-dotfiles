@@ -69,13 +69,11 @@ ShellRoot {
         target: "settings"
 
         function setEmoji(value: string) {
-            ShellSettings.setBadgeMode("emoji");
-            ShellSettings.setBadgeText(value);
+            ShellSettings.setEmojiPreset(value);
         }
 
         function setImage(value: string) {
-            ShellSettings.setBadgeSource(value);
-            ShellSettings.setBadgeMode("image");
+            ShellSettings.setBadgePreset(value);
         }
 
         function resetBadge() {

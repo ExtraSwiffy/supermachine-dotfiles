@@ -256,6 +256,82 @@ PanelWindow {
                         }
 
                         Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            spacing: 8
+
+                            Text { text: "SuperMachine badge collection"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+
+                            Flow {
+                                width: parent.width
+                                spacing: 8
+
+                                Repeater {
+                                    model: ShellSettings.badgePresets
+
+                                    delegate: Rectangle {
+                                        id: presetCard
+                                        required property var modelData
+                                        width: 92
+                                        height: 90
+                                        radius: 15
+                                        color: Theme.searchBackground
+                                        border.width: ShellSettings.badgeSource === modelData.source.toString() ? 2 : 0
+                                        border.color: Theme.ink
+
+                                        AnimatedImage {
+                                            anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
+                                            width: 54
+                                            height: 54
+                                            source: presetCard.modelData.source
+                                            fillMode: Image.PreserveAspectFit
+                                            asynchronous: true
+                                        }
+
+                                        Text {
+                                            anchors { bottom: parent.bottom; bottomMargin: 7; horizontalCenter: parent.horizontalCenter }
+                                            text: presetCard.modelData.animated ? `${presetCard.modelData.name}  •` : presetCard.modelData.name
+                                            color: Theme.ink
+                                            font.pixelSize: 9
+                                            font.weight: Font.Medium
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: ShellSettings.setBadgePreset(presetCard.modelData.source)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            spacing: 8
+
+                            Text { text: "Quick emoji"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+
+                            Row {
+                                spacing: 7
+                                Repeater {
+                                    model: ShellSettings.emojiPresets
+                                    delegate: Rectangle {
+                                        id: emojiCard
+                                        required property string modelData
+                                        width: 42
+                                        height: 42
+                                        radius: 12
+                                        color: ShellSettings.badgeMode === "emoji" && ShellSettings.badgeText === modelData ? Theme.ink : Theme.searchBackground
+                                        Text { anchors.centerIn: parent; text: emojiCard.modelData; font.pixelSize: 21 }
+                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setEmojiPreset(emojiCard.modelData) }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
                             visible: ControlCenterState.section === "appearance" && ShellSettings.badgeMode === "emoji"
                             width: parent.width - 28
                             spacing: 7

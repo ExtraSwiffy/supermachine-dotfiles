@@ -11,6 +11,20 @@ QtObject {
     property string badgeSource: ""
     property int badgeSize: 30
 
+    readonly property var badgePresets: [
+        { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
+        { name: "Robot", source: Qt.resolvedUrl("assets/badges/robot.webp"), animated: false },
+        { name: "Moon", source: Qt.resolvedUrl("assets/badges/moon-cloud.webp"), animated: false },
+        { name: "Crystal", source: Qt.resolvedUrl("assets/badges/crystal.webp"), animated: false },
+        { name: "Fox", source: Qt.resolvedUrl("assets/badges/fox.webp"), animated: false },
+        { name: "Frog", source: Qt.resolvedUrl("assets/badges/frog.webp"), animated: false },
+        { name: "Rocket loop", source: Qt.resolvedUrl("assets/badges/rocket-flight.gif"), animated: true },
+        { name: "Moon drift", source: Qt.resolvedUrl("assets/badges/moon-drift.gif"), animated: true },
+        { name: "Crystal pulse", source: Qt.resolvedUrl("assets/badges/crystal-pulse.gif"), animated: true }
+    ]
+
+    readonly property var emojiPresets: ["🚀", "⚡", "🌙", "🛸", "🐸", "🦊", "💎", "🌈"]
+
     property FileView settingsFile: FileView {
         path: `${Quickshell.shellDir}/user-settings.json`
         blockLoading: true
@@ -61,6 +75,18 @@ QtObject {
 
     function setBadgeSource(value) {
         badgeSource = normalizeSource(value);
+        save();
+    }
+
+    function setBadgePreset(source) {
+        badgeSource = source.toString();
+        badgeMode = "image";
+        save();
+    }
+
+    function setEmojiPreset(value) {
+        badgeText = value;
+        badgeMode = "emoji";
         save();
     }
 
