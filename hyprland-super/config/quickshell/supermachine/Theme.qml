@@ -5,11 +5,11 @@ QtObject {
     readonly property color surface: "#ffffff"
     readonly property color ink: "#111416"
     readonly property color mutedInk: "#596164"
-    readonly property color launcherBackground: "#111416"
-    readonly property color searchBackground: "#24292c"
-    readonly property color launcherText: "#f4f6f6"
-    readonly property color launcherMuted: "#9da6a8"
-    readonly property color launcherAccent: "#ffffff"
+    readonly property color launcherBackground: "#ffffff"
+    readonly property color searchBackground: "#edf0f0"
+    readonly property color launcherText: "#111416"
+    readonly property color launcherMuted: "#667073"
+    readonly property color launcherAccent: "#111416"
 
     // Use badgeText for emoji, or set badgeSource to an image/GIF file path.
     readonly property string badgeText: "🚀"

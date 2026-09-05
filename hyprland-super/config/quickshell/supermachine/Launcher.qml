@@ -63,11 +63,13 @@ PanelWindow {
                         const h = root.height;
                         const j = Theme.launcherJoinRadius;
                         const r = Theme.innerRadius;
+                        const railTop = h - Theme.frameWidth;
 
                         return `M ${j + r} 0 H ${w - j - r} `
                             + `Q ${w - j} 0 ${w - j} ${r} `
-                            + `V ${h - j} Q ${w - j} ${h} ${w} ${h} `
-                            + `H 0 Q ${j} ${h} ${j} ${h - j} `
+                            + `V ${railTop - j} Q ${w - j} ${railTop} ${w} ${railTop} `
+                            + `V ${h} H 0 V ${railTop} `
+                            + `Q ${j} ${railTop} ${j} ${railTop - j} `
                             + `V ${r} Q ${j} 0 ${j + r} 0 Z`;
                     }
                 }
