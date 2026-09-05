@@ -111,6 +111,7 @@ Scope {
         WlrLayershell.namespace: "supermachine-sidebar-reserve"
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.exclusionMode: ExclusionMode.Normal
+        exclusiveZone: Theme.sidebarWidth
         mask: Region {}
     }
 
@@ -126,13 +127,15 @@ Scope {
             implicitWidth: Theme.frameWidth
             implicitHeight: Theme.frameWidth
             anchors {
-                top: modelData === "top"
-                right: modelData === "right"
-                bottom: modelData === "bottom"
+                top: modelData === "top" || modelData === "right"
+                right: true
+                bottom: modelData === "bottom" || modelData === "right"
+                left: modelData === "top" || modelData === "bottom"
             }
             WlrLayershell.namespace: `supermachine-${modelData}-reserve`
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Normal
+            exclusiveZone: Theme.frameWidth
             mask: Region {}
         }
     }
