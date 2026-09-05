@@ -31,6 +31,8 @@ section() {
     tail -n 300 "${log_dir}/quickshell.log" 2>&1 || true
     section "Recent Hyprland log"
     tail -n 300 "${log_dir}/hyprland.log" 2>&1 || true
+    section "Recent Console Mode log"
+    tail -n 400 "${log_dir}/console-mode.log" 2>&1 || true
     section "Current boot warnings and errors"
     journalctl -b -p warning..alert --no-pager -n 350 2>&1 || true
     section "Previous boot warnings and errors"

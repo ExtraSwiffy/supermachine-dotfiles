@@ -4,7 +4,13 @@ set -euo pipefail
 state_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/supermachine"
 state_file="${state_dir}/console-mode"
 display_file="${state_dir}/console-display"
-log_file="${XDG_CACHE_HOME:-${HOME}/.cache}/supermachine-console-mode.log"
+log_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/supermachine/logs"
+log_file="${log_dir}/console-mode.log"
+
+mkdir -p "$log_dir"
+if [[ -f "$log_file" ]] && (( $(wc -c < "$log_file") > 2097152 )); then
+    mv "$log_file" "${log_file}.previous"
+fi
 
 notify() {
     notify-send "SuperMachine Console Mode" "$1" >/dev/null 2>&1 || true
@@ -20,12 +26,14 @@ enter_mode() {
         hyprctl monitors -j | jq -r 'first(.[] | select(.focused == true)) | "\(.width) \(.height) \(.refreshRate | floor)"' > "$display_file" 2>/dev/null || true
     fi
     printf '%s\n' console > "$state_file"
+    printf '\n[%s] Console Mode requested from Hyprland\n' "$(date --iso-8601=seconds)" >> "$log_file"
     notify "Switching to the Steam console session."
     sleep 0.5
     hyprctl dispatch exit >/dev/null 2>&1 || true
 }
 
 return_mode() {
+    printf '[%s] Desktop Mode requested from Steam\n' "$(date --iso-8601=seconds)" >> "$log_file"
     rm -f "$state_file"
     timeout 6 steam -shutdown >/dev/null 2>&1 || true
     pkill -x steamwebhelper >/dev/null 2>&1 || true
@@ -46,6 +54,7 @@ run_session() {
     {
         printf 'Starting console session at %s (%sx%s@%s)\n' "$(date)" "$width" "$height" "$refresh"
         gamescope -e -f -b --force-windows-fullscreen --force-grab-cursor --hide-cursor-delay 0 --adaptive-sync --immediate-flips -W "$width" -H "$height" -w "$width" -h "$height" -r "$refresh" -- steam -steamdeck -steamos3 -steampal -gamepadui
+        printf 'Gamescope session exited at %s with code %s\n' "$(date)" "$?"
     } >> "$log_file" 2>&1 || true
 }
 

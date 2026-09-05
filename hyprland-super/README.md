@@ -63,3 +63,7 @@ automatically restarts after unexpected failures. In `Super+Tab` → System,
 report** creates a timestamped report under
 `~/.local/state/supermachine/reports/` with recent session, journal, graphics,
 and crash information.
+
+Console Mode writes its complete Gamescope and Steam launch output to
+`~/.local/state/supermachine/logs/console-mode.log`; that log is also embedded
+in every diagnostic report.
