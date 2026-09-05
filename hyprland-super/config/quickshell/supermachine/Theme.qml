@@ -29,4 +29,7 @@ QtObject {
     readonly property int wallpaperCardRadius: 18
     readonly property int controlCenterHeight: 610
     readonly property int controlCenterJoinRadius: 28
+    readonly property int badgeDeckWidth: 146
+    readonly property int badgeDeckJoinRadius: 27
+    readonly property int badgeDeckReserve: sidebarWidth + badgeDeckWidth - badgeDeckJoinRadius
 }

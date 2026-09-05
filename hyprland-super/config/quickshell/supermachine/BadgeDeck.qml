@@ -10,7 +10,7 @@ PanelWindow {
 
     readonly property var monitor: Hyprland.monitorFor(targetScreen)
     readonly property bool deckOpen: BadgeDeckState.open && BadgeDeckState.screenName === monitor?.name
-    readonly property int deckWidth: 146
+    readonly property int deckWidth: Theme.badgeDeckWidth
     readonly property int cardSize: 88
     readonly property int cardStep: 43
 
@@ -61,14 +61,14 @@ PanelWindow {
                 PathLine { x: deckShape.width; y: 0 }
                 PathLine { x: deckShape.width; y: Theme.frameWidth }
                 PathCubic {
-                    x: deckShape.width - 27; y: Theme.frameWidth + 27
+                    x: deckShape.width - Theme.badgeDeckJoinRadius; y: Theme.frameWidth + Theme.badgeDeckJoinRadius
                     control1X: deckShape.width - 15; control1Y: Theme.frameWidth
-                    control2X: deckShape.width - 27; control2Y: Theme.frameWidth + 12
+                    control2X: deckShape.width - Theme.badgeDeckJoinRadius; control2Y: Theme.frameWidth + 12
                 }
-                PathLine { x: deckShape.width - 27; y: deckShape.height - Theme.frameWidth - 27 }
+                PathLine { x: deckShape.width - Theme.badgeDeckJoinRadius; y: deckShape.height - Theme.frameWidth - Theme.badgeDeckJoinRadius }
                 PathCubic {
                     x: deckShape.width; y: deckShape.height - Theme.frameWidth
-                    control1X: deckShape.width - 27; control1Y: deckShape.height - Theme.frameWidth - 12
+                    control1X: deckShape.width - Theme.badgeDeckJoinRadius; control1Y: deckShape.height - Theme.frameWidth - 12
                     control2X: deckShape.width - 15; control2Y: deckShape.height - Theme.frameWidth
                 }
                 PathLine { x: deckShape.width; y: deckShape.height }

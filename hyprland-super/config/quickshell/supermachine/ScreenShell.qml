@@ -177,14 +177,18 @@ Scope {
 
     // This invisible layer reserves the same width as the visible rail.
     PanelWindow {
+        readonly property bool badgeReserve: BadgeDeckState.open
+            && BadgeDeckState.screenName === root.modelData.name
+        readonly property int reservedWidth: badgeReserve ? Theme.badgeDeckReserve : Theme.sidebarWidth
+
         screen: root.modelData
         color: "transparent"
-        implicitWidth: Theme.sidebarWidth
+        implicitWidth: reservedWidth
         anchors { top: true; bottom: true; left: true }
         WlrLayershell.namespace: "supermachine-sidebar-reserve"
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.exclusionMode: ExclusionMode.Normal
-        exclusiveZone: Theme.sidebarWidth
+        exclusiveZone: reservedWidth
         mask: Region {}
     }
 
