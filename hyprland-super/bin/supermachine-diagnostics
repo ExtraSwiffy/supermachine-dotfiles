@@ -37,6 +37,9 @@ section() {
     journalctl -b -p warning..alert --no-pager -n 350 2>&1 || true
     section "Previous boot warnings and errors"
     journalctl -b -1 -p warning..alert --no-pager -n 250 2>&1 || true
+    section "Reset and shutdown evidence"
+    journalctl -b 0 -k --no-pager 2>&1 | grep -Ei 'previous system reset reason|machine check|hardware error|watchdog|thermal.*critical|panic' | tail -n 100 || true
+    journalctl -b -1 --no-pager 2>&1 | grep -Ei 'shutdown|reboot|power key|watchdog|thermal.*critical|panic|out of memory|gpu.*(reset|fault|hang)' | tail -n 150 || true
     section "Recent crashes"
     coredumpctl --no-pager --since '2 days ago' 2>&1 | tail -n 100 || true
     find "${XDG_CACHE_HOME:-${HOME}/.cache}/quickshell/crashes" -maxdepth 2 -type f -printf '%TY-%Tm-%Td %TH:%TM  %p\n' 2>/dev/null | sort -r | head -n 100 || true

@@ -3,6 +3,8 @@
 A minimal, from-scratch Hyprland and Quickshell desktop. Hyprland owns the
 session and window management; Quickshell provides the rounded screen frame,
 left rail, launcher, wallpaper deck, badge deck, and control center.
+Foot uses the included SuperOS terminal profile and prompt rather than any
+shell branding inherited from an older desktop configuration.
 
 ## Shell shortcuts
 

@@ -12,7 +12,8 @@ bash -n "${project_dir}/superbase.sh" \
     "${project_dir}/bin/supermachine-system-info" \
     "${project_dir}/bin/steamos-session-select" \
     "${project_dir}/bin/supermachine-shell" \
-    "${project_dir}/bin/supermachine-diagnostics"
+    "${project_dir}/bin/supermachine-diagnostics" \
+    "${project_dir}/bin/supermachine-terminal"
 
 if command -v Hyprland >/dev/null 2>&1; then
     Hyprland --verify-config -c "${project_dir}/config/hypr/hyprland.lua"
