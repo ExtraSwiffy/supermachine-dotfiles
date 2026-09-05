@@ -13,6 +13,7 @@ PanelWindow {
     readonly property int deckWidth: Theme.badgeDeckWidth
     readonly property int cardSize: 88
     readonly property int cardStep: 43
+    readonly property int railWidth: Theme.sidebarWidthFor(targetScreen)
 
     function signedDistance(index) {
         const count = ShellSettings.badgePresets.length;
@@ -26,7 +27,7 @@ PanelWindow {
 
     screen: targetScreen
     color: "transparent"
-    implicitWidth: Theme.sidebarWidth + deckWidth
+    implicitWidth: railWidth + deckWidth
     anchors { top: true; bottom: true; left: true }
     WlrLayershell.namespace: "supermachine-badge-deck"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -49,7 +50,7 @@ PanelWindow {
 
         Shape {
             id: deckShape
-            x: Theme.sidebarWidth - Theme.frameWidth
+            x: root.railWidth - Theme.frameWidth
             width: root.deckWidth + Theme.frameWidth
             height: parent.height
             preferredRendererType: Shape.CurveRenderer
@@ -78,7 +79,7 @@ PanelWindow {
         }
 
         Text {
-            x: Theme.sidebarWidth + 17
+            x: root.railWidth + 17
             y: 20
             text: "BADGE DECK"
             color: Theme.mutedInk
@@ -89,7 +90,7 @@ PanelWindow {
 
         Item {
             id: cardStage
-            x: Theme.sidebarWidth + 8
+            x: root.railWidth + 8
             y: 48
             width: root.deckWidth - 16
             height: parent.height - 96

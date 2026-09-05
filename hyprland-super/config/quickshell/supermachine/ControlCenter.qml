@@ -20,7 +20,7 @@ PanelWindow {
 
     screen: targetScreen
     color: "transparent"
-    implicitWidth: Math.max(1, targetScreen.width - Theme.sidebarWidth)
+    implicitWidth: Math.max(1, targetScreen.width - Theme.sidebarWidthFor(targetScreen))
     implicitHeight: Theme.controlCenterHeight
     anchors { right: true; bottom: true }
     WlrLayershell.namespace: "supermachine-control-center"
@@ -202,6 +202,143 @@ PanelWindow {
                                         Text { anchors.centerIn: parent; text: colorModeButton.modelData.name; color: ShellSettings.colorMode === colorModeButton.modelData.key ? Theme.surface : Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
                                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setColorMode(colorModeButton.modelData.key) }
                                     }
+                                }
+                            }
+                        }
+
+                        Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            spacing: 9
+                            Text { text: "Shell palette · 50 colors"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                            Flickable {
+                                id: paletteFlick
+                                width: parent.width
+                                height: 54
+                                contentWidth: paletteRow.width
+                                clip: true
+                                boundsBehavior: Flickable.StopAtBounds
+                                Row {
+                                    id: paletteRow
+                                    spacing: 8
+                                    Repeater {
+                                        model: [
+                                            "#ffffff", "#f2f4f3", "#e8e2da", "#ded2c4", "#d7c6a5",
+                                            "#f3d7d7", "#efb8b8", "#e9c2d3", "#d9bddb", "#c9bde3",
+                                            "#bdc9e8", "#b9d5ea", "#b8e0df", "#bfe1ce", "#d1e3b5",
+                                            "#e7dfa9", "#efd0a4", "#e9b99f", "#d7b39b", "#b8aa99",
+                                            "#7f94a5", "#668a9a", "#517f80", "#557764", "#68764f",
+                                            "#8a714d", "#8d5f4c", "#824e59", "#74506f", "#5d557d",
+                                            "#445775", "#355e67", "#315b54", "#3f5943", "#54573b",
+                                            "#5e4f38", "#604338", "#593943", "#4e3b52", "#3e405a",
+                                            "#25364a", "#203e44", "#203d37", "#2c3b2d", "#393a27",
+                                            "#3e3227", "#3d2a28", "#38272f", "#292b3d", "#111719"
+                                        ]
+                                        delegate: Rectangle {
+                                            id: shellColorButton
+                                            required property string modelData
+                                            width: 46; height: 46; radius: 15
+                                            color: modelData
+                                            border.width: ShellSettings.shellColor.toLowerCase() === modelData.toLowerCase() ? 4 : 1
+                                            border.color: ShellSettings.shellColor.toLowerCase() === modelData.toLowerCase() ? Theme.ink : "#55808080"
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: ShellSettings.setShellColor(shellColorButton.modelData)
+                                            }
+                                        }
+                                    }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.NoButton
+                                    onWheel: wheel => {
+                                        const maximum = Math.max(0, paletteFlick.contentWidth - paletteFlick.width);
+                                        paletteFlick.contentX = Math.max(0, Math.min(maximum,
+                                            paletteFlick.contentX - wheel.angleDelta.y * 1.4));
+                                        wheel.accepted = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            spacing: 9
+                            Text { text: "Screen border texture"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                            Flickable {
+                                id: textureFlick
+                                width: parent.width
+                                height: 46
+                                contentWidth: textureRow.width
+                                clip: true
+                                boundsBehavior: Flickable.StopAtBounds
+                                Row {
+                                    id: textureRow
+                                    spacing: 8
+                                    Repeater {
+                                        model: ShellSettings.texturePresets
+                                        delegate: Rectangle {
+                                            id: textureButton
+                                            required property var modelData
+                                            width: Math.max(82, textureLabel.implicitWidth + 24); height: 38; radius: 12
+                                            color: ShellSettings.shellTexture === modelData.key ? Theme.ink : Theme.searchBackground
+                                            Text {
+                                                id: textureLabel
+                                                anchors.centerIn: parent
+                                                text: textureButton.modelData.name
+                                                color: ShellSettings.shellTexture === textureButton.modelData.key ? Theme.surface : Theme.ink
+                                                font.pixelSize: 11
+                                                font.weight: Font.Medium
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: ShellSettings.setShellTexture(textureButton.modelData.key)
+                                            }
+                                        }
+                                    }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.NoButton
+                                    onWheel: wheel => {
+                                        const maximum = Math.max(0, textureFlick.contentWidth - textureFlick.width);
+                                        textureFlick.contentX = Math.max(0, Math.min(maximum,
+                                            textureFlick.contentX - wheel.angleDelta.y * 1.4));
+                                        wheel.accepted = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            height: 72
+                            radius: 17
+                            color: Theme.searchBackground
+                            Column {
+                                anchors { left: parent.left; leftMargin: 16; verticalCenter: parent.verticalCenter }
+                                spacing: 3
+                                Text { text: "Secondary monitor sidebar"; color: Theme.ink; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                Text { text: "Turn off for an even border on the portrait display"; color: Theme.mutedInk; font.pixelSize: 10 }
+                            }
+                            Rectangle {
+                                anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }
+                                width: 52; height: 30; radius: 15
+                                color: ShellSettings.secondarySidebarEnabled ? Theme.ink : (Theme.dark ? Qt.lighter(Theme.surface, 1.7) : Qt.darker(Theme.surface, 1.25))
+                                Rectangle {
+                                    width: 22; height: 22; radius: 11; y: 4
+                                    x: ShellSettings.secondarySidebarEnabled ? 26 : 4
+                                    color: Theme.surface
+                                    Behavior on x { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: ShellSettings.setSecondarySidebarEnabled(!ShellSettings.secondarySidebarEnabled)
                                 }
                             }
                         }

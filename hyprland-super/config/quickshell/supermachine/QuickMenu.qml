@@ -58,7 +58,7 @@ PanelWindow {
         id: mainMenu
         width: 224
         height: menuColumn.height + 16
-        x: Math.max(Theme.sidebarWidth + 8, Math.min(root.width - width - 527, QuickMenuState.requestedX))
+        x: Math.max(Theme.sidebarWidthFor(targetScreen) + 8, Math.min(root.width - width - 527, QuickMenuState.requestedX))
         y: Math.max(Theme.frameWidth + 8, Math.min(root.height - height - 12, QuickMenuState.requestedY))
         radius: 15
         color: Theme.surface

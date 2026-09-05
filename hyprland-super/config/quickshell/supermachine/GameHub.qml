@@ -103,9 +103,9 @@ PanelWindow {
 
     Rectangle {
         id: surface
-        x: Theme.sidebarWidth
+        x: Theme.sidebarWidthFor(targetScreen)
         y: Theme.frameWidth
-        width: root.width - Theme.sidebarWidth - Theme.frameWidth
+        width: root.width - Theme.sidebarWidthFor(targetScreen) - Theme.frameWidth
         height: root.height - Theme.frameWidth * 2
         color: Theme.dark ? "#1b2224" : "#e9eded"
         visible: root.hubOpen

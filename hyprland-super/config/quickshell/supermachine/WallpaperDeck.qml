@@ -31,7 +31,7 @@ PanelWindow {
 
     screen: targetScreen
     color: "transparent"
-    implicitWidth: Math.max(1, targetScreen.width - Theme.sidebarWidth)
+    implicitWidth: Math.max(1, targetScreen.width - Theme.sidebarWidthFor(targetScreen))
     implicitHeight: Theme.wallpaperDeckHeight
     anchors { right: true; bottom: true }
     WlrLayershell.namespace: "supermachine-wallpaper-deck"

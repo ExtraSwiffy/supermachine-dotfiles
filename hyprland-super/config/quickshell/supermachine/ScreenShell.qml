@@ -6,6 +6,8 @@ import Quickshell.Wayland
 Scope {
     id: root
     required property ShellScreen modelData
+    readonly property int railWidth: Theme.sidebarWidthFor(root.modelData)
+    readonly property bool railVisible: railWidth > Theme.frameWidth
 
     SystemClock {
         id: clock
@@ -44,7 +46,7 @@ Scope {
                     path: {
                         const w = frame.width;
                         const h = frame.height;
-                        const x = Theme.sidebarWidth;
+                        const x = root.railWidth;
                         const y = Theme.frameWidth;
                         const right = w - Theme.frameWidth;
                         const bottom = h - Theme.frameWidth;
@@ -61,10 +63,115 @@ Scope {
             }
         }
 
+        Canvas {
+            id: frameTexture
+            anchors.fill: parent
+            visible: Theme.frameTexture !== "solid"
+            opacity: Theme.dark ? 0.22 : 0.15
+
+            function roundedPath(context, x, y, width, height, radius) {
+                context.beginPath();
+                context.moveTo(x + radius, y);
+                context.lineTo(x + width - radius, y);
+                context.quadraticCurveTo(x + width, y, x + width, y + radius);
+                context.lineTo(x + width, y + height - radius);
+                context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                context.lineTo(x + radius, y + height);
+                context.quadraticCurveTo(x, y + height, x, y + height - radius);
+                context.lineTo(x, y + radius);
+                context.quadraticCurveTo(x, y, x + radius, y);
+                context.closePath();
+            }
+
+            onPaint: {
+                const ctx = getContext("2d");
+                ctx.globalCompositeOperation = "source-over";
+                ctx.clearRect(0, 0, width, height);
+                ctx.strokeStyle = Theme.dark ? "#ffffff" : "#000000";
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.lineWidth = 1;
+                const parts = Theme.frameTexture.split("-");
+                const family = parts[0];
+                const legacyLevel = (family === "dots" || family === "grain" || family === "diagonal" || family === "grid") ? 3 : 1;
+                const level = parts.length > 1 ? Number(parts[1]) : legacyLevel;
+                const step = 5 + level * 3;
+
+                if (family === "dots" || family === "grain") {
+                    for (let y = 3; y < height; y += step) {
+                        for (let x = 3 + ((y / step) % 2) * step / 2; x < width; x += step) {
+                            ctx.beginPath();
+                            ctx.arc(x, y, family === "grain" ? 0.5 + level * 0.12 : 0.8 + level * 0.18, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                } else if (family === "vertical" || family === "horizontal") {
+                    for (let position = 0; position < (family === "vertical" ? width : height); position += step) {
+                        ctx.beginPath();
+                        ctx.moveTo(family === "vertical" ? position : 0, family === "vertical" ? 0 : position);
+                        ctx.lineTo(family === "vertical" ? position : width, family === "vertical" ? height : position);
+                        ctx.stroke();
+                    }
+                } else if (family === "checker") {
+                    for (let y = 0; y < height; y += step) {
+                        for (let x = 0; x < width; x += step) {
+                            if ((Math.floor(x / step) + Math.floor(y / step)) % 2 === 0)
+                                ctx.fillRect(x, y, step, step);
+                        }
+                    }
+                } else if (family === "wave") {
+                    for (let y = step; y < height; y += step * 1.6) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        for (let x = 0; x < width; x += 4)
+                            ctx.lineTo(x, y + Math.sin(x / (step * 0.8)) * (2 + level));
+                        ctx.stroke();
+                    }
+                } else if (family === "dash") {
+                    for (let y = 3; y < height; y += step) {
+                        for (let x = (Math.floor(y / step) % 2) * step; x < width; x += step * 2)
+                            ctx.fillRect(x, y, step * 0.8, 1 + level * 0.25);
+                    }
+                } else {
+                    const lineStep = family === "diamond" ? step * 1.45 : step;
+                    for (let x = -height; x < width + height; x += lineStep) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x + height, height);
+                        ctx.stroke();
+                    }
+                    if (family === "grid" || family === "diamond") {
+                        for (let x = 0; x < width + height; x += lineStep) {
+                            ctx.beginPath();
+                            ctx.moveTo(x, 0);
+                            ctx.lineTo(x - height, height);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                ctx.globalCompositeOperation = "destination-out";
+                roundedPath(ctx, root.railWidth, Theme.frameWidth,
+                    width - root.railWidth - Theme.frameWidth,
+                    height - Theme.frameWidth * 2, Theme.innerRadius);
+                ctx.fill();
+                ctx.globalCompositeOperation = "source-over";
+            }
+
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+            Connections {
+                target: ShellSettings
+                function onShellTextureChanged() { frameTexture.requestPaint(); }
+                function onColorModeChanged() { frameTexture.requestPaint(); }
+                function onSecondarySidebarEnabledChanged() { frameTexture.requestPaint(); }
+            }
+        }
+
         Column {
-            x: Math.round((Theme.sidebarWidth - width) / 2)
+            x: Math.round((root.railWidth - width) / 2)
             anchors.verticalCenter: parent.verticalCenter
             spacing: 7
+            visible: root.railVisible
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -138,12 +245,13 @@ Scope {
     PanelWindow {
         screen: root.modelData
         color: "transparent"
-        implicitWidth: Theme.sidebarWidth
+        implicitWidth: root.railWidth
         implicitHeight: 92
         anchors { top: true; left: true }
         WlrLayershell.namespace: "supermachine-badge"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
+        visible: root.railVisible
 
         Item {
             anchors.centerIn: parent
@@ -187,7 +295,7 @@ Scope {
     PanelWindow {
         readonly property bool badgeReserve: BadgeDeckState.open
             && BadgeDeckState.screenName === root.modelData.name
-        readonly property int reservedWidth: badgeReserve ? Theme.badgeDeckReserve : Theme.sidebarWidth
+        readonly property int reservedWidth: badgeReserve ? Theme.badgeDeckReserveFor(root.modelData) : root.railWidth
 
         screen: root.modelData
         color: "transparent"

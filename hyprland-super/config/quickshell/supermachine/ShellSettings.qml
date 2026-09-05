@@ -11,6 +11,42 @@ QtObject {
     property string badgeSource: Qt.resolvedUrl("assets/badges/whitetail-deer.webp").toString()
     property int badgeSize: 42
     property string colorMode: "dark"
+    property string shellColor: "#111719"
+    property string shellTexture: "solid"
+    property bool secondarySidebarEnabled: true
+    readonly property var texturePresets: [
+        { key: "solid", name: "Solid" },
+        { key: "dots-1", name: "Micro dots" }, { key: "dots-2", name: "Fine dots" },
+        { key: "dots", name: "Dots" }, { key: "dots-4", name: "Wide dots" },
+        { key: "dots-5", name: "Large dots" }, { key: "dots-6", name: "Orbit dots" },
+        { key: "grain-1", name: "Dust" }, { key: "grain-2", name: "Fine grain" },
+        { key: "grain", name: "Grain" }, { key: "grain-4", name: "Sand" },
+        { key: "grain-5", name: "Coarse grain" }, { key: "grain-6", name: "Pebble" },
+        { key: "diagonal-1", name: "Hairline" }, { key: "diagonal-2", name: "Fine stripe" },
+        { key: "diagonal", name: "Stripe" }, { key: "diagonal-4", name: "Wide stripe" },
+        { key: "diagonal-5", name: "Bold stripe" }, { key: "diagonal-6", name: "Ribbon" },
+        { key: "grid-1", name: "Micro grid" }, { key: "grid-2", name: "Fine grid" },
+        { key: "grid", name: "Grid" }, { key: "grid-4", name: "Wide grid" },
+        { key: "grid-5", name: "Bold grid" }, { key: "grid-6", name: "Trellis" },
+        { key: "vertical-1", name: "Micro pin" }, { key: "vertical-2", name: "Pinstripe" },
+        { key: "vertical-3", name: "Columns" }, { key: "vertical-4", name: "Wide columns" },
+        { key: "vertical-5", name: "Pillars" },
+        { key: "horizontal-1", name: "Micro bands" }, { key: "horizontal-2", name: "Fine bands" },
+        { key: "horizontal-3", name: "Bands" }, { key: "horizontal-4", name: "Wide bands" },
+        { key: "horizontal-5", name: "Horizon" },
+        { key: "checker-1", name: "Micro check" }, { key: "checker-2", name: "Fine check" },
+        { key: "checker-3", name: "Checker" }, { key: "checker-4", name: "Wide check" },
+        { key: "checker-5", name: "Blocks" },
+        { key: "diamond-1", name: "Micro diamond" }, { key: "diamond-2", name: "Fine diamond" },
+        { key: "diamond-3", name: "Diamond" }, { key: "diamond-4", name: "Wide diamond" },
+        { key: "diamond-5", name: "Argyle" },
+        { key: "wave-1", name: "Micro wave" }, { key: "wave-2", name: "Fine wave" },
+        { key: "wave-3", name: "Wave" }, { key: "wave-4", name: "Wide wave" },
+        { key: "wave-5", name: "Tide" },
+        { key: "dash-1", name: "Micro dash" }, { key: "dash-2", name: "Fine dash" },
+        { key: "dash-3", name: "Dash" }, { key: "dash-4", name: "Wide dash" },
+        { key: "dash-5", name: "Stitch" }
+    ]
     property bool rainEnabled: true
     property bool leavesEnabled: true
     property bool snowEnabled: false
@@ -63,6 +99,9 @@ QtObject {
             badgeSource = saved.badgeSource ?? badgeSource;
             badgeSize = saved.badgeSize ?? badgeSize;
             colorMode = saved.colorMode ?? colorMode;
+            shellColor = saved.shellColor ?? (colorMode === "dark" ? "#111719" : "#ffffff");
+            shellTexture = saved.shellTexture ?? shellTexture;
+            secondarySidebarEnabled = saved.secondarySidebarEnabled ?? secondarySidebarEnabled;
             rainEnabled = saved.rainEnabled ?? rainEnabled;
             leavesEnabled = saved.leavesEnabled ?? leavesEnabled;
             leafColor = saved.leafColor ?? leafColor;
@@ -88,6 +127,9 @@ QtObject {
             badgeSource,
             badgeSize,
             colorMode,
+            shellColor,
+            shellTexture,
+            secondarySidebarEnabled,
             rainEnabled,
             leavesEnabled,
             leafColor,
@@ -147,6 +189,29 @@ QtObject {
 
     function setColorMode(value) {
         colorMode = value === "dark" ? "dark" : "light";
+        shellColor = colorMode === "dark" ? "#111719" : "#ffffff";
+        save();
+    }
+
+    function setShellColor(value) {
+        shellColor = value;
+        const hex = value.replace("#", "");
+        const red = parseInt(hex.slice(0, 2), 16);
+        const green = parseInt(hex.slice(2, 4), 16);
+        const blue = parseInt(hex.slice(4, 6), 16);
+        colorMode = (red * 0.299 + green * 0.587 + blue * 0.114) < 145 ? "dark" : "light";
+        save();
+    }
+
+    function setShellTexture(value) {
+        if (!texturePresets.some(preset => preset.key === value))
+            return;
+        shellTexture = value;
+        save();
+    }
+
+    function setSecondarySidebarEnabled(value) {
+        secondarySidebarEnabled = value;
         save();
     }
 

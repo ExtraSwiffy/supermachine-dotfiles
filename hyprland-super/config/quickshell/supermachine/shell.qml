@@ -163,6 +163,18 @@ ShellRoot {
             ShellSettings.setColorMode(value);
         }
 
+        function setShellColor(value: string) {
+            ShellSettings.setShellColor(value);
+        }
+
+        function setShellTexture(value: string) {
+            ShellSettings.setShellTexture(value);
+        }
+
+        function setSecondarySidebar(value: bool) {
+            ShellSettings.setSecondarySidebarEnabled(value);
+        }
+
         function setRain(value: bool) {
             ShellSettings.setRainEnabled(value);
         }
@@ -212,7 +224,7 @@ ShellRoot {
         }
 
         function status(): string {
-            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:frame=${ShellSettings.frameWidth}:gap=${ShellSettings.windowGap}:border=${ShellSettings.windowBorderColor}:power=${ShellSettings.powerProfile}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:snow=${ShellSettings.snowEnabled}@${ShellSettings.snowSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}:bats=${ShellSettings.batsEnabled}@${ShellSettings.batSpeed}`;
+            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:shell=${ShellSettings.shellColor}@${ShellSettings.shellTexture}:frame=${ShellSettings.frameWidth}:gap=${ShellSettings.windowGap}:border=${ShellSettings.windowBorderColor}:power=${ShellSettings.powerProfile}:rain=${ShellSettings.rainEnabled}@${ShellSettings.rainSpeed}:snow=${ShellSettings.snowEnabled}@${ShellSettings.snowSpeed}:leaves=${ShellSettings.leavesEnabled}@${ShellSettings.leafSpeed}:${ShellSettings.leafColor}:bats=${ShellSettings.batsEnabled}@${ShellSettings.batSpeed}`;
         }
     }
 
