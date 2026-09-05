@@ -106,7 +106,7 @@ PanelWindow {
                     readonly property bool selected: index === BadgeDeckState.selectedIndex
                     width: root.cardSize
                     height: root.cardSize
-                    x: (cardStage.width - width) / 2 - 26
+                    x: (cardStage.width - width) / 2 - 16
                     y: (cardStage.height - height) / 2 + distance * root.cardStep
                     scale: selected ? 1 : Math.max(0.82, 0.94 - Math.abs(distance) * 0.018)
                     opacity: selected ? 1 : Math.max(0.54, 0.9 - Math.abs(distance) * 0.055)
