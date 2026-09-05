@@ -68,6 +68,7 @@ hl.on("hyprland.start", function()
 end)
 
 hl.bind(main_mod .. " + Return", hl.dsp.exec_cmd(terminal))
+hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + Space", hl.dsp.exec_cmd("qs -c supermachine ipc call launcher toggle"))
 hl.bind(main_mod .. " + W", hl.dsp.exec_cmd("qs -c supermachine ipc call wallpapers toggle"))
 hl.bind(main_mod .. " + Tab", hl.dsp.exec_cmd("qs -c supermachine ipc call controlcenter toggle"))
