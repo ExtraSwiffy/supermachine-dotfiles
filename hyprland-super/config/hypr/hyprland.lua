@@ -28,7 +28,7 @@ hl.config({
         resize_on_border = true,
     },
     decoration = {
-        rounding = 12,
+        rounding = 18,
         rounding_power = 2,
         active_opacity = 1,
         inactive_opacity = 0.96,

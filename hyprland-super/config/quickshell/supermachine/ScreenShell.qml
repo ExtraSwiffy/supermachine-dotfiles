@@ -113,4 +113,27 @@ Scope {
         WlrLayershell.exclusionMode: ExclusionMode.Normal
         mask: Region {}
     }
+
+    // Keep tiled and maximized windows evenly inside the visible frame.
+    Variants {
+        model: ["top", "right", "bottom"]
+
+        PanelWindow {
+            required property string modelData
+
+            screen: root.modelData
+            color: "transparent"
+            implicitWidth: Theme.frameWidth
+            implicitHeight: Theme.frameWidth
+            anchors {
+                top: modelData === "top"
+                right: modelData === "right"
+                bottom: modelData === "bottom"
+            }
+            WlrLayershell.namespace: `supermachine-${modelData}-reserve`
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.exclusionMode: ExclusionMode.Normal
+            mask: Region {}
+        }
+    }
 }
