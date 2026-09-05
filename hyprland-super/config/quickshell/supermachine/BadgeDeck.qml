@@ -10,7 +10,7 @@ PanelWindow {
 
     readonly property var monitor: Hyprland.monitorFor(targetScreen)
     readonly property bool deckOpen: BadgeDeckState.open && BadgeDeckState.screenName === monitor?.name
-    readonly property int deckWidth: 126
+    readonly property int deckWidth: 146
     readonly property int cardSize: 88
     readonly property int cardStep: 43
 
@@ -106,7 +106,7 @@ PanelWindow {
                     readonly property bool selected: index === BadgeDeckState.selectedIndex
                     width: root.cardSize
                     height: root.cardSize
-                    x: (cardStage.width - width) / 2 - 16
+                    x: (cardStage.width - width) / 2 - 14
                     y: (cardStage.height - height) / 2 + distance * root.cardStep
                     scale: selected ? 1 : Math.max(0.82, 0.94 - Math.abs(distance) * 0.018)
                     opacity: selected ? 1 : Math.max(0.54, 0.9 - Math.abs(distance) * 0.055)
