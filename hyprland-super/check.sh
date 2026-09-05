@@ -18,7 +18,9 @@ if command -v qmllint >/dev/null 2>&1; then
     # These files use only types qmllint can resolve without a running shell.
     qmllint \
         "${project_dir}/config/quickshell/supermachine/LauncherState.qml" \
+        "${project_dir}/config/quickshell/supermachine/ControlCenterState.qml" \
         "${project_dir}/config/quickshell/supermachine/ScreenShell.qml" \
+        "${project_dir}/config/quickshell/supermachine/ShellSettings.qml" \
         "${project_dir}/config/quickshell/supermachine/Theme.qml" \
         "${project_dir}/config/quickshell/supermachine/WallpaperState.qml"
 else

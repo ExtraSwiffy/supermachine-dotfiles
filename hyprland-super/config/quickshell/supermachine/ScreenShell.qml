@@ -115,6 +115,10 @@ Scope {
         targetScreen: root.modelData
     }
 
+    ControlCenter {
+        targetScreen: root.modelData
+    }
+
     PanelWindow {
         screen: root.modelData
         color: "transparent"
@@ -131,7 +135,9 @@ Scope {
             height: 48
 
             AnimatedImage {
-                anchors.fill: parent
+                anchors.centerIn: parent
+                width: ShellSettings.badgeSize + 12
+                height: width
                 visible: Theme.badgeSource.length > 0
                 source: Theme.badgeSource
                 fillMode: Image.PreserveAspectFit
@@ -142,7 +148,7 @@ Scope {
                 anchors.centerIn: parent
                 visible: Theme.badgeSource.length === 0
                 text: Theme.badgeText
-                font.pixelSize: 30
+                font.pixelSize: ShellSettings.badgeSize
             }
 
             MouseArea {
@@ -150,6 +156,7 @@ Scope {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     WallpaperState.close();
+                    ControlCenterState.close();
                     LauncherState.toggle(root.modelData.name);
                 }
             }
@@ -178,11 +185,16 @@ Scope {
             readonly property bool wallpaperReserve: modelData === "bottom"
                 && WallpaperState.open
                 && WallpaperState.screenName === root.modelData.name
+            readonly property bool controlCenterReserve: modelData === "bottom"
+                && ControlCenterState.open
+                && ControlCenterState.screenName === root.modelData.name
+            readonly property int bottomReserve: controlCenterReserve ? Theme.controlCenterHeight
+                : wallpaperReserve ? Theme.wallpaperDeckHeight : Theme.frameWidth
 
             screen: root.modelData
             color: "transparent"
             implicitWidth: Theme.frameWidth
-            implicitHeight: wallpaperReserve ? Theme.wallpaperDeckHeight : Theme.frameWidth
+            implicitHeight: bottomReserve
             anchors {
                 top: modelData === "top" || modelData === "right"
                 right: true
@@ -192,7 +204,7 @@ Scope {
             WlrLayershell.namespace: `supermachine-${modelData}-reserve`
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Normal
-            exclusiveZone: wallpaperReserve ? Theme.wallpaperDeckHeight : Theme.frameWidth
+            exclusiveZone: bottomReserve
             mask: Region {}
         }
     }

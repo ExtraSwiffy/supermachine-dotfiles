@@ -12,8 +12,8 @@ QtObject {
     readonly property color launcherAccent: "#111416"
 
     // Use badgeText for emoji, or set badgeSource to an image/GIF file path.
-    readonly property string badgeText: "🚀"
-    readonly property string badgeSource: ""
+    readonly property string badgeText: ShellSettings.badgeText
+    readonly property string badgeSource: ShellSettings.badgeMode === "image" ? ShellSettings.badgeSource : ""
 
     readonly property int frameWidth: 9
     readonly property int sidebarWidth: 76
@@ -26,4 +26,6 @@ QtObject {
     readonly property int wallpaperDeckHeight: 350
     readonly property int wallpaperJoinRadius: 28
     readonly property int wallpaperCardRadius: 18
+    readonly property int controlCenterHeight: 610
+    readonly property int controlCenterJoinRadius: 28
 }
