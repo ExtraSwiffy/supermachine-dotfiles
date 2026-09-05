@@ -1,9 +1,9 @@
 # SuperMachine 2.0
 
 A minimal, from-scratch Hyprland and Quickshell desktop. Hyprland owns the
-session and window management; Quickshell owns the visible desktop frame,
-sidebar, and interactive surfaces. Application choices will be added only when
-the shell needs them.
+session and window management; Quickshell currently provides only a rounded
+screen frame and a left time-and-date rail. Application choices will be added
+only when the shell needs them.
 
 ## Stage one: fresh Arch TTY
 
@@ -39,3 +39,6 @@ and starts the SuperMachine shell. Display-specific rules belong in
 ./deploy.sh
 qs -p ./config/quickshell/supermachine
 ```
+
+Use `./deploy.sh --shell-only` when previewing Quickshell without replacing the
+active Hyprland configuration.

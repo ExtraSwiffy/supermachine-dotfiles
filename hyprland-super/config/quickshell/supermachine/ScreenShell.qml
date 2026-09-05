@@ -6,22 +6,43 @@ Scope {
     id: root
     required property ShellScreen modelData
 
-    Variants {
-        model: ["top", "right", "bottom"]
-        Edge {
-            required property string modelData
-            targetScreen: root.modelData
-            edge: modelData
+    SystemClock {
+        id: clock
+        precision: SystemClock.Seconds
+    }
+
+    // A click-through outline gives the desktop one continuous rounded edge.
+    PanelWindow {
+        screen: root.modelData
+        color: "transparent"
+        anchors { top: true; right: true; bottom: true; left: true }
+        WlrLayershell.namespace: "supermachine-frame"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.exclusionMode: ExclusionMode.Ignore
+        mask: Region {}
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: Theme.frameInset
+            color: "transparent"
+            radius: Theme.outerRadius
+            border.width: Theme.frameWidth
+            border.color: Theme.border
         }
     }
 
+    // The rail reserves only its own width. Everything else remains usable.
     PanelWindow {
         id: sidebar
         screen: root.modelData
         color: "transparent"
         implicitWidth: Theme.sidebarWidth
         anchors { top: true; bottom: true; left: true }
-        margins { top: Theme.frameWidth; bottom: Theme.frameWidth; left: Theme.frameWidth }
+        margins {
+            top: Theme.frameInset
+            bottom: Theme.frameInset
+            left: Theme.frameInset
+        }
         WlrLayershell.namespace: "supermachine-sidebar"
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.exclusionMode: ExclusionMode.Normal
@@ -29,67 +50,56 @@ Scope {
         Rectangle {
             anchors.fill: parent
             color: Theme.background
-            radius: Theme.radius
-            border.width: Theme.frameWidth
+            radius: Theme.sidebarRadius
+            border.width: Theme.sidebarBorderWidth
             border.color: Theme.border
 
             Column {
-                anchors { top: parent.top; horizontalCenter: parent.horizontalCenter; topMargin: 16 }
-                spacing: 12
+                anchors.centerIn: parent
+                spacing: 7
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: Qt.formatDateTime(clock.date, "HH")
+                    color: Theme.text
+                    font.pixelSize: 25
+                    font.weight: Font.DemiBold
+                }
 
                 Rectangle {
-                    width: 34; height: 34; radius: 12
-                    color: launcher.containsMouse ? Theme.surfaceHover : Theme.surface
-                    Text { anchors.centerIn: parent; text: "◆"; color: Theme.border; font.pixelSize: 16 }
-                    MouseArea { id: launcher; anchors.fill: parent; hoverEnabled: true }
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 24
+                    height: 2
+                    radius: 1
+                    color: Theme.border
                 }
 
-                Repeater {
-                    model: 5
-                    Rectangle {
-                        width: 30; height: 30; radius: 10
-                        color: index === 0 ? Theme.border : Theme.surface
-                        Text { anchors.centerIn: parent; text: index + 1; color: index === 0 ? "#0a1012" : Theme.text }
-                    }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: Qt.formatDateTime(clock.date, "mm")
+                    color: Theme.text
+                    font.pixelSize: 25
+                    font.weight: Font.DemiBold
                 }
-            }
-        }
-    }
 
-    PanelWindow {
-        id: topMenu
-        screen: root.modelData
-        color: "transparent"
-        implicitWidth: 420
-        implicitHeight: menuOpen ? 92 : 8
-        anchors { top: true }
-        margins { top: Theme.frameWidth }
-        WlrLayershell.namespace: "supermachine-top-menu"
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.exclusionMode: ExclusionMode.Ignore
+                Item { width: 1; height: 13 }
 
-        property bool menuOpen: hover.containsMouse
-        Behavior on implicitHeight { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: Qt.formatDateTime(clock.date, "ddd").toUpperCase()
+                    color: Theme.muted
+                    font.pixelSize: 10
+                    font.letterSpacing: 1.5
+                }
 
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.background
-            radius: Theme.radius
-            border.width: Theme.frameWidth
-            border.color: Theme.border
-            clip: true
-
-            Row {
-                anchors.centerIn: parent
-                spacing: 34
-                opacity: topMenu.menuOpen ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 150 } }
-                Repeater {
-                    model: ["WORK", "MEDIA", "SYSTEM"]
-                    Text { required property string modelData; text: modelData; color: Theme.text; font.pixelSize: 12; font.letterSpacing: 2 }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: Qt.formatDateTime(clock.date, "MMM d").toUpperCase()
+                    color: Theme.text
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
                 }
             }
-            MouseArea { id: hover; anchors.fill: parent; hoverEnabled: true }
         }
     }
 }
