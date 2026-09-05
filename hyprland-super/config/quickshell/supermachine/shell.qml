@@ -19,6 +19,31 @@ ShellRoot {
         }
     }
 
+    IpcHandler {
+        target: "wallpapers"
+
+        function toggle() {
+            LauncherState.close();
+            WallpaperState.toggle(Hyprland.focusedMonitor?.name ?? "");
+        }
+
+        function close() {
+            WallpaperState.close();
+        }
+
+        function next() {
+            WallpaperState.step(1);
+        }
+
+        function previous() {
+            WallpaperState.step(-1);
+        }
+
+        function status() {
+            return `${WallpaperState.open}:${WallpaperState.selectedName}`;
+        }
+    }
+
     Variants {
         model: Quickshell.screens
         ScreenShell {}

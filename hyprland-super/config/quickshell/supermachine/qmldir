@@ -2,3 +2,6 @@ singleton Theme 1.0 Theme.qml
 ScreenShell 1.0 ScreenShell.qml
 Launcher 1.0 Launcher.qml
 singleton LauncherState 1.0 LauncherState.qml
+singleton WallpaperState 1.0 WallpaperState.qml
+WallpaperBackground 1.0 WallpaperBackground.qml
+WallpaperDeck 1.0 WallpaperDeck.qml

@@ -19,7 +19,8 @@ if command -v qmllint >/dev/null 2>&1; then
     qmllint \
         "${project_dir}/config/quickshell/supermachine/LauncherState.qml" \
         "${project_dir}/config/quickshell/supermachine/ScreenShell.qml" \
-        "${project_dir}/config/quickshell/supermachine/Theme.qml"
+        "${project_dir}/config/quickshell/supermachine/Theme.qml" \
+        "${project_dir}/config/quickshell/supermachine/WallpaperState.qml"
 else
     echo "warning: qmllint is not installed; skipped QML linting"
 fi

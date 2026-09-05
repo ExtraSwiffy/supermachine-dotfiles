@@ -12,6 +12,10 @@ Scope {
         precision: SystemClock.Seconds
     }
 
+    WallpaperBackground {
+        targetScreen: root.modelData
+    }
+
     // One continuous surface: a wide left rail flowing into thin screen edges.
     PanelWindow {
         id: frame
@@ -104,6 +108,10 @@ Scope {
 
     // Interactive surfaces are created after the frame so they render above it.
     Launcher {
+        targetScreen: root.modelData
+    }
+
+    WallpaperDeck {
         targetScreen: root.modelData
     }
 

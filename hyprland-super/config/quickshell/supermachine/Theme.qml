@@ -23,4 +23,7 @@ QtObject {
     readonly property int launcherHeight: 500
     readonly property int launcherJoinRadius: 24
     readonly property int launcherResultCount: 7
+    readonly property int wallpaperDeckHeight: 350
+    readonly property int wallpaperJoinRadius: 28
+    readonly property int wallpaperCardRadius: 18
 }
