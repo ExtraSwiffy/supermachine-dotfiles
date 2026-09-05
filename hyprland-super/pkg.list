@@ -1,5 +1,6 @@
 # Stage-one packages available from the official Arch repositories.
 foot
+fastfetch
 git
 hyprland
 ttf-jetbrains-mono-nerd
