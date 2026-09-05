@@ -102,6 +102,49 @@ Scope {
         }
     }
 
+    // Interactive surfaces are created after the frame so they render above it.
+    Launcher {
+        targetScreen: root.modelData
+    }
+
+    PanelWindow {
+        screen: root.modelData
+        color: "transparent"
+        implicitWidth: Theme.sidebarWidth
+        implicitHeight: 92
+        anchors { top: true; left: true }
+        WlrLayershell.namespace: "supermachine-badge"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+        Item {
+            anchors.centerIn: parent
+            width: 48
+            height: 48
+
+            AnimatedImage {
+                anchors.fill: parent
+                visible: Theme.badgeSource.length > 0
+                source: Theme.badgeSource
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+            }
+
+            Text {
+                anchors.centerIn: parent
+                visible: Theme.badgeSource.length === 0
+                text: Theme.badgeText
+                font.pixelSize: 30
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: LauncherState.toggle(root.modelData.name)
+            }
+        }
+    }
+
     // This invisible layer reserves the same width as the visible rail.
     PanelWindow {
         screen: root.modelData
