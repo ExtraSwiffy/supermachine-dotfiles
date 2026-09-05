@@ -69,8 +69,8 @@ PanelWindow {
                         const f = Theme.frameWidth;
                         const k = j * 0.55228475;
 
-                        return `M 0 0 H ${f} `
-                            + `C ${f} ${k} ${f + j - k} ${j} ${f + j} ${j} `
+                        return `M 0 0 `
+                            + `C 0 ${k} ${j - k} ${j} ${j} ${j} `
                             + `H ${w - f - j} `
                             + `C ${w - f - j + k} ${j} ${w - f} ${k} ${w - f} 0 `
                             + `H ${w} V ${h} H 0 Z`;
