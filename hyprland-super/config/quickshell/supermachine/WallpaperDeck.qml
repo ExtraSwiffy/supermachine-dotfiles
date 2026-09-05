@@ -14,14 +14,14 @@ PanelWindow {
     readonly property int cardWidth: Math.min(430, Math.round(width * 0.34))
     readonly property int cardHeight: Math.round(cardWidth * 0.5625)
     readonly property real deckStep: {
-        const count = WallpaperState.wallpapers.length;
+        const count = WallpaperState.visibleCards.length;
         const usable = width - 96;
         return count < 2 ? 0 : Math.min(cardWidth * 0.34, (usable - cardWidth) / (count - 1));
     }
 
     function signedDistance(index) {
-        const count = WallpaperState.wallpapers.length;
-        let distance = index - WallpaperState.selectedIndex;
+        const count = WallpaperState.visibleCards.length;
+        let distance = index - WallpaperState.visibleIndex;
         if (distance > count / 2)
             distance -= count;
         if (distance < -count / 2)
@@ -81,7 +81,7 @@ PanelWindow {
 
         Text {
             anchors { top: parent.top; topMargin: Theme.wallpaperJoinRadius + 10; horizontalCenter: parent.horizontalCenter }
-            text: WallpaperState.selectedName
+            text: WallpaperState.browsingDecks ? WallpaperState.deckTitle : WallpaperState.visibleCards[WallpaperState.visibleIndex]?.name ?? ""
             color: Theme.ink
             font.pixelSize: 17
             font.weight: Font.DemiBold
@@ -89,7 +89,9 @@ PanelWindow {
 
         Text {
             anchors { top: parent.top; topMargin: Theme.wallpaperJoinRadius + 35; horizontalCenter: parent.horizontalCenter }
-            text: "CLICK A CARD TO PREVIEW  •  SCROLL TO GLIDE  •  ESC TO CLOSE"
+            text: WallpaperState.browsingDecks
+                ? "CHOOSE A DECK  •  SCROLL TO GLIDE  •  ENTER TO OPEN"
+                : "CLICK A CARD TO PREVIEW  •  ESC TO RETURN TO DECKS"
             color: Theme.mutedInk
             font.pixelSize: 9
             font.letterSpacing: 1.2
@@ -109,14 +111,14 @@ PanelWindow {
             anchors { leftMargin: 36; rightMargin: 36; topMargin: Theme.wallpaperJoinRadius + 62; bottomMargin: Theme.frameWidth + 12 }
 
             Repeater {
-                model: WallpaperState.wallpapers
+                model: WallpaperState.visibleCards
 
                 delegate: Item {
                     id: card
                     required property var modelData
                     required property int index
                     readonly property real distance: root.signedDistance(index)
-                    readonly property bool selected: index === WallpaperState.selectedIndex
+                    readonly property bool selected: index === WallpaperState.visibleIndex
 
                     width: root.cardWidth
                     height: root.cardHeight
@@ -146,27 +148,45 @@ PanelWindow {
                             asynchronous: true
                             cache: true
                         }
+
+                        Rectangle {
+                            visible: WallpaperState.browsingDecks
+                            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+                            height: 68
+                            gradient: Gradient {
+                                GradientStop { position: 0; color: "#00101214" }
+                                GradientStop { position: 1; color: "#dd101214" }
+                            }
+
+                            Column {
+                                anchors { left: parent.left; leftMargin: 18; bottom: parent.bottom; bottomMargin: 12 }
+                                spacing: 2
+                                Text { text: card.modelData.name; color: "white"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                Text { text: card.modelData.detail; color: "#cbd3d4"; font.pixelSize: 10 }
+                            }
+                        }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: WallpaperState.select(card.index)
+                        onClicked: WallpaperState.chooseVisible(card.index)
                         onDoubleClicked: {
-                            WallpaperState.select(card.index);
-                            WallpaperState.close();
+                            WallpaperState.chooseVisible(card.index);
+                            if (!WallpaperState.browsingDecks)
+                                WallpaperState.close();
                         }
                     }
                 }
             }
         }
 
-        Keys.onEscapePressed: WallpaperState.close()
+        Keys.onEscapePressed: WallpaperState.back()
         Keys.onLeftPressed: WallpaperState.step(-1)
         Keys.onRightPressed: WallpaperState.step(1)
-        Keys.onReturnPressed: WallpaperState.close()
-        Keys.onEnterPressed: WallpaperState.close()
+        Keys.onReturnPressed: WallpaperState.activate()
+        Keys.onEnterPressed: WallpaperState.activate()
     }
 
     onDeckOpenChanged: {

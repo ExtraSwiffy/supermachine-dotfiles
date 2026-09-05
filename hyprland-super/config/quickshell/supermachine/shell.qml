@@ -44,8 +44,16 @@ ShellRoot {
             WallpaperState.step(-1);
         }
 
+        function enterDeck(index: int) {
+            WallpaperState.enterDeck(index);
+        }
+
+        function back() {
+            WallpaperState.back();
+        }
+
         function status(): string {
-            return `${WallpaperState.open}:${WallpaperState.selectedName}`;
+            return `${WallpaperState.open}:${WallpaperState.browsingDecks ? "decks" : WallpaperState.deckTitle}:${WallpaperState.selectedName}`;
         }
     }
 

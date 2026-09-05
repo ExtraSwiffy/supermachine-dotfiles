@@ -6,6 +6,9 @@ QtObject {
     property string screenName: ""
     // Redwood Creek is the curated out-of-box default.
     property int selectedIndex: 4
+    property bool browsingDecks: true
+    property int selectedDeckIndex: 0
+    property int selectedCardIndex: 0
 
     readonly property var wallpapers: [
         { name: "Alpine Morning", source: Qt.resolvedUrl("assets/wallpapers/alpine-morning.webp") },
@@ -47,6 +50,29 @@ QtObject {
     readonly property url selectedSource: wallpapers.length > selectedIndex ? wallpapers[selectedIndex].source : ""
     readonly property string selectedName: wallpapers.length > selectedIndex ? wallpapers[selectedIndex].name : ""
 
+    readonly property var decks: [
+        { name: "Scenic Nature", detail: "13 landscapes", indices: [0, 1, 3, 4, 5, 7, 9, 13, 14, 16, 17, 19, 21] },
+        { name: "Fantasy Worlds", detail: "11 dreamscapes", indices: [2, 6, 8, 10, 11, 12, 15, 18, 20, 22, 23] },
+        { name: "Winter", detail: "3 snowy scenes", indices: [24, 25, 26] },
+        { name: "Christmas", detail: "2 festive scenes", indices: [27, 28] },
+        { name: "Halloween", detail: "5 spooky scenes", indices: [29, 30, 31, 32, 33] }
+    ]
+
+    readonly property var deckCards: decks.map((deck, index) => ({
+        name: deck.name,
+        detail: deck.detail,
+        source: wallpapers[deck.indices[0]].source,
+        deckIndex: index
+    }))
+    readonly property var wallpaperCards: decks[selectedDeckIndex].indices.map(wallpaperIndex => ({
+        name: wallpapers[wallpaperIndex].name,
+        source: wallpapers[wallpaperIndex].source,
+        wallpaperIndex
+    }))
+    readonly property var visibleCards: browsingDecks ? deckCards : wallpaperCards
+    readonly property int visibleIndex: browsingDecks ? selectedDeckIndex : selectedCardIndex
+    readonly property string deckTitle: browsingDecks ? "Wallpaper Decks" : decks[selectedDeckIndex].name
+
     function thumbnailFor(source) {
         return source.toString().replace("/wallpapers/", "/wallpapers/thumbs/");
     }
@@ -58,6 +84,7 @@ QtObject {
         }
 
         screenName = name;
+        showDeckChooser();
         open = true;
     }
 
@@ -71,8 +98,58 @@ QtObject {
     }
 
     function step(amount) {
-        const count = wallpapers.length;
-        if (count > 0)
-            selectedIndex = (selectedIndex + amount + count) % count;
+        const count = visibleCards.length;
+        if (!count)
+            return;
+        if (browsingDecks)
+            selectedDeckIndex = (selectedDeckIndex + amount + count) % count;
+        else
+            selectedCardIndex = (selectedCardIndex + amount + count) % count;
+    }
+
+    function showDeckChooser() {
+        browsingDecks = true;
+        for (let i = 0; i < decks.length; i++) {
+            if (decks[i].indices.indexOf(selectedIndex) !== -1) {
+                selectedDeckIndex = i;
+                break;
+            }
+        }
+    }
+
+    function enterDeck(index) {
+        if (index < 0 || index >= decks.length)
+            return;
+        selectedDeckIndex = index;
+        const currentPosition = decks[index].indices.indexOf(selectedIndex);
+        selectedCardIndex = currentPosition === -1 ? 0 : currentPosition;
+        browsingDecks = false;
+    }
+
+    function chooseVisible(index) {
+        if (index < 0 || index >= visibleCards.length)
+            return;
+        if (browsingDecks) {
+            enterDeck(index);
+            return;
+        }
+        selectedCardIndex = index;
+        select(visibleCards[index].wallpaperIndex);
+    }
+
+    function activate() {
+        if (browsingDecks)
+            enterDeck(selectedDeckIndex);
+        else {
+            chooseVisible(selectedCardIndex);
+            close();
+        }
+    }
+
+    function back() {
+        if (browsingDecks)
+            close();
+        else
+            browsingDecks = true;
     }
 }
