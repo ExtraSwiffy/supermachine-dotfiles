@@ -7,6 +7,7 @@ ShellRoot {
         target: "launcher"
 
         function toggle() {
+            WallpaperState.close();
             LauncherState.toggle(Hyprland.focusedMonitor?.name ?? "");
         }
 
@@ -14,7 +15,7 @@ ShellRoot {
             LauncherState.close();
         }
 
-        function status() {
+        function status(): string {
             return `${LauncherState.open}:${LauncherState.screenName}`;
         }
     }
@@ -39,7 +40,7 @@ ShellRoot {
             WallpaperState.step(-1);
         }
 
-        function status() {
+        function status(): string {
             return `${WallpaperState.open}:${WallpaperState.selectedName}`;
         }
     }

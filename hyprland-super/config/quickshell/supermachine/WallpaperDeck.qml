@@ -41,11 +41,12 @@ PanelWindow {
 
     Region { id: closedMask }
 
-    Item {
+    FocusScope {
         id: movingSurface
         width: parent.width
         height: parent.height
         y: root.deckOpen ? 0 : root.height
+        focus: root.deckOpen
 
         Behavior on y {
             NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
@@ -94,8 +95,16 @@ PanelWindow {
             font.letterSpacing: 1.2
         }
 
+        MouseArea {
+            anchors.fill: parent
+            z: 1
+            acceptedButtons: Qt.NoButton
+            onWheel: wheel.angleDelta.y < 0 ? WallpaperState.step(1) : WallpaperState.step(-1)
+        }
+
         Item {
             id: cardStage
+            z: 2
             anchors { left: parent.left; right: parent.right; top: parent.top; bottom: parent.bottom }
             anchors { leftMargin: 36; rightMargin: 36; topMargin: 70; bottomMargin: Theme.frameWidth + 18 }
 
@@ -150,19 +159,24 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: WallpaperState.select(card.index)
+                        onDoubleClicked: {
+                            WallpaperState.select(card.index);
+                            WallpaperState.close();
+                        }
                     }
                 }
             }
         }
 
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.NoButton
-            onWheel: wheel.angleDelta.y < 0 ? WallpaperState.step(1) : WallpaperState.step(-1)
-        }
-
         Keys.onEscapePressed: WallpaperState.close()
         Keys.onLeftPressed: WallpaperState.step(-1)
         Keys.onRightPressed: WallpaperState.step(1)
+        Keys.onReturnPressed: WallpaperState.close()
+        Keys.onEnterPressed: WallpaperState.close()
+    }
+
+    onDeckOpenChanged: {
+        if (deckOpen)
+            Qt.callLater(() => movingSurface.forceActiveFocus());
     }
 }

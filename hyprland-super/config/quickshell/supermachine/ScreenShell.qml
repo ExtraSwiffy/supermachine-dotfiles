@@ -148,7 +148,10 @@ Scope {
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: LauncherState.toggle(root.modelData.name)
+                onClicked: {
+                    WallpaperState.close();
+                    LauncherState.toggle(root.modelData.name);
+                }
             }
         }
     }
