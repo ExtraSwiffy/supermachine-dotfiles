@@ -4,6 +4,7 @@ Launcher 1.0 Launcher.qml
 singleton LauncherState 1.0 LauncherState.qml
 singleton WallpaperState 1.0 WallpaperState.qml
 WallpaperBackground 1.0 WallpaperBackground.qml
+WallpaperEffects 1.0 WallpaperEffects.qml
 WallpaperDeck 1.0 WallpaperDeck.qml
 singleton ShellSettings 1.0 ShellSettings.qml
 singleton ControlCenterState 1.0 ControlCenterState.qml

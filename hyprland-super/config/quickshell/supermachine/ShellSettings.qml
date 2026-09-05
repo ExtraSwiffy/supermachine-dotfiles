@@ -10,6 +10,10 @@ QtObject {
     property string badgeText: "🚀"
     property string badgeSource: ""
     property int badgeSize: 30
+    property string colorMode: "light"
+    property bool rainEnabled: false
+    property bool leavesEnabled: false
+    property string leafColor: "#e58a45"
 
     readonly property var badgePresets: [
         { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
@@ -18,9 +22,11 @@ QtObject {
         { name: "Crystal", source: Qt.resolvedUrl("assets/badges/crystal.webp"), animated: false },
         { name: "Fox", source: Qt.resolvedUrl("assets/badges/fox.webp"), animated: false },
         { name: "Frog", source: Qt.resolvedUrl("assets/badges/frog.webp"), animated: false },
+        { name: "Coffee", source: Qt.resolvedUrl("assets/badges/coffee.webp"), animated: false },
         { name: "Rocket loop", source: Qt.resolvedUrl("assets/badges/rocket-flight.gif"), animated: true },
         { name: "Moon drift", source: Qt.resolvedUrl("assets/badges/moon-drift.gif"), animated: true },
-        { name: "Crystal pulse", source: Qt.resolvedUrl("assets/badges/crystal-pulse.gif"), animated: true }
+        { name: "Crystal pulse", source: Qt.resolvedUrl("assets/badges/crystal-pulse.gif"), animated: true },
+        { name: "Coffee steam", source: Qt.resolvedUrl("assets/badges/coffee-steam.gif"), animated: true }
     ]
 
     readonly property var emojiPresets: ["🚀", "⚡", "🌙", "🛸", "🐸", "🦊", "💎", "🌈"]
@@ -49,6 +55,10 @@ QtObject {
             badgeText = saved.badgeText ?? badgeText;
             badgeSource = saved.badgeSource ?? badgeSource;
             badgeSize = saved.badgeSize ?? badgeSize;
+            colorMode = saved.colorMode ?? colorMode;
+            rainEnabled = saved.rainEnabled ?? rainEnabled;
+            leavesEnabled = saved.leavesEnabled ?? leavesEnabled;
+            leafColor = saved.leafColor ?? leafColor;
         } catch (error) {
             console.warn(`Could not load SuperMachine settings: ${error}`);
         }
@@ -59,7 +69,11 @@ QtObject {
             badgeMode,
             badgeText,
             badgeSource,
-            badgeSize
+            badgeSize,
+            colorMode,
+            rainEnabled,
+            leavesEnabled,
+            leafColor
         }, null, 2));
     }
 
@@ -92,6 +106,26 @@ QtObject {
 
     function setBadgeSize(value) {
         badgeSize = Math.max(20, Math.min(42, value));
+        save();
+    }
+
+    function setColorMode(value) {
+        colorMode = value === "dark" ? "dark" : "light";
+        save();
+    }
+
+    function setRainEnabled(value) {
+        rainEnabled = value;
+        save();
+    }
+
+    function setLeavesEnabled(value) {
+        leavesEnabled = value;
+        save();
+    }
+
+    function setLeafColor(value) {
+        leafColor = value;
         save();
     }
 

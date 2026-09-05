@@ -16,6 +16,10 @@ Scope {
         targetScreen: root.modelData
     }
 
+    WallpaperEffects {
+        targetScreen: root.modelData
+    }
+
     // One continuous surface: a wide left rail flowing into thin screen edges.
     PanelWindow {
         id: frame
@@ -142,6 +146,9 @@ Scope {
                 source: Theme.badgeSource
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
+                playing: visible
+                paused: false
+                cache: false
             }
 
             Text {

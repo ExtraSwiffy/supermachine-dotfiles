@@ -60,6 +60,14 @@ ShellRoot {
             ControlCenterState.close();
         }
 
+        function openSection(section: string) {
+            LauncherState.close();
+            WallpaperState.close();
+            ControlCenterState.show(section);
+            ControlCenterState.screenName = Hyprland.focusedMonitor?.name ?? "";
+            ControlCenterState.open = true;
+        }
+
         function status(): string {
             return `${ControlCenterState.open}:${ControlCenterState.section}`;
         }
@@ -80,8 +88,20 @@ ShellRoot {
             ShellSettings.resetBadge();
         }
 
+        function setColorMode(value: string) {
+            ShellSettings.setColorMode(value);
+        }
+
+        function setRain(value: bool) {
+            ShellSettings.setRainEnabled(value);
+        }
+
+        function setLeaves(value: bool) {
+            ShellSettings.setLeavesEnabled(value);
+        }
+
         function status(): string {
-            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}`;
+            return `${ShellSettings.badgeMode}:${ShellSettings.badgeText}:${ShellSettings.badgeSource}:${ShellSettings.badgeSize}:${ShellSettings.colorMode}:rain=${ShellSettings.rainEnabled}:leaves=${ShellSettings.leavesEnabled}:${ShellSettings.leafColor}`;
         }
     }
 

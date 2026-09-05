@@ -12,6 +12,7 @@ PanelWindow {
     readonly property bool centerOpen: ControlCenterState.open && ControlCenterState.screenName === monitor?.name
     readonly property var sections: [
         { key: "appearance", icon: "✦", name: "Appearance", detail: "Badge & shell" },
+        { key: "effects", icon: "☂", name: "Effects", detail: "Rain & falling leaves" },
         { key: "network", icon: "⌁", name: "Network", detail: "Wi-Fi & connections" },
         { key: "power", icon: "ϟ", name: "Power", detail: "Profiles & battery" },
         { key: "system", icon: "◉", name: "System", detail: "Hardware & software" }
@@ -184,6 +185,93 @@ PanelWindow {
                             wrapMode: Text.WordWrap
                         }
 
+                        Column {
+                            visible: ControlCenterState.section === "appearance"
+                            width: parent.width - 28
+                            spacing: 8
+                            Text { text: "Shell color mode"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                            Row {
+                                spacing: 10
+                                Repeater {
+                                    model: [{ key: "light", name: "☀  Light" }, { key: "dark", name: "☾  Dark" }]
+                                    delegate: Rectangle {
+                                        id: colorModeButton
+                                        required property var modelData
+                                        width: 126; height: 42; radius: 13
+                                        color: ShellSettings.colorMode === modelData.key ? Theme.ink : Theme.searchBackground
+                                        Text { anchors.centerIn: parent; text: colorModeButton.modelData.name; color: ShellSettings.colorMode === colorModeButton.modelData.key ? Theme.surface : Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setColorMode(colorModeButton.modelData.key) }
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            width: parent.width - 28
+                            visible: ControlCenterState.section === "effects"
+                            text: "Layer gentle motion over the wallpaper. Effects stay behind your windows and remember their settings."
+                            color: Theme.mutedInk
+                            font.pixelSize: 12
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Repeater {
+                            model: ControlCenterState.section === "effects" ? [
+                                { key: "rain", title: "Rain drops", detail: "Fine glassy rain with varied speed", enabled: ShellSettings.rainEnabled },
+                                { key: "leaves", title: "Falling leaves", detail: "Slow drifting and rotating leaves", enabled: ShellSettings.leavesEnabled }
+                            ] : []
+                            delegate: Rectangle {
+                                id: effectCard
+                                required property var modelData
+                                width: settingsColumn.width - 28; height: 82; radius: 18
+                                color: Theme.searchBackground
+                                Column {
+                                    anchors { left: parent.left; leftMargin: 16; verticalCenter: parent.verticalCenter }
+                                    spacing: 4
+                                    Text { text: effectCard.modelData.title; color: Theme.ink; font.pixelSize: 15; font.weight: Font.DemiBold }
+                                    Text { text: effectCard.modelData.detail; color: Theme.mutedInk; font.pixelSize: 11 }
+                                }
+                                Rectangle {
+                                    anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }
+                                    width: 52; height: 30; radius: 15
+                                    color: effectCard.modelData.enabled ? Theme.ink : (Theme.dark ? "#3a4547" : "#cbd1d2")
+                                    Rectangle {
+                                        width: 22; height: 22; radius: 11; y: 4
+                                        x: effectCard.modelData.enabled ? 26 : 4
+                                        color: Theme.surface
+                                        Behavior on x { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        onClicked: effectCard.modelData.key === "rain"
+                                            ? ShellSettings.setRainEnabled(!ShellSettings.rainEnabled)
+                                            : ShellSettings.setLeavesEnabled(!ShellSettings.leavesEnabled)
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            visible: ControlCenterState.section === "effects"
+                            width: parent.width - 28; spacing: 9
+                            Text { text: "Leaf color"; color: Theme.ink; font.pixelSize: 12; font.weight: Font.Medium }
+                            Row {
+                                spacing: 10
+                                Repeater {
+                                    model: ["#e58a45", "#e9b949", "#d45b52", "#83ad62", "#b77ad8", "#64bfc4"]
+                                    delegate: Rectangle {
+                                        id: leafColorButton
+                                        required property string modelData
+                                        width: 46; height: 46; radius: 15; color: modelData
+                                        border.width: ShellSettings.leafColor === modelData ? 3 : 0
+                                        border.color: Theme.ink
+                                        Rectangle { anchors.centerIn: parent; width: 14; height: 9; radius: 7; color: "#ffffff"; opacity: ShellSettings.leafColor === leafColorButton.modelData ? 0.92 : 0 }
+                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: ShellSettings.setLeafColor(leafColorButton.modelData) }
+                                    }
+                                }
+                            }
+                        }
+
                         Rectangle {
                             width: parent.width - 28
                             height: 132
@@ -211,6 +299,9 @@ PanelWindow {
                                         source: ShellSettings.badgeSource
                                         fillMode: Image.PreserveAspectFit
                                         asynchronous: true
+                                        playing: visible
+                                        paused: false
+                                        cache: false
                                     }
 
                                     Text {
@@ -286,6 +377,9 @@ PanelWindow {
                                             source: presetCard.modelData.source
                                             fillMode: Image.PreserveAspectFit
                                             asynchronous: true
+                                            playing: visible
+                                            paused: false
+                                            cache: false
                                         }
 
                                         Text {
@@ -422,7 +516,7 @@ PanelWindow {
                         }
 
                         Rectangle {
-                            visible: ControlCenterState.section !== "appearance"
+                            visible: ControlCenterState.section !== "appearance" && ControlCenterState.section !== "effects"
                             width: parent.width - 28
                             height: 150
                             radius: 18
