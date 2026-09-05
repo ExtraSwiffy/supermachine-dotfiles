@@ -1,5 +1,7 @@
 pragma Singleton
 import QtQuick
+import Quickshell
+import Quickshell.Io
 
 QtObject {
     property bool open: false
@@ -9,6 +11,14 @@ QtObject {
     property bool browsingDecks: true
     property int selectedDeckIndex: 0
     property int selectedCardIndex: 0
+    property int previewIndex: -1
+
+    property FileView settingsFile: FileView {
+        path: `${Quickshell.shellDir}/wallpaper-settings.json`
+        blockLoading: true
+        atomicWrites: true
+        printErrors: false
+    }
 
     readonly property var wallpapers: [
         { name: "Alpine Morning", source: Qt.resolvedUrl("assets/wallpapers/alpine-morning.webp") },
@@ -47,8 +57,9 @@ QtObject {
         { name: "Moonlit Bat Cemetery", source: Qt.resolvedUrl("assets/wallpapers/moonlit-bat-cemetery.webp") }
     ]
 
-    readonly property url selectedSource: wallpapers.length > selectedIndex ? wallpapers[selectedIndex].source : ""
-    readonly property string selectedName: wallpapers.length > selectedIndex ? wallpapers[selectedIndex].name : ""
+    readonly property int displayIndex: previewIndex >= 0 ? previewIndex : selectedIndex
+    readonly property url selectedSource: wallpapers.length > displayIndex ? wallpapers[displayIndex].source : ""
+    readonly property string selectedName: wallpapers.length > displayIndex ? wallpapers[displayIndex].name : ""
 
     readonly property var decks: [
         { name: "Scenic Nature", detail: "13 landscapes", indices: [0, 1, 3, 4, 5, 7, 9, 13, 14, 16, 17, 19, 21] },
@@ -77,6 +88,27 @@ QtObject {
         return source.toString().replace("/wallpapers/", "/wallpapers/thumbs/");
     }
 
+    function load() {
+        try {
+            const raw = settingsFile.text();
+            if (!raw.trim().length)
+                return;
+            const saved = JSON.parse(raw);
+            const index = Number(saved.selectedIndex);
+            if (index >= 0 && index < wallpapers.length)
+                selectedIndex = index;
+        } catch (error) {
+            console.warn(`Could not load wallpaper choice: ${error}`);
+        }
+    }
+
+    function save() {
+        settingsFile.setText(JSON.stringify({
+            selectedIndex,
+            selectedName: wallpapers[selectedIndex].name
+        }, null, 2));
+    }
+
     function toggle(name) {
         if (open && screenName === name) {
             open = false;
@@ -89,12 +121,15 @@ QtObject {
     }
 
     function close() {
+        previewIndex = -1;
         open = false;
     }
 
     function select(index) {
-        if (index >= 0 && index < wallpapers.length)
+        if (index >= 0 && index < wallpapers.length) {
             selectedIndex = index;
+            save();
+        }
     }
 
     function step(amount) {
@@ -103,8 +138,10 @@ QtObject {
             return;
         if (browsingDecks)
             selectedDeckIndex = (selectedDeckIndex + amount + count) % count;
-        else
+        else {
             selectedCardIndex = (selectedCardIndex + amount + count) % count;
+            previewIndex = visibleCards[selectedCardIndex].wallpaperIndex;
+        }
     }
 
     function showDeckChooser() {
@@ -123,6 +160,7 @@ QtObject {
         selectedDeckIndex = index;
         const currentPosition = decks[index].indices.indexOf(selectedIndex);
         selectedCardIndex = currentPosition === -1 ? 0 : currentPosition;
+        previewIndex = decks[index].indices[selectedCardIndex];
         browsingDecks = false;
     }
 
@@ -134,14 +172,16 @@ QtObject {
             return;
         }
         selectedCardIndex = index;
-        select(visibleCards[index].wallpaperIndex);
+        previewIndex = visibleCards[index].wallpaperIndex;
     }
 
     function activate() {
         if (browsingDecks)
             enterDeck(selectedDeckIndex);
         else {
-            chooseVisible(selectedCardIndex);
+            if (previewIndex >= 0)
+                select(previewIndex);
+            previewIndex = -1;
             close();
         }
     }
@@ -149,7 +189,11 @@ QtObject {
     function back() {
         if (browsingDecks)
             close();
-        else
+        else {
+            previewIndex = -1;
             browsingDecks = true;
+        }
     }
+
+    Component.onCompleted: load()
 }

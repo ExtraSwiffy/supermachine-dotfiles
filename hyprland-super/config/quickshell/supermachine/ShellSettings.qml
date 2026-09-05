@@ -25,25 +25,18 @@ QtObject {
     property string windowBorderColor: "#86d9d9"
     property string powerProfile: "performance"
 
-    readonly property var badgePresets: [
-        { name: "Rocket", source: Qt.resolvedUrl("assets/badges/rocket.webp"), animated: false },
-        { name: "Robot", source: Qt.resolvedUrl("assets/badges/robot.webp"), animated: false },
-        { name: "Moon", source: Qt.resolvedUrl("assets/badges/moon-cloud.webp"), animated: false },
-        { name: "Crystal", source: Qt.resolvedUrl("assets/badges/crystal.webp"), animated: false },
-        { name: "Fox", source: Qt.resolvedUrl("assets/badges/fox.webp"), animated: false },
-        { name: "Frog", source: Qt.resolvedUrl("assets/badges/frog.webp"), animated: false },
-        { name: "Coffee", source: Qt.resolvedUrl("assets/badges/coffee.webp"), animated: false },
-        { name: "Windmill", source: Qt.resolvedUrl("assets/badges/ranch-windmill.webp"), animated: false },
-        { name: "Red barn", source: Qt.resolvedUrl("assets/badges/red-barn.webp"), animated: false },
-        { name: "Whitetail", source: Qt.resolvedUrl("assets/badges/whitetail-deer.webp"), animated: false },
-        { name: "Rocket loop", source: Qt.resolvedUrl("assets/badges/rocket-flight.gif"), animated: true },
-        { name: "Moon drift", source: Qt.resolvedUrl("assets/badges/moon-drift.gif"), animated: true },
-        { name: "Crystal pulse", source: Qt.resolvedUrl("assets/badges/crystal-pulse.gif"), animated: true },
-        { name: "Coffee steam", source: Qt.resolvedUrl("assets/badges/coffee-steam.gif"), animated: true },
-        { name: "Windmill spin", source: Qt.resolvedUrl("assets/badges/windmill-spin.gif"), animated: true }
-    ]
+    readonly property var badgePresets: {
+        const badges = [
+            { name: "Whitetail", source: Qt.resolvedUrl("assets/badges/whitetail-deer.webp"), animated: false }
+        ];
+        if (GameState.roadrunnerUnlocked)
+            badges.push({ name: "Roadrunner · 50", source: Qt.resolvedUrl("assets/badges/desert-roadrunner-50.webp"), animated: false });
+        if (GameState.coyoteUnlocked)
+            badges.push({ name: "Coyote · 100", source: Qt.resolvedUrl("assets/badges/desert-coyote-100.webp"), animated: false });
+        return badges;
+    }
 
-    readonly property var emojiPresets: ["🚀", "⚡", "🌙", "🛸", "🐸", "🦊", "💎", "🌈"]
+    readonly property var emojiPresets: []
 
     property FileView settingsFile: FileView {
         path: `${Quickshell.shellDir}/user-settings.json`
@@ -114,6 +107,15 @@ QtObject {
     function setBadgeMode(mode) {
         badgeMode = mode;
         save();
+    }
+
+    function validateBadge() {
+        const allowed = badgePresets.some(badge => badge.source.toString() === badgeSource.toString());
+        if (!allowed) {
+            badgeMode = "image";
+            badgeSource = Qt.resolvedUrl("assets/badges/whitetail-deer.webp").toString();
+            save();
+        }
     }
 
     function setBadgeText(value) {
@@ -248,6 +250,9 @@ QtObject {
 
     Component.onCompleted: {
         load();
+        // GameState loads its unlocks independently; defer validation until all
+        // singletons have completed startup so an earned badge is never reset.
+        Qt.callLater(root.validateBadge);
         applyWindowSettings();
         Quickshell.execDetached(["powerprofilesctl", "set", powerProfile]);
         // Also writes newly introduced defaults during settings migrations.

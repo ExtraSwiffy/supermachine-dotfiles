@@ -91,7 +91,7 @@ PanelWindow {
             anchors { top: parent.top; topMargin: Theme.wallpaperJoinRadius + 35; horizontalCenter: parent.horizontalCenter }
             text: WallpaperState.browsingDecks
                 ? "CHOOSE A DECK  •  SCROLL TO GLIDE  •  ENTER TO OPEN"
-                : "CLICK A CARD TO PREVIEW  •  ESC TO RETURN TO DECKS"
+                : "CLICK OR SCROLL TO PREVIEW  •  ENTER TO APPLY  •  ESC TO CANCEL"
             color: Theme.mutedInk
             font.pixelSize: 9
             font.letterSpacing: 1.2

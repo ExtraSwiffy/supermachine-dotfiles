@@ -21,6 +21,7 @@ emit "Quickshell · Quick menu" "${config_home}/quickshell/supermachine/QuickMen
 emit "Quickshell · Control center" "${config_home}/quickshell/supermachine/ControlCenter.qml"
 emit "Quickshell · Wallpaper deck" "${config_home}/quickshell/supermachine/WallpaperDeck.qml"
 emit "Quickshell · Badge deck" "${config_home}/quickshell/supermachine/BadgeDeck.qml"
+emit "Quickshell · Game hub" "${config_home}/quickshell/supermachine/GameHub.qml"
 emit "Foot · Terminal" "${config_home}/foot/foot.ini"
 emit "Terminal · Prompt" "${config_home}/supermachine/terminal.bashrc"
 emit "Installer · Pacman packages" "${repo_dir}/pkg.list"

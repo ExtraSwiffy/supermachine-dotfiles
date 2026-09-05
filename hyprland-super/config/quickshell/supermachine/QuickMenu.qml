@@ -77,6 +77,7 @@ PanelWindow {
                     { title: "Terminal", icon: ">_", command: ["foot"] },
                     { title: "Applications", icon: "⌕", command: ["qs", "-c", "supermachine", "ipc", "call", "launcher", "toggle"] },
                     { title: "Wallpaper decks", icon: "▧", command: ["qs", "-c", "supermachine", "ipc", "call", "wallpapers", "toggle"] },
+                    { title: "SuperOS Arcade", icon: "★", command: ["qs", "-c", "supermachine", "ipc", "call", "games", "toggle"] },
                     { title: "System settings", icon: "⚙", command: ["qs", "-c", "supermachine", "ipc", "call", "controlcenter", "toggle"] },
                     { title: "Open diagnostics", icon: "◫", command: ["foot", "-e", "bash", "-lc", "supermachine-diagnostics; exec bash"] },
                     { title: "Restart shell", icon: "↻", command: ["systemctl", "--user", "restart", "supermachine-shell.service"] }

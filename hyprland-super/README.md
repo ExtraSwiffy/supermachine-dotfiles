@@ -11,6 +11,7 @@ shell branding inherited from an older desktop configuration.
 - `Super+Space` — application launcher
 - `Super+W` — wallpaper deck
 - `Super+B` — badge deck
+- `Super+G` — SuperOS Arcade
 - `Super+Tab` — settings deck
 
 The first-stage deployment adds a guarded TTY1 login hook that starts the

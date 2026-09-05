@@ -4,6 +4,27 @@ import Quickshell.Io
 
 ShellRoot {
     IpcHandler {
+        target: "games"
+
+        function toggle() {
+            LauncherState.close();
+            WallpaperState.close();
+            ControlCenterState.close();
+            BadgeDeckState.close();
+            QuickMenuState.close();
+            GameState.toggle(Hyprland.focusedMonitor?.name ?? "");
+        }
+
+        function close() {
+            GameState.close();
+        }
+
+        function status(): string {
+            return `${GameState.open}:${GameState.page}:${GameState.bestJumps}`;
+        }
+    }
+
+    IpcHandler {
         target: "quickmenu"
 
         function close() {
@@ -19,6 +40,7 @@ ShellRoot {
         target: "launcher"
 
         function toggle() {
+            GameState.close();
             WallpaperState.close();
             ControlCenterState.close();
             BadgeDeckState.close();
@@ -38,6 +60,7 @@ ShellRoot {
         target: "wallpapers"
 
         function toggle() {
+            GameState.close();
             LauncherState.close();
             ControlCenterState.close();
             BadgeDeckState.close();
@@ -54,6 +77,10 @@ ShellRoot {
 
         function previous() {
             WallpaperState.step(-1);
+        }
+
+        function select(index: int) {
+            WallpaperState.select(index);
         }
 
         function enterDeck(index: int) {
@@ -73,6 +100,7 @@ ShellRoot {
         target: "controlcenter"
 
         function toggle() {
+            GameState.close();
             LauncherState.close();
             WallpaperState.close();
             BadgeDeckState.close();
@@ -100,6 +128,7 @@ ShellRoot {
         target: "badges"
 
         function toggle() {
+            GameState.close();
             LauncherState.close();
             WallpaperState.close();
             ControlCenterState.close();

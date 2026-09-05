@@ -14,3 +14,5 @@ BadgeDeck 1.0 BadgeDeck.qml
 singleton SystemInfo 1.0 SystemInfo.qml
 singleton QuickMenuState 1.0 QuickMenuState.qml
 QuickMenu 1.0 QuickMenu.qml
+singleton GameState 1.0 GameState.qml
+GameHub 1.0 GameHub.qml

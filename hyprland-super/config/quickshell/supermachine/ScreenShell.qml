@@ -131,6 +131,10 @@ Scope {
         targetScreen: root.modelData
     }
 
+    GameHub {
+        targetScreen: root.modelData
+    }
+
     PanelWindow {
         screen: root.modelData
         color: "transparent"
