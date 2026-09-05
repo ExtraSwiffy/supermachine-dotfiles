@@ -3,6 +3,7 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import Quickshell.Widgets
 
 PanelWindow {
     id: root
@@ -15,7 +16,7 @@ PanelWindow {
     readonly property real deckStep: {
         const count = WallpaperState.wallpapers.length;
         const usable = width - 96;
-        return count < 2 ? 0 : Math.min(cardWidth * 0.48, (usable - cardWidth) / (count - 1));
+        return count < 2 ? 0 : Math.min(cardWidth * 0.34, (usable - cardWidth) / (count - 1));
     }
 
     function signedDistance(index) {
@@ -64,16 +65,12 @@ PanelWindow {
                     path: {
                         const w = root.width;
                         const h = root.height;
-                        const j = Theme.wallpaperJoinRadius;
                         const r = Theme.innerRadius;
-                        const railTop = h - Theme.frameWidth;
 
-                        return `M ${j + r} 0 H ${w - j - r} `
-                            + `Q ${w - j} 0 ${w - j} ${r} `
-                            + `V ${railTop - j} Q ${w - j} ${railTop} ${w} ${railTop} `
-                            + `V ${h} H 0 V ${railTop} `
-                            + `Q ${j} ${railTop} ${j} ${railTop - j} `
-                            + `V ${r} Q ${j} 0 ${j + r} 0 Z`;
+                        return `M ${r} 0 H ${w - r} `
+                            + `Q ${w} 0 ${w} ${r} `
+                            + `V ${h} H 0 V ${r} `
+                            + `Q 0 0 ${r} 0 Z`;
                     }
                 }
             }
@@ -131,11 +128,13 @@ PanelWindow {
                     Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
                     Behavior on opacity { NumberAnimation { duration: 220 } }
 
-                    Rectangle {
+                    ClippingRectangle {
                         anchors.fill: parent
                         radius: Theme.wallpaperCardRadius
                         color: Theme.searchBackground
-                        clip: true
+                        contentUnderBorder: true
+                        border.width: card.selected ? 4 : 1
+                        border.color: card.selected ? Theme.surface : "#66ffffff"
 
                         Image {
                             anchors.fill: parent
@@ -143,14 +142,6 @@ PanelWindow {
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
                             cache: true
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: parent.radius
-                            color: "transparent"
-                            border.width: card.selected ? 4 : 1
-                            border.color: card.selected ? Theme.surface : "#66ffffff"
                         }
                     }
 

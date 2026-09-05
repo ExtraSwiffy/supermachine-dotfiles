@@ -175,11 +175,14 @@ Scope {
 
         PanelWindow {
             required property string modelData
+            readonly property bool wallpaperReserve: modelData === "bottom"
+                && WallpaperState.open
+                && WallpaperState.screenName === root.modelData.name
 
             screen: root.modelData
             color: "transparent"
             implicitWidth: Theme.frameWidth
-            implicitHeight: Theme.frameWidth
+            implicitHeight: wallpaperReserve ? Theme.wallpaperDeckHeight : Theme.frameWidth
             anchors {
                 top: modelData === "top" || modelData === "right"
                 right: true
@@ -189,7 +192,7 @@ Scope {
             WlrLayershell.namespace: `supermachine-${modelData}-reserve`
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Normal
-            exclusiveZone: Theme.frameWidth
+            exclusiveZone: wallpaperReserve ? Theme.wallpaperDeckHeight : Theme.frameWidth
             mask: Region {}
         }
     }
