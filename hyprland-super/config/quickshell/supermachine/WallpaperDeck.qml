@@ -66,12 +66,14 @@ PanelWindow {
                         const w = root.width;
                         const h = root.height;
                         const j = Theme.wallpaperJoinRadius;
+                        const f = Theme.frameWidth;
+                        const k = j * 0.55228475;
 
-                        return `M 0 0 `
-                            + `C ${j} 0 ${j} ${j} ${j * 2} ${j} `
-                            + `H ${w - j * 2} `
-                            + `C ${w - j} ${j} ${w - j} 0 ${w} 0 `
-                            + `V ${h} H 0 Z`;
+                        return `M 0 0 H ${f} `
+                            + `C ${f} ${k} ${f + j - k} ${j} ${f + j} ${j} `
+                            + `H ${w - f - j} `
+                            + `C ${w - f - j + k} ${j} ${w - f} ${k} ${w - f} 0 `
+                            + `H ${w} V ${h} H 0 Z`;
                     }
                 }
             }
